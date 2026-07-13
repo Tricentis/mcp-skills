@@ -1,0 +1,24 @@
+# Tosca Commander — MCP (GitHub Copilot)
+
+Automate Tosca Commander via the **in-process MCP server** when Commander is open with a workspace.
+
+## Code Mode
+
+When the IDE supports **code execution** or **programmatic MCP** (Claude Code, Cloudflare, Anthropic API), write a **script** that orchestrates Commander MCP tools — full sequence upfront, loops for pagination/DI polling.
+
+When the IDE only exposes **direct MCP tools** (Cursor, Windsurf, Copilot), use **direct tool mode**: same orchestration rules as a numbered plan, one tool per step.
+
+See the **commander-mcp** skill (`code-mode.md`, `direct-tool-mode.md`).
+
+## Rules
+
+| Rule | Detail |
+|------|--------|
+| DI entry | Read `di-orchestration.md` + one `reference/di/` file |
+| Persistence | `save_workspace` after mutations; `check_in_all` in multi-user workspaces |
+| Validation | One `execute_test_suite` at a time; poll with `execute_test_suite_status` |
+| Targeting | Explicit `objectIds` / `identifiers` — do not rely on UI selection |
+
+## Reference
+
+`.github/instructions/commander-mcp.instructions.md` and the commander-mcp skill.

@@ -1,0 +1,9 @@
+# Default owners — teams TBD until public launch
+/LICENSE @Tricentis/open-source-approvers
+/NOTICE @Tricentis/open-source-approvers
+/README.md @Tricentis/open-source-approvers
+/GOVERNANCE.md @Tricentis/open-source-approvers
+/.github/ @Tricentis/devops-approvers
+
+# Product skills
+/Tosca/Commander/MCP/ @Tricentis/tosca-commander-mcp-approvers

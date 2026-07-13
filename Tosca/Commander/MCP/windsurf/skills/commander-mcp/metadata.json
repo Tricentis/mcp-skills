@@ -1,0 +1,11 @@
+{
+  "name": "commander-mcp",
+  "version": "0.1.2",
+  "organization": "Tricentis",
+  "technology": "Tosca Commander MCP",
+  "abstract": "Agent skill for orchestrating Tosca Commander McpServerAddIn tools — workspace navigation, checkout, tasks, test case creation, and Data Integrity workflows via Code Mode or direct tool mode.",
+  "mcpServer": "tosca-commander",
+  "mcpEndpoint": "http://127.0.0.1:46248/mcp",
+  "toolCount": 25,
+  "slashCommand": "/commander-mcp"
+}

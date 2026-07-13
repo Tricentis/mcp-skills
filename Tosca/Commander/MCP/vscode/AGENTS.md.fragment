@@ -1,0 +1,8 @@
+## Commander MCP
+
+When Commander MCP tools are connected, use the **commander-mcp** skill (Code Mode — plan tool sequences before executing).
+
+- Read `di-orchestration.md` before Data Integrity tools
+- `save_workspace` / `check_in_all` after mutations
+
+Requires Commander open with workspace. For headless automation use Tosca.Commander.IDE.integration.

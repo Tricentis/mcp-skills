@@ -1,0 +1,23 @@
+{
+  "name": "commander-mcp",
+  "version": "0.1.2",
+  "description": "Tosca Commander MCP automation — skills, rules, and Commander MCP server config for Cursor agents.",
+  "author": {
+    "name": "Tricentis"
+  },
+  "homepage": "https://github.com/Tricentis/mcp-skills",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tricentis/mcp-skills.git"
+  },
+  "license": "CC-BY-NC-4.0",
+  "keywords": [
+    "tricentis",
+    "tosca",
+    "commander",
+    "mcp",
+    "code-mode"
+  ],
+  "skills": "./skills",
+  "rules": "./rules"
+}
