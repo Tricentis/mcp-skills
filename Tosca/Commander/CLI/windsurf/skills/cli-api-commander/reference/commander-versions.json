@@ -1,0 +1,27 @@
+{
+  "baseDirectory": "~/Documents/GitHub/Tricentis-Tosca",
+  "defaultVersion": "26.1",
+  "versions": {
+    "24.1": {
+      "directory": "Tricentis.ToscaCommander.241",
+      "label": "Tosca Commander 24.1"
+    },
+    "24.2": {
+      "directory": "Tricentis.ToscaCommander.242",
+      "label": "Tosca Commander 24.2"
+    },
+    "25.1": {
+      "directory": "Tricentis.ToscaCommander.251",
+      "label": "Tosca Commander 25.1"
+    },
+    "26.1": {
+      "directory": "Tricentis.ToscaCommander.261",
+      "label": "Tosca Commander 26.1"
+    },
+    "master": {
+      "directory": "Tricentis.ToscaCommander",
+      "label": "Tosca Commander master (development)"
+    }
+  },
+  "notes": "Paths are resolved relative to baseDirectory. Override with TCSHELL_COMMANDER_BASE env var or -CommanderBase parameter."
+}

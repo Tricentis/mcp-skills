@@ -1,0 +1,30 @@
+{
+  "name": "cli-api-commander-ide",
+  "displayName": "Tosca Commander IDE Integration",
+  "description": "Copilot instructions for Tosca Commander CLI and TCAPI automation — TCShell.exe, .tcs scripts, and Remote Control. Does NOT cover Data Integrity or in-process Commander automation.",
+  "version": "1.0.0",
+  "publisher": "tricentis",
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cli-api-commander.showInstallGuide",
+        "title": "Tosca Commander: Show IDE Integration Install Guide"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0"
+  }
+}

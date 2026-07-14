@@ -1,0 +1,29 @@
+{
+  "targetPath": "Tosca/Commander/CLI",
+  "sourceRepo": "Tricentis-Tosca/Tosca.Commander.IDE.integration",
+  "releaseBranch": "cli-1.0.0",
+  "mcpSkillsRepo": "Tricentis/mcp-skills",
+  "mcpSkillsHomepage": "https://github.com/Tricentis/mcp-skills",
+  "license": "Apache-2.0",
+  "skillId": "cli-api-commander",
+  "packageName": "cli-api-commander-IDE",
+  "forbiddenPaths": [
+    "docs/",
+    "packages/",
+    "packages/core/",
+    "packages/cursor-pack/",
+    "packages/claude-pack/",
+    "evaluations/",
+    "sync/",
+    "dist/",
+    "plans/",
+    "scripts/build_tcshell_skill_docs.ps1",
+    "scripts/sync_ide_packs.py",
+    "scripts/validate_pack.ps1",
+    "scripts/validate_skill.py",
+    "scripts/export_mcp_skills.py",
+    "scripts/get_export_suggestions.py",
+    "scripts/pack_release.py",
+    "scripts/bootstrap_skills_distribution.py"
+  ]
+}
