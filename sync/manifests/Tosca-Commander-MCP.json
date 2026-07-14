@@ -5,6 +5,7 @@
   "mcpSkillsRepo": "Tricentis/mcp-skills",
   "mcpSkillsHomepage": "https://github.com/Tricentis/mcp-skills",
   "license": "Apache-2.0",
+  "releaseTagPrefix": "tosca/commander/mcp",
   "includes": [
     { "from": "packages/cursor-pack", "to": "cursor" },
     { "from": "packages/claude-pack", "to": "claude" },
