@@ -4,7 +4,7 @@ Code Mode sequence for context-menu tasks via MCP.
 
 ```text
 Execute task:
-- [ ] get_objects — resolve objectIds
+- [ ] get_object_info — resolve objectIds
 - [ ] list_available_tasks — exact task name + param schema
 - [ ] Checkout if edit tasks missing (see Checkout gate below)
 - [ ] execute_task — supply missing_param values in a loop if needed
@@ -15,7 +15,7 @@ Execute task:
 
 | Step | Tool | Args | Expected |
 |------|------|------|----------|
-| 1 | `get_objects` | target path or id | Resolve `objectIds` |
+| 1 | `get_object_info` | target path or id | Resolve `objectIds` |
 | 2 | `list_available_tasks` | `objectIds` | Task list with parameter schemas |
 | 3 | `execute_task` | task name + params + `objectIds` | Task result |
 | 4 | `save_workspace` | — | If task mutated workspace |

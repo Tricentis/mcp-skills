@@ -5,10 +5,10 @@ Code Mode sequence for `create_test_case`.
 ```text
 Create test case:
 - [ ] get_workspace_info
-- [ ] get_objects — verify parent folder
+- [ ] get_object_info — verify parent folder
 - [ ] Checkout parent if multi-user and tasks missing
 - [ ] create_test_case
-- [ ] get_objects — verify creation
+- [ ] get_object_info — verify creation
 ```
 
 ## Plan
@@ -16,9 +16,9 @@ Create test case:
 | Step | Tool | Args | Expected |
 |------|------|------|----------|
 | 1 | `get_workspace_info` | — | Confirm workspace ready |
-| 2 | `get_objects` | folder node path | Verify parent folder exists |
+| 2 | `get_object_info` | folder node path | Verify parent folder exists |
 | 3 | `create_test_case` | `folderPath`, `name`, optional `steps`, `requirements` | New test case created |
-| 4 | `get_objects` | new case path | Verify creation |
+| 4 | `get_object_info` | new case path | Verify creation |
 
 ## Args notes
 

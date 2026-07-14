@@ -6,6 +6,16 @@ Read on demand when planning DI work. **Before any DI tool:** read **di-orchestr
 > gated on the DI license; `execute_test_suite` is not itself gated, but a DI test run through it
 > fails at runtime without a DI license.
 
+## Contents
+
+- [Available Tools](#available-tools)
+- [Connection Types](#connection-types)
+- [Connection Tags and the Query Gate](#connection-tags-and-the-query-gate)
+- [Example Workflows](#example-workflows)
+- [DI Modules](#di-modules-for-creating-test-steps)
+- [Prerequisites](#prerequisites--importing-the-di-template)
+- [Tips](#tips)
+
 ## Tools, connections, and quick patterns
 
 ## Available Tools

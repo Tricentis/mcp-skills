@@ -33,6 +33,7 @@ jobs:
           fi
           git tag "$TAG"
           git push origin "$TAG"
+          BRANCH=$(python3 -c "import json; print(json.load(open('Tosca/Commander/MCP/manifest.json'))['sourceBranch'])")
           gh release create "$TAG" \
             --title "Tosca Commander MCP $VERSION" \
-            --notes "Synced from Tricentis-Tosca/Tosca.Commander.MCP.Integration branch 1.0.0. See manifest.json for sourceSha."
+            --notes "Synced from Tricentis-Tosca/Tosca.Commander.MCP.Integration branch ${BRANCH}. See manifest.json for sourceSha."

@@ -2,6 +2,24 @@
 
 All notable changes to the **commander-mcp** skill are documented here.
 
+## [1.0.1] - 2026-07-14
+
+### Changed
+
+- Slimmer `SKILL.md` routing (81 lines) — workflow and DI tables defer to index files
+- Progressive disclosure: Contents sections on long companions and DI reference files
+- Activation: `tosca-commander` trigger in description; rules aligned with SKILL.md negatives
+- Corrected tool names throughout (`get_object_info` replaces stale `get_objects` / `list_children`)
+- `evaluations/` remains internal — excluded from consumer export
+
+## [1.0.0] - 2026-07-13
+
+### Added
+
+- Public distribution via Tricentis/mcp-skills (`Tosca/Commander/MCP`)
+- Apache 2.0 license; consumer export parity (`ConsumerExport.ps1`)
+- Installer `-VerifyManifest`; six-tier install documentation
+
 ## [0.1.2] - 2026-07-06
 
 ### Added

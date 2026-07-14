@@ -15,6 +15,14 @@ DI workflow:
 - [ ] Phase 5 — save_workspace
 ```
 
+## Contents
+
+- [Step 0 — Route before any DI tool call](#step-0--route-before-any-di-tool-call)
+- [DI orchestration phases](#di-orchestration-phases)
+- [Phase 2–5 details](#phase-2--connections-and-schema)
+- [Scenario → reference file](#scenario--which-reference-file)
+- [Anti-patterns](#anti-patterns)
+
 ## Step 0 — Route before any DI tool call
 
 1. Confirm DI is licensed and MCP is ready ([when-to-use-mcp.md](when-to-use-mcp.md)).

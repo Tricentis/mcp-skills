@@ -2,9 +2,10 @@
 description: >-
   Automates Tosca Commander via in-process MCP when Commander is open with a
   workspace. Prefer Code Mode when the IDE supports code execution; otherwise
-  direct tool mode. Load commander-mcp skill on /commander-mcp, Tosca
+  direct tool mode. Load commander-mcp on /commander-mcp, tosca-commander, Tosca
   automation, or when Commander MCP tools connect. Does NOT cover headless
-  TCShell or CI (use IDE.integration).
+  TCShell, TCAPI, Remote Control, or CI when Commander is closed (use
+  IDE.integration).
 globs:
 alwaysApply: false
 ---

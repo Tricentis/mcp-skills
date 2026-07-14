@@ -1,9 +1,7 @@
-Copyright (c) Tricentis
+Tricentis MCP Skills
 
-This repository is licensed under Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0). See [LICENSE](LICENSE).
+This repository is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE).
 
-Suggested attribution:
+Copyright 2026 Tricentis
 
-> "Tricentis MCP Skills" © Tricentis. Licensed under CC BY-NC 4.0.
-
-Commander MCP skill content is synced from Tricentis-Tosca/Tosca.Commander.MCP.Integration (release branch `1.0.0`).
+"Tricentis MCP Skills" © Tricentis. Licensed under Apache License 2.0.

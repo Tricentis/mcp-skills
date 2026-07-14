@@ -6,8 +6,8 @@ Read-only Code Mode sequence to understand what is open in Commander.
 Inspect workspace:
 - [ ] get_workspace_info
 - [ ] get_current_selection (optional)
-- [ ] list_children — paginate until done
-- [ ] get_objects / get_attributes (if user named targets)
+- [ ] get_object_info — paginate children until done
+- [ ] get_object_info / get_attributes (if user named targets)
 ```
 
 ## Plan

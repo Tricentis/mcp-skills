@@ -3,9 +3,9 @@ name: commander-mcp
 description: >-
   Automates Tosca Commander via in-process MCP when Commander is open with a
   workspace — checkout, tasks, test cases, and Data Integrity. Use for Tosca
-  automation, /commander-mcp, McpServerAddIn, or when Commander MCP tools
-  connect. Does NOT cover headless TCShell, TCAPI, Remote Control, or CI when
-  Commander is closed (use Tosca.Commander.IDE.integration).
+  automation, /commander-mcp, tosca-commander, McpServerAddIn, or when Commander
+  MCP tools connect. Does NOT cover headless TCShell, TCAPI, Remote Control, or
+  CI when Commander is closed (use Tosca.Commander.IDE.integration).
 ---
 
 # Commander MCP — workspace automation
@@ -47,42 +47,25 @@ Commander MCP session:
 
 ## Workflow templates (pick one)
 
-| Workflow | File |
-|----------|------|
-| Inspect workspace | [reference/workflows/inspect-workspace.md](reference/workflows/inspect-workspace.md) |
-| Create test case | [reference/workflows/create-test-case.md](reference/workflows/create-test-case.md) |
-| Add step to test case | [reference/workflows/add-step-to-existing-test-case.md](reference/workflows/add-step-to-existing-test-case.md) |
-| Run Commander task | [reference/workflows/execute-task.md](reference/workflows/execute-task.md) |
-| Persist changes | [reference/workflows/save-and-checkin.md](reference/workflows/save-and-checkin.md) |
-| Data Integrity intro | [reference/workflows/di-getting-started.md](reference/workflows/di-getting-started.md) |
+See [reference/workflows-index.md](reference/workflows-index.md) — load **one** template matching the user's goal; do not read all workflow files at session start.
 
-## Data Integrity reference (pick one)
+## Data Integrity (router + one file)
 
-Load [di-orchestration.md](di-orchestration.md) first, then **one** file:
+1. Read [di-orchestration.md](di-orchestration.md) (phases and gates).
+2. Pick **one** supplemental file from [reference/di/index.md](reference/di/index.md).
 
-| Scenario | File |
-|----------|------|
-| Index / router | [reference/di/index.md](reference/di/index.md) |
-| Overview | [reference/di/overview.md](reference/di/overview.md) |
-| Conventions | [reference/di/conventions.md](reference/di/conventions.md) |
-| SAP endpoints | [reference/di/sap-endpoints.md](reference/di/sap-endpoints.md) |
-| Options / reports | [reference/di/comparison-options-and-reports.md](reference/di/comparison-options-and-reports.md) |
-| SQL Server vs SQLite | [reference/di/workflows/01-sql-server-vs-sqlite.md](reference/di/workflows/01-sql-server-vs-sqlite.md) |
-| SAP vs database | [reference/di/workflows/02-sap-vs-sql-server.md](reference/di/workflows/02-sap-vs-sql-server.md) |
-| Database vs CSV | [reference/di/workflows/03-database-vs-csv.md](reference/di/workflows/03-database-vs-csv.md) |
-| JDBC vs ODBC | [reference/di/workflows/04-jdbc-vs-odbc.md](reference/di/workflows/04-jdbc-vs-odbc.md) |
-| Column renames | [reference/di/workflows/05-column-renames.md](reference/di/workflows/05-column-renames.md) |
-| Lineage CSV | [reference/di/workflows/06-lineage-csv.md](reference/di/workflows/06-lineage-csv.md) |
-| DB Expert / data quality | [reference/di/workflows/07-db-expert-data-quality.md](reference/di/workflows/07-db-expert-data-quality.md) |
+Do not load multiple DI reference files unless the scenario requires it (e.g. SAP workflow + [reference/di/sap-endpoints.md](reference/di/sap-endpoints.md)).
 
-## Tool reference (on demand)
+## Tool reference (load only when needed)
 
-| Resource | Purpose |
-|----------|---------|
-| [reference/tools-catalog.md](reference/tools-catalog.md) | Tool names and parameters (generated) |
-| [reference/tools-index.md](reference/tools-index.md) | Quick tool lookup |
-| [reference/workflows-index.md](reference/workflows-index.md) | Workflow template index |
-| [tool-planning.md](tool-planning.md) | Planning primitives |
+Do **not** open the catalog at session start.
+
+| Resource | When to load |
+|----------|--------------|
+| [reference/tools-catalog.md](reference/tools-catalog.md) | Parameter details for a **specific** tool in your plan |
+| [reference/tools-index.md](reference/tools-index.md) | Quick name lookup |
+| [reference/workflows-index.md](reference/workflows-index.md) | Choosing a workflow template |
+| [tool-planning.md](tool-planning.md) | Drafting a multi-step plan |
 
 ## Prerequisites
 

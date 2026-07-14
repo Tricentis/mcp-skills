@@ -11,6 +11,25 @@ function Get-SkillId {
     return $script:SkillId
 }
 
+function Test-PackManifest {
+    param(
+        [string]$PackRoot,
+        [string]$ExpectedPackageName = "commander-mcp"
+    )
+    $manifestPath = Join-Path $PackRoot "manifest.json"
+    if (-not (Test-Path $manifestPath)) {
+        throw "manifest.json not found beside installer: $manifestPath"
+    }
+    $manifest = Get-Content -Path $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($manifest.packageName -ne $ExpectedPackageName) {
+        throw "Unexpected packageName in manifest.json: $($manifest.packageName)"
+    }
+    if (-not $manifest.version) {
+        throw "manifest.json missing version"
+    }
+    Write-Host "Verified manifest: $($manifest.packageName) $($manifest.version)"
+}
+
 function Copy-DirectoryContents {
     param(
         [Parameter(Mandatory = $true)][string]$Source,
@@ -84,8 +103,8 @@ function Get-IdePackMap {
             PackPath     = Join-Path $root "windsurf"
             UserSkill    = Join-Path $env:USERPROFILE ".codeium/windsurf/skills/$id"
             UserRules    = Join-Path $env:USERPROFILE ".codeium/windsurf/rules"
-            ProjectSkill = ".windsurf/skills/$id"
-            ProjectRules = ".windsurf/rules"
+            ProjectSkill = ".codeium/windsurf/skills/$id"
+            ProjectRules = ".codeium/windsurf/rules"
         }
     }
 }

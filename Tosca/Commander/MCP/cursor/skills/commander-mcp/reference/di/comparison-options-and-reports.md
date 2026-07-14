@@ -1,5 +1,15 @@
 # Row-by-row comparison — optional parameters and reports
 
+## Contents
+
+- [Optional parameters](#optional-createdi_row_by_row_comparison-parameters)
+- [`folderId`](#folderid--place-the-test-case-in-a-specific-folder)
+- [`generalOptions`](#generaloptions--tune-comparison-behaviour-and-reporting)
+- [`results`](#results--write-a-comparison-report-to-disk)
+- [`tolerances`](#tolerances--per-column-tolerance-and-datetimenumeric-formatting)
+- [Reading the report](#reading-the-report-resultsdb)
+- [HTML export](#exporting-the-report-to-html--always-offer-this)
+
 ## Optional `create_di_row_by_row_comparison` parameters
 
 The five DIWorkflows above use only the required parameters. Three optional parameters are worth
@@ -11,8 +21,8 @@ Without `folderId`, the test case lands in the first `TestCases` folder under th
 To target a specific folder, look it up first and pass its ID.
 
 ```
-► search_objects(query="TestCases/Migration Checks", typeName="TCFolder")
-◄ { "results": [ { "id": "5fee1234-aaaa-bbbb-cccc-111122223333", "name": "Migration Checks", ... } ] }
+► get_object_info(identifiers=["/TestCases/Migration Checks"])
+◄ { "surrogateId": "5fee1234-aaaa-bbbb-cccc-111122223333", "name": "Migration Checks", "type": "TCFolder", ... }
 
 ► create_di_row_by_row_comparison(
     name="Customers: Prod vs Staging",

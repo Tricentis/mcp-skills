@@ -24,6 +24,15 @@ References:
 - [Anthropic: Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
 - Cloudflare uses the same term for MCP-as-code-API
 
+## Contents
+
+- [Why Code Mode for Commander MCP](#why-code-mode-for-commander-mcp)
+- [When to use Code Mode](#when-to-use-code-mode)
+- [IDE support](#ide-support)
+- [Workflow](#workflow)
+- [Code Mode vs direct tool mode](#code-mode-vs-direct-tool-mode)
+- [Anti-patterns](#anti-patterns)
+
 ## Why Code Mode for Commander MCP
 
 Commander workflows are multi-step (navigate → checkout → task → save; DI validate polling; paginated `get_object_info` children). Code Mode:

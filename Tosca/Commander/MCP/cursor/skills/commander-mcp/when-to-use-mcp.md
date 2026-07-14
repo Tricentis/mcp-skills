@@ -16,6 +16,17 @@ MCP readiness:
 
 **Progressive disclosure:** read this file for routing; open companion docs only for the current intent.
 
+## Contents
+
+- [Step 1 — Is MCP the right path?](#step-1--is-mcp-the-right-path)
+- [Step 2 — Verify MCP connectivity](#step-2--verify-mcp-connectivity)
+- [Step 3 — Classify user intent](#step-3--classify-user-intent)
+- [Step 4 — Pick execution mode](#step-4--pick-execution-mode)
+- [Step 5 — Orchestrate](#step-5--orchestrate)
+- [Step 6 — Selection rules](#step-6--selection-rules)
+- [When to prompt the user](#when-to-prompt-the-user)
+- [Agent workflow (mandatory)](#agent-workflow-mandatory)
+
 For Commander **closed**, batch/CI, or workspace file locked by a headless process, use **[Tosca.Commander.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration)** (TCShell / TCAPI / Remote Control) instead.
 
 ## Step 1 — Is MCP the right path?
@@ -58,7 +69,7 @@ Use when the user refers to "what I have selected" — but still pass explicit `
 | Intent | Tool category | Code Mode? | Start with |
 |--------|---------------|------------|------------|
 | "What's open?" / audit | Read-only workspace | Optional | `get_workspace_info` → navigate |
-| Read properties | Attributes | Yes | `get_objects` → `get_attributes` |
+| Read properties | Attributes | Yes | `get_object_info` → `get_attributes` |
 | Edit property | Mutation | Yes | checkout? → `get_attributes` → `set_attribute` → save |
 | Context-menu action | Tasks | Yes | `list_available_tasks` → `execute_task` |
 | Drag-and-drop | Drop task | Yes | resolve IDs → `execute_drop_task` |
@@ -85,7 +96,7 @@ Both modes use the same tool ordering from [tool-orchestration.md](tool-orchestr
 
 1. **Always plan multi-step work** before the first mutation tool.
 2. **Pass explicit `objectIds` / `identifiers`** — do not assume UI selection persists between MCP calls.
-3. **Discover before mutate** — `get_objects`, `get_attributes`, `list_available_tasks` before writes/tasks.
+3. **Discover before mutate** — `get_object_info`, `get_attributes`, `list_available_tasks` before writes/tasks.
 4. **Checkout before edit** in multi-user workspaces — see [workspace-orchestration.md](workspace-orchestration.md).
 5. **Persist last** — `save_workspace` / `check_in_all` after all mutations in the plan.
 6. **DI gate** — read [di-orchestration.md](di-orchestration.md) before any DI tool.

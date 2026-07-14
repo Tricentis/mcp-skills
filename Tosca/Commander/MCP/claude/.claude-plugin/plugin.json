@@ -1,7 +1,7 @@
 {
   "name": "commander-mcp",
-  "version": "0.1.2",
-  "description": "Tosca Commander MCP automation with Code Mode workflows for Claude Code agents.",
+  "version": "1.0.1",
+  "description": "Tosca Commander MCP automation with Code Mode workflows for Claude Code agents. Install via marketplace or zip/git — not both to the same profile.",
   "author": {
     "name": "Tricentis"
   },
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "https://github.com/Tricentis/mcp-skills.git"
   },
-  "license": "CC-BY-NC-4.0",
+  "license": "Apache-2.0",
   "keywords": [
     "tricentis",
     "tosca",

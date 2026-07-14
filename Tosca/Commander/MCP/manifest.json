@@ -1,18 +1,18 @@
 {
+  "sourceSha": "491d2181dfaf2b60b101ab95f019517b93c58cbd",
+  "adminRequired": false,
   "packageName": "commander-mcp",
-  "version": "1.0.0",
+  "syncedAt": "2026-07-14T11:05:13.9527430-05:00",
+  "sourceRepo": "Tricentis-Tosca/Tosca.Commander.MCP.Integration",
   "installScope": "User",
-  "syncedAt": "2026-07-13T16:35:27.6649370-05:00",
+  "sourceBranch": "1.0.1",
+  "license": "Apache-2.0",
+  "generatedAt": "2026-07-14T11:05:13.9528000-05:00",
+  "version": "1.0.1",
   "supportedIdes": [
     "Cursor",
     "Claude",
     "VSCode",
     "Windsurf"
-  ],
-  "sourceBranch": "1.0.0",
-  "generatedAt": "2026-07-13T16:35:27.6650090-05:00",
-  "sourceSha": "b6b17028e846b4476be88d9e02ac3bb0c5f2559f",
-  "sourceRepo": "Tricentis-Tosca/Tosca.Commander.MCP.Integration",
-  "license": "CC-BY-NC-4.0",
-  "adminRequired": false
+  ]
 }

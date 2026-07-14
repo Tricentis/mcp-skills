@@ -84,6 +84,22 @@ Configure Commander MCP in Claude Code settings separately.
 | `cursor/skills/commander-mcp/` | `.cursor/skills/commander-mcp/` |
 | `cursor/rules/commander-mcp.mdc` | `.cursor/rules/commander-mcp.mdc` |
 | `cursor/mcp.json` | `.cursor/mcp.json` (merge if exists) |
+| `windsurf/skills/commander-mcp/` | `.codeium/windsurf/skills/commander-mcp/` |
+| `windsurf/rules/commander-mcp.md` | `.codeium/windsurf/rules/commander-mcp.md` |
+
+---
+
+## Security and trust
+
+| Control | What it means |
+|---------|----------------|
+| **SHA256** | Verify release zip against `SHA256SUMS` before extract (Tier 2–3). |
+| **sourceSha** | `manifest.json` records the integration-repo commit used to build this tree. |
+| **Localhost MCP only** | Pack `mcp.json` points to `http://127.0.0.1:46248/mcp` — no remote endpoints. |
+| **No network in installer** | Install scripts copy local files only; they do not download or execute remote code. |
+| **Optional verify** | `.\Install-CommanderMcpPack.ps1 -Ide Cursor -VerifyManifest` checks `manifest.json` before copy. |
+
+Pick **one** install method per profile (marketplace **or** zip/git) to avoid duplicate skills.
 
 ---
 
@@ -107,6 +123,12 @@ Install-CommanderMcpPack.bat -Ide Cursor
 
 ```powershell
 .\Install-CommanderMcpPack.ps1 -Ide Cursor
+```
+
+Optional manifest check before copy:
+
+```powershell
+.\Install-CommanderMcpPack.ps1 -Ide Cursor -VerifyManifest
 ```
 
 Supported `-Ide` values: `Cursor`, `Claude`, `VSCode`, `Windsurf`.
@@ -193,4 +215,4 @@ These skills are provided on an **open-source cadence** — outside Tricentis pr
 
 ## License
 
-Licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). See [repository LICENSE](../../../LICENSE).
+Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). See [repository LICENSE](../../../LICENSE).

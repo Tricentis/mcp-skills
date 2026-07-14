@@ -2,14 +2,19 @@
 
 GitHub-only automation for syncing skills from internal source repos to **Tricentis/mcp-skills**.
 
+**Full workflow (all skills repos):** [Tosca.Commander.MCP.Integration `docs/mcp-skills-distribution-plan.md`](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration/blob/main/docs/mcp-skills-distribution-plan.md) — Phases 0–8 from skill-authoring audit through export by target path.
+
 ## Flow
 
 ```text
-integration main → export script → branch 1.0.0 (export only)
-                                → PR to mcp-skills main
-                                → 2 approvals + CI
-                                → merge → production env → tag tosca/commander/mcp/{version}
+integration main → sync + validate → ConsumerExport staging
+                → orphan branch 1.0.0 (export only)
+                → PR to mcp-skills main
+                → 2 approvals + validate-export CI
+                → merge → production env → tag {product}/{interface}/{skill}/{version}
 ```
+
+Release zip (`pack_release.ps1`) and mcp-skills git tree are built from the **same** `ConsumerExport.ps1` staging — they must stay identical.
 
 ## Source repo (`Tosca.Commander.MCP.Integration`)
 
@@ -19,17 +24,21 @@ integration main → export script → branch 1.0.0 (export only)
 
 **Jobs:**
 
-1. `sync_mcp_packs.ps1` + `validate_skill.py`
-2. `export_mcp_skills.ps1` — updates orphan branch **`1.0.0`**
+1. `sync_mcp_packs.ps1` + `validate_skill.py` + `validate_pack.ps1`
+2. `export_mcp_skills.ps1` — updates orphan branch **`1.0.0`** via `git worktree add --orphan`
 3. Opens PR on `Tricentis/mcp-skills` (requires `MCP_SKILLS_SYNC_TOKEN` secret)
 
 **Manual export (local):**
 
 ```powershell
-pwsh -File scripts/export_mcp_skills.ps1 -Version 1.0.0 `
+pwsh -File scripts/validate_pack.ps1
+pwsh -File scripts/pack_release.ps1                    # zip + SHA256 (parity check)
+pwsh -File scripts/export_mcp_skills.ps1 `
   -McpSkillsPath ~/Documents/GitHub/Tricentis/mcp-skills `
   -UpdateReleaseBranch
 ```
+
+Version defaults to `skills/commander-mcp/metadata.json` when `-Version` is omitted.
 
 ## This repo (`mcp-skills`)
 
@@ -37,6 +46,10 @@ pwsh -File scripts/export_mcp_skills.ps1 -Version 1.0.0 `
 |----------|------|---------|
 | Validate | `.github/workflows/validate-export.yml` | Pull requests |
 | Release | `.github/workflows/release.yml` | Push to `main` when `manifest.json` version changes |
+
+## License
+
+Entire repository and all product trees: **Apache License 2.0** (`Apache-2.0`). SPDX in `manifest.json` and plugin manifests.
 
 ## Branch protection checklist (`main`)
 
@@ -82,16 +95,34 @@ Prefer a GitHub App (`tricentis-mcp-skills-sync`) over a user PAT.
 
 ## Adding a new product path
 
-1. Add export manifest in source repo under `sync/`.
-2. Add `CODEOWNERS` line for the new `Product/...` path.
-3. Add copy of manifest under `sync/manifests/` in mcp-skills.
-4. Extend `validate-export.yml` forbidden-path checks if needed.
+Follow **Part 6** in the [distribution plan](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration/blob/main/docs/mcp-skills-distribution-plan.md):
+
+1. Add `sync/mcp-skills-manifest.json` (or product-specific manifest) in **source repo**.
+2. Add `sync/templates/{skill-id}-user-README.md` and `skill-LICENSE.md` if needed.
+3. Extend `sync_mcp_packs.ps1` / `validate_pack.ps1` for the new skill.
+4. Copy manifest to `sync/manifests/` in **mcp-skills**.
+5. Add `CODEOWNERS` line for the new `{Product}/**` path.
+6. Add repository map row to mcp-skills root `README.md`.
+7. Define tag pattern: `{product}/{interface}/{skill}/{version}`.
+8. Run `validate_pack.ps1`, `pack_release.ps1`, and `export_mcp_skills.ps1` before first PR.
+
+**Per-skill invariants:**
+
+| Invariant | Enforcement |
+|-----------|-------------|
+| `evaluations/` not in consumer tree | `sync_mcp_packs.ps1` + `validate_pack.ps1` |
+| Zip ≡ export tree | Shared `ConsumerExport.ps1` |
+| `forbiddenPaths` not at staging root | `Build-ConsumerStaging` throws |
+| Version alignment | `metadata.json` → plugins → `manifest.json` |
+| License | Apache 2.0 at root, product path, and skill LICENSE pointers |
 
 ## Failure modes
 
 | Failure | Action |
 |---------|--------|
 | Forbidden path in PR | Fix export allowlist in source repo; re-export |
+| `evaluations/` in pack | Re-run `sync_mcp_packs.ps1`; verify `validate_pack.ps1` |
 | validate-export CI red | Fix diff locally; push to sync branch |
 | Rejected PR | Close; fix source; re-run export workflow |
 | Bad release | Revert merge PR on mcp-skills; re-sync from fixed source |
+| Zip ≠ export mismatch | Fix `ConsumerExport.ps1`; rebuild both artifacts |

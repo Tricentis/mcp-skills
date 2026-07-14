@@ -2,9 +2,9 @@
 
 Open-source skills that help customers use Tricentis products through IDE agents, MCP servers, and command-line interfaces.
 
-**License:** [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) — free to download, use, and adapt for **non-commercial** purposes; attribution required. See [LICENSE](LICENSE).
+**License:** [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) — see [LICENSE](LICENSE).
 
-> "Tricentis MCP Skills" © Tricentis. Licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
+> "Tricentis MCP Skills" © Tricentis. Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 ## Support disclaimer
 

@@ -4,6 +4,12 @@ Use with [code-mode.md](code-mode.md), [tool-orchestration.md](tool-orchestratio
 
 **Primary orchestration doc:** [tool-orchestration.md](tool-orchestration.md) — when/how to call each tool in Code Mode.
 
+## Contents
+
+- [Planning primitives](#planning-primitives)
+- [Category-specific plans](#category-specific-plans)
+- [Error recovery](#error-recovery)
+
 ## Planning primitives
 
 ### Resolve identity
@@ -11,7 +17,7 @@ Use with [code-mode.md](code-mode.md), [tool-orchestration.md](tool-orchestratio
 Objects are addressed by **surrogate ID** or **node path** (e.g. `/TestCases/MyFolder/MyCase`).
 
 ```
-get_objects(identifiers=[path or id])
+get_object_info(identifiers=[path or id])
   → surrogateId for downstream tools
 ```
 
@@ -31,7 +37,7 @@ When the plan targets specific objects, **always pass `objectIds` / `identifiers
 
 Tools returning `nextOffset`:
 
-- `list_children` — default limit 200
+- `get_object_info` (`include_parent_and_children=true`) — default limit 200; paginate with `offset=nextOffset`
 - `run_di_sql_statement` — default limit 200; prefer SQL-side LIMIT for large tables
 
 Loop: call with `offset=nextOffset` until `nextOffset` is absent.
@@ -70,7 +76,7 @@ Use when the UI equivalent is drag-and-drop with a drop task.
 ```
 get_workspace_info
 get_current_selection
-list_children(parent_id=root, loaded_only=false)  # paginate
+get_object_info(identifiers=[parent], include_parent_and_children=true, limit=200, offset=0)  # paginate
 get_attributes(identifiers=[...])
 ```
 
@@ -79,7 +85,7 @@ get_attributes(identifiers=[...])
 ```
 create_test_case(folderPath, name, steps?, requirements?)
 save_workspace
-get_objects(node path)  # verify
+get_object_info(node path)  # verify
 ```
 
 See [reference/workflows/create-test-case.md](reference/workflows/create-test-case.md).
@@ -129,7 +135,7 @@ execute_test_suite ...
 | Error signal | Plan adjustment |
 |--------------|-----------------|
 | "not checked out" / unknown task name | Checkout correct object → re-run `list_available_tasks` |
-| "object not found" | Re-resolve with `get_objects` or `list_children` |
+| "object not found" | Re-resolve with `get_object_info` or paginated children |
 | Task not in list | Re-run `list_available_tasks` after selection/checkout change |
 | DI license | Stop; inform user DI is not licensed |
 | Another execute_test_suite in progress | Poll `execute_test_suite_status` until complete |

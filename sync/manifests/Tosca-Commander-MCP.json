@@ -1,10 +1,10 @@
 {
   "targetPath": "Tosca/Commander/MCP",
   "sourceRepo": "Tricentis-Tosca/Tosca.Commander.MCP.Integration",
-  "releaseBranch": "1.0.0",
+  "releaseBranch": "1.0.1",
   "mcpSkillsRepo": "Tricentis/mcp-skills",
   "mcpSkillsHomepage": "https://github.com/Tricentis/mcp-skills",
-  "license": "CC-BY-NC-4.0",
+  "license": "Apache-2.0",
   "includes": [
     { "from": "packages/cursor-pack", "to": "cursor" },
     { "from": "packages/claude-pack", "to": "claude" },

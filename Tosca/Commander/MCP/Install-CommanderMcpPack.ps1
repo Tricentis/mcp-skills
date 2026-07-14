@@ -11,7 +11,9 @@ param(
     [ValidateSet("User", "Project")]
     [string]$Scope = "User",
 
-    [string]$ProjectPath = (Get-Location).Path
+    [string]$ProjectPath = (Get-Location).Path,
+
+    [switch]$VerifyManifest
 )
 
 $ErrorActionPreference = "Stop"
@@ -21,6 +23,10 @@ $repoRoot = Get-RepoRoot
 $skillId = Get-SkillId
 $packMap = Get-IdePackMap
 $config = $packMap[$Ide]
+
+if ($VerifyManifest) {
+    Test-PackManifest -PackRoot $PSScriptRoot
+}
 
 function Install-CursorPack {
     param([string]$TargetSkill, [string]$TargetRules, [string]$TargetMcpJson)

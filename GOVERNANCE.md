@@ -48,3 +48,5 @@ Org administrators with audit-log access can query `repo.merge` and `environment
 These materials are not covered by Tricentis product support contracts. Use [GitHub Issues](https://github.com/Tricentis/mcp-skills/issues) for community feedback.
 
 See [docs/github-cicd-pipeline.md](docs/github-cicd-pipeline.md) for the full pipeline.
+
+**Reusable plan (all skills):** [Tosca.Commander.MCP.Integration `docs/mcp-skills-distribution-plan.md`](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration/blob/main/docs/mcp-skills-distribution-plan.md) — single workflow for skill-authoring audits, deployment, and export by target path.
