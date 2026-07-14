@@ -1,0 +1,49 @@
+{
+  "defaultVersion": "26.1",
+  "notes": "Maps Commander release to TCAPI assembly target and host requirements. Align with commander-versions.json keys.",
+  "versions": {
+    "24.1": {
+      "label": "Tosca Commander 24.1",
+      "tcApiTargets": ["net48", "net8.0-windows"],
+      "dotnetDesktopRuntime": "8.0",
+      "devCornerDocVersion": "2024.1",
+      "hostGuidance": "Install may ship .NET Framework (net48) TCAPI.dll. Prefer Windows PowerShell 5.1 if pwsh Add-Type fails; net8 DLLs work with pwsh 7+ and .NET 8 desktop runtime."
+    },
+    "24.2": {
+      "label": "Tosca Commander 24.2",
+      "tcApiTargets": ["net8.0-windows"],
+      "dotnetDesktopRuntime": "8.0",
+      "devCornerDocVersion": "2024.2",
+      "hostGuidance": "TCAPI targets .NET 8 Windows. Use pwsh 7+ or dotnet script with .NET 8 desktop runtime."
+    },
+    "25.1": {
+      "label": "Tosca Commander 25.1",
+      "tcApiTargets": ["net8.0-windows"],
+      "dotnetDesktopRuntime": "8.0",
+      "devCornerDocVersion": "2025.1",
+      "hostGuidance": "TCAPI targets .NET 8 Windows. Use pwsh 7+ or dotnet script with .NET 8 desktop runtime."
+    },
+    "26.1": {
+      "label": "Tosca Commander 26.1",
+      "tcApiTargets": ["net10.0-windows"],
+      "dotnetDesktopRuntime": "10.0",
+      "devCornerDocVersion": "2026.1",
+      "hostGuidance": "TCAPI targets .NET 10 Windows. Use pwsh 7.4+ with .NET 10 or dotnet script with .NET 10 desktop runtime."
+    },
+    "master": {
+      "label": "Tosca Commander master",
+      "tcApiTargets": ["net10.0-windows"],
+      "dotnetDesktopRuntime": "10.0",
+      "devCornerDocVersion": "2026.1",
+      "hostGuidance": "Development builds track latest TCAPI (.NET 10 Windows)."
+    }
+  },
+  "sharedApiSurface": [
+    "TCAPI.CreateInstance()",
+    "OpenWorkspace(path, user, password)",
+    "CloseWorkspace() / CloseInstance()",
+    "TCWorkspace.GetProject()",
+    "Search(TQL)",
+    "Save()"
+  ]
+}

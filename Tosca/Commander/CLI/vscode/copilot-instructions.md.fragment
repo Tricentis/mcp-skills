@@ -1,0 +1,29 @@
+# Tosca Commander — GitHub Copilot instructions
+
+Automate Tosca Commander via **TCShell** (headless) or **Remote Control** (GUI-attended). Use the IDE **terminal** on Windows — not MCP or other protocol servers.
+
+## Mode routing
+
+| Situation | Backend |
+|-----------|---------|
+| Commander GUI open; user refers to selection or visible UI | Remote Control |
+| CI, batch, unattended, no GUI | Headless `TCShell.exe` |
+
+## Headless invocation
+
+```powershell
+& "$env:COMMANDER_HOME\TCShell\TCShell.exe" -workspace "C:\path\workspace.tws" -auth script.tcs
+```
+
+- Batch scripts must call `save` before `exit`.
+- Never commit secrets; use `-auth` with env vars or secure credential stores.
+
+## Remote Control
+
+1. Open Commander with a workspace.
+2. Start **Remote Control** from the project context menu.
+3. Run `Get-CommanderAutomationPaths.ps1` first; use Remote Control client (`TcShellRemoteControl.ps1`) only when detection selects it.
+
+## Reference
+
+See `.github/instructions/cli-api-commander.instructions.md` and the cli-api-commander skill reference bundle for command syntax and samples.

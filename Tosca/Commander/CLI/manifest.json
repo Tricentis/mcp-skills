@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "packageName": "cli-api-commander-IDE",
+  "installScope": "User",
+  "adminRequired": false,
+  "supportedIdes": [
+    "Cursor",
+    "Claude",
+    "VSCode",
+    "Windsurf"
+  ],
+  "license": "Apache-2.0",
+  "sourceRepo": "Tricentis-Tosca/Tosca.Commander.IDE.integration",
+  "sourceBranch": "cli-1.0.0",
+  "sourceSha": "637947351872bce97ae912bf2898b11bc4ee0b64",
+  "syncedAt": "2026-07-14T16:45:23.111336+00:00",
+  "generatedAt": "2026-07-14T16:45:23.111336+00:00"
+}

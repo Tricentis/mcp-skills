@@ -1,0 +1,15 @@
+## Tosca Commander (local IDE)
+
+For TCShell, TCAPI, and Remote Control automation, use the **cli-api-commander** skill.
+
+- **User journeys:** `journeys-index.md` → one workflow template
+- **Path selection:** run `Get-CommanderAutomationPaths.py` (or `.ps1`); read `Runtimes` first
+- **Headless:** `TCShell.exe -workspace "<path>.tws" [-auth | -login] script.tcs` via cmd
+- **TCAPI (Windows):** `Get-TcApiRuntime.ps1`; `.ps1` or `.csx` per detection
+- **GUI-attended:** Remote Control only with user consent — `TcShellRemoteControl.ps1`
+- **Data Integrity:** not available via this skill
+- **Batch mode:** always call `save` before exit
+
+Install: `Install-CliApiCommanderPack.ps1 -Ide <Cursor|Claude|VSCode|Windsurf>` (user scope, no admin).
+
+Documentation: [tcshell-ide-automation.md](docs/tcshell-ide-automation.md) | [skill-authoring.md](docs/skill-authoring.md)

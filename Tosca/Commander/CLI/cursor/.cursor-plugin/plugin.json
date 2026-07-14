@@ -1,0 +1,25 @@
+{
+  "name": "cli-api-commander",
+  "version": "1.0.0",
+  "description": "Skills and rules only (no scripts). For path detectors use the release zip. Tosca Commander CLI and TCAPI automation for Cursor agents. TCShell.exe, .tcs scripts, TCAPI, and Remote Control via shell/stdio. Does NOT cover Data Integrity or in-process Commander automation. Install via marketplace or zip/git \u2014 not both to the same profile.",
+  "author": {
+    "name": "Tricentis"
+  },
+  "homepage": "https://github.com/Tricentis/mcp-skills",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tricentis/mcp-skills.git"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "tricentis",
+    "tosca",
+    "commander",
+    "tcshell",
+    "tcapi",
+    "cli",
+    "remote-control"
+  ],
+  "skills": "./skills",
+  "rules": "./rules"
+}
