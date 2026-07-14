@@ -1,19 +1,38 @@
-# Shared helpers for Tosca Cloud MCP skill packaging scripts.
+# Shared helpers for Tosca Cloud MCP install scripts in Tricentis/mcp-skills (Tosca/Cloud/MCP layout).
 
-$script:RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$script:RepoRoot = Split-Path $PSScriptRoot -Parent
 $script:SkillPrefix = "tosca-"
+$script:PackageName = "tosca-cloud-mcp"
 
 function Get-RepoRoot {
     return $script:RepoRoot
 }
 
 function Get-CloudSkillIds {
-    $skillsDir = Join-Path $script:RepoRoot "skills"
+    $skillsDir = Join-Path $script:RepoRoot "cursor/skills"
+    if (-not (Test-Path $skillsDir)) {
+        throw "cursor/skills not found under pack root: $skillsDir"
+    }
     return @(Get-ChildItem -Path $skillsDir -Directory -Filter "$($script:SkillPrefix)*" | ForEach-Object { $_.Name })
 }
 
-function Get-CoreRulesPath {
-    return Join-Path $script:RepoRoot "packages/core/rules"
+function Test-PackManifest {
+    param(
+        [string]$PackRoot,
+        [string]$ExpectedPackageName = $script:PackageName
+    )
+    $manifestPath = Join-Path $PackRoot "manifest.json"
+    if (-not (Test-Path $manifestPath)) {
+        throw "manifest.json not found beside installer: $manifestPath"
+    }
+    $manifest = Get-Content -Path $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($manifest.packageName -ne $ExpectedPackageName) {
+        throw "Unexpected packageName in manifest.json: $($manifest.packageName)"
+    }
+    if (-not $manifest.version) {
+        throw "manifest.json missing version"
+    }
+    Write-Host "Verified manifest: $($manifest.packageName) $($manifest.version)"
 }
 
 function Copy-DirectoryContents {
@@ -72,11 +91,12 @@ function Merge-CursorMcpConfig {
 }
 
 function Get-IdePackMap {
+    $root = $script:RepoRoot
     return [ordered]@{
         Cursor = @{
-            PackPath     = Join-Path $script:RepoRoot "packages/cursor-pack"
-            UserSkills   = Join-Path $env:USERPROFILE ".cursor/skills"
-            UserRules    = Join-Path $env:USERPROFILE ".cursor/rules"
+            PackPath      = Join-Path $root "cursor"
+            UserSkills    = Join-Path $env:USERPROFILE ".cursor/skills"
+            UserRules     = Join-Path $env:USERPROFILE ".cursor/rules"
             ProjectSkills = ".cursor/skills"
             ProjectRules  = ".cursor/rules"
         }
