@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Installs Tosca Cloud MCP skills and rules for Cursor; merges MCP config when configured.
+    Installs Tosca Cloud MCP skills and rules for Cursor from mcp-skills consumer layout.
 #>
 [CmdletBinding()]
 param(
@@ -18,20 +18,27 @@ param(
     [ValidateSet("prod", "staging", "dev")]
     [string]$Env = "prod",
 
-    [switch]$SkipMcpConfig
+    [switch]$SkipMcpConfig,
+    [switch]$VerifyManifest
 )
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "lib/IntegrationCommon.ps1")
 
-$repoRoot = Get-RepoRoot
-& (Join-Path $PSScriptRoot "sync_mcp_packs.ps1")
-
 $packMap = Get-IdePackMap
 $config = $packMap[$Ide]
 $skillIds = Get-CloudSkillIds
-$srcSkillsRoot = Join-Path $repoRoot "packages/cursor-pack/skills"
-$srcRules = Join-Path $repoRoot "packages/cursor-pack/rules/tosca-cloud-mcp.mdc"
+
+if ($VerifyManifest) {
+    Test-PackManifest -PackRoot $PSScriptRoot
+}
+
+if ($skillIds.Count -eq 0) {
+    throw "No tosca-* skills found under $(Join-Path $config.PackPath 'skills')"
+}
+
+$srcSkillsRoot = Join-Path $config.PackPath "skills"
+$srcRules = Join-Path $config.PackPath "rules/tosca-cloud-mcp.mdc"
 
 function Install-CursorPack {
     param([string]$TargetSkillsRoot, [string]$TargetRules, [string]$TargetMcpJson)
@@ -45,9 +52,9 @@ function Install-CursorPack {
     Copy-Item -Path $srcRules -Destination (Join-Path $TargetRules "tosca-cloud-mcp.mdc") -Force
 
     if (-not $SkipMcpConfig) {
-        $configure = Join-Path $repoRoot "scripts/configure_mcp_connection.py"
+        $configure = Join-Path $PSScriptRoot "configure_mcp_connection.py"
         if (-not (Test-Path $configure)) {
-            throw "configure_mcp_connection.py not found"
+            throw "configure_mcp_connection.py not found beside installer: $configure"
         }
         $args = @($configure, "--env", $Env, "--space", $Space, "--output", $TargetMcpJson)
         if ($Tenant) {
