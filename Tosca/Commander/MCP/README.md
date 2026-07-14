@@ -27,6 +27,8 @@ For **TCShell / TCAPI / Remote Control** when Commander is closed, use [Tosca.Co
 
 Pick **one** tier and **one** scope (user or project). Do not install via plugin and zip/git to the same profile paths.
 
+> **Maintainers:** Skill authoring, build, and export scripts live in the internal source repo ([Tosca.Commander.MCP.Integration `scripts/`](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration/tree/main/scripts)). This directory ships **install scripts only**.
+
 ---
 
 ## Tier 1: Manual folder copy

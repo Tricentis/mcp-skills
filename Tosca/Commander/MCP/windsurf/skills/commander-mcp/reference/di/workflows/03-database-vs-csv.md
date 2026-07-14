@@ -27,7 +27,13 @@
   → rowKey = "ProductId"
 ```
 
-**Step 3 — Auto-detect CSV format**
+**Step 3 — Detect CSV format (MANDATORY for every `csv_local`/CSV endpoint)**
+
+> **Always detect the separator, line ending, and header before creating a CSV endpoint — never rely
+> on defaults.** The DI reader's default `columnSeparator` is `|`, which almost never matches a real
+> file; guessing wrong yields a confusing single-column / "No matching column name found for RowKey"
+> failure instead of a clear error. Run the detection below, then set `columnSeparator` (and
+> `rowSeparator` if not CRLF) explicitly. Only ask the user if detection is ambiguous.
 
 Run this PowerShell snippet — it reads the first 512 bytes and reports the column separator,
 line ending, and whether a header row is likely present:
@@ -59,7 +65,11 @@ Interpret the output:
 - **Header row**: if the first-line values look like column names (text, not numbers), set `firstRowColumnNames: "True"` (default); if all values are data, set `"False"` and use `targetColumnRenames` to supply names
 
 Show the detected values to the user with a one-line confirmation ("Detected: comma separator, CRLF line endings, header row present — proceeding.") before creating the test case.
-Only pass `columnSeparator`/`rowSeparator` to step 4 when they differ from the defaults (default: `,` and `\r\n`); omit fields that match the defaults.
+The DI file reader's default `columnSeparator` is **`|`** (pipe), not comma — so a comma- or
+semicolon-delimited CSV **must** set `columnSeparator` explicitly (e.g. `","` or `";"`), otherwise the
+whole line is read as a single column and the comparison fails with *"No matching column name found for
+RowKey"*. The default `rowSeparator` is the OS newline (`\r\n` on Windows); set `"\n"` for LF-only
+files. Always pass `columnSeparator` for CSV; only pass `rowSeparator` when the file isn't CRLF.
 
 **Step 4 — Create the comparison**
 ```

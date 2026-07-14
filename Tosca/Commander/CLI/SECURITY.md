@@ -48,7 +48,7 @@ Installers remove the retired skill id `tcshell-commander` from the same profile
 | `Get-CommanderAutomationPaths.ps1` / `.py` | Commander install dirs, workspace path | Stdout only | No |
 | `Invoke-TcApi.ps1`, `Get-TcApiRuntime.ps1` | Commander DLLs, workspace | Stdout / local IPC | No |
 | `TcShellRemoteControl.ps1` | Commander Remote Control IPC | GUI automation (user-attended) | No |
-| `pack_release.ps1` | Repo sources | `dist/*.zip`, `SHA256SUMS` | No |
+| `pack_release.py` | Repo sources | `dist/*.zip`, `SHA256SUMS` | No |
 
 Doc URL strings in scripts point to Tricentis DevCorner for human-readable API reference — **no automatic HTTP calls** at runtime.
 

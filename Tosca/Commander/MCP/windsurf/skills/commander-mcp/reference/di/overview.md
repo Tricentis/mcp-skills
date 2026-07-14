@@ -117,7 +117,22 @@ This ensures correct column names, matching schemas, and a valid rowKey.
      rowKey="id")
 ```
 
-### 6. Create and execute a DI test case
+### 6. Compare a JSON file against a CSV file
+```
+create_di_row_by_row_comparison(
+  name="JSON vs CSV",
+  source={type:"json_local", filename:"C:\data\people.json",
+          jsonPaths:[{name:"id",   jsonPath:"people[*].id"},
+                     {name:"city", jsonPath:"people[*].person.address.city"}]},
+  target={type:"csv_local", filename:"C:\data\people.csv", columnSeparator:","},
+  rowKey="id")
+```
+`json_local` reads a JSON file directly — no caching DB needed. `jsonPaths` (inline `{name, jsonPath}`
+pairs) flattens the JSON into named columns; pass `jsonPathsFilename` instead to reuse an existing
+JSONPaths file, or omit both to unpack one level deep. Works on either side (JSON vs JSON too).
+The JSON file root must be an object (not a bare array), and array paths use `[*]` (e.g. `people[*].id`).
+
+### 7. Create and execute a DI test case
 ```
 1. create_di_db_expert_module(name="Check Orders", connection="MyDB", sqlStatement="SELECT COUNT(*) FROM Orders")
 2. execute_test_suite(test_case_id="<returned_testcase_id>", is_validation_run=true)
@@ -169,6 +184,7 @@ After import, the DI modules will be available under "/Data Integrity Testing_im
 - Pagination: when `nextOffset` is returned, call again with `offset=nextOffset`.
 - Secrets (passwords, keys, SAS URLs, credential-bearing connection strings) are never passed through MCP — set them in the Tosca UI after creating the connection, or supply them via DSN configuration.
 - `tag` cannot be set or changed via `di_connection` — new connections default to `Production`; re-tag in Tosca UI to `Dev`/`Development`/`Staging`/`Stg` to avoid the elicitation prompt on `run_di_sql_statement`/`get_di_connection_schema` (see **Connection Tags and the Query Gate**).
+- For any CSV endpoint (`csv_local`, `csv_ssh`, `csv_*`), always detect the file's separator/line-ending/header first and set `columnSeparator` explicitly — the DI default is `|`, so an undetected comma/semicolon file fails as a single column. See [workflows/03-database-vs-csv.md](workflows/03-database-vs-csv.md), Step 3.
 - For ODBC connections, the DSN must be pre-configured on the machine (System or User DSN).
 - `run_di_sql_statement` uses a CLI executor — results are capped at maxRows (default 1000).
 - For SQLite connections, set `useCachingDatabase=true` to use Tosca's pre-existing caching database (no sqliteFilePath needed).
