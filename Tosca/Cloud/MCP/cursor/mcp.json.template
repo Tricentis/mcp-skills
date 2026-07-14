@@ -1,0 +1,20 @@
+{
+  "_comment": "Template — run scripts/configure_mcp_connection.py to generate a tenant-specific mcp.json",
+  "mcpServers": {
+    "tosca-cloud": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://TENANT.my.tricentis.com/SPACE/_mcp/api/mcp",
+        "56874",
+        "--host",
+        "127.0.0.1",
+        "--static-oauth-client-info",
+        "{\"client_id\":\"0oaau7llfuawmRFYK0x7\"}",
+        "--static-oauth-client-metadata",
+        "{\"scope\":\"profile email openid offline_access tta\"}"
+      ]
+    }
+  }
+}

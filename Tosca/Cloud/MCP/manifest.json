@@ -1,0 +1,15 @@
+{
+  "version": "0.1.3",
+  "packageName": "tosca-cloud-mcp",
+  "installScope": "User",
+  "adminRequired": false,
+  "supportedIdes": [
+    "Cursor"
+  ],
+  "license": "Apache-2.0",
+  "sourceRepo": "Tricentis-Tosca/Tosca.Cloud.MCP.integration",
+  "sourceBranch": "cloud-mcp-0.1.3",
+  "sourceSha": "",
+  "syncedAt": "2026-07-14T18:44:21.963253+00:00",
+  "generatedAt": "2026-07-14T18:44:21.963253+00:00"
+}
