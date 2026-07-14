@@ -27,13 +27,21 @@ jobs:
         run: |
           TAG="${{ steps.ver.outputs.tag }}"
           VERSION="${{ steps.ver.outputs.version }}"
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists; skipping."
+          BRANCH=$(python3 -c "import json; print(json.load(open('Tosca/Commander/MCP/manifest.json'))['sourceBranch'])")
+          NOTES="Synced from Tricentis-Tosca/Tosca.Commander.MCP.Integration branch ${BRANCH}. See manifest.json for sourceSha."
+
+          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+            git tag "$TAG"
+          fi
+          if ! git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            git push origin "$TAG"
+          else
+            echo "Tag $TAG already on origin; skipping push."
+          fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; skipping."
             exit 0
           fi
-          git tag "$TAG"
-          git push origin "$TAG"
-          BRANCH=$(python3 -c "import json; print(json.load(open('Tosca/Commander/MCP/manifest.json'))['sourceBranch'])")
           gh release create "$TAG" \
             --title "Tosca Commander MCP $VERSION" \
-            --notes "Synced from Tricentis-Tosca/Tosca.Commander.MCP.Integration branch ${BRANCH}. See manifest.json for sourceSha."
+            --notes "$NOTES"
