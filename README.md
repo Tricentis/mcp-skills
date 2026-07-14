@@ -14,7 +14,45 @@ Open-source agent skills that help customers automate Tricentis products through
 | Commander **closed**, batch/CI, workspace locked, or **TCShell / TCAPI / Remote Control** | **Commander CLI & API** | [Tosca/Commander/CLI/README.md](Tosca/Commander/CLI/README.md) |
 | **Tosca Cloud** tenant; hosted **Tosca Cloud MCP** (inventory, playlists, runs, Builder) | **Tosca Cloud MCP** | [Tosca/Cloud/MCP/README.md](Tosca/Cloud/MCP/README.md) |
 
-Commander MCP and Commander CLI are complementary — use MCP when the GUI is running; use CLI when automation must be headless. See each install guide for prerequisites and tier options.
+Commander MCP and Commander CLI are complementary — use MCP when the GUI is running; use CLI when automation must be headless.
+
+---
+
+## Installation (all skill sets)
+
+Every product path uses the same **six-tier enterprise install model**. Pick **one tier** and **one scope** (user or project) per IDE profile — do not install via marketplace **and** zip/git to the same paths.
+
+| Tier | When | Mechanism |
+|------|------|-----------|
+| **1** | Scripts blocked | Manual folder copy from the product directory |
+| **2** | No direct GitHub; IT mirror OK | Approved zip + SHA256 verify → Tier 1 or 3 |
+| **3** | PowerShell or batch allowed | Release zip + product installer script |
+| **4** | Git clone allowed | Clone this repo → run installer from product path |
+| **5** | Enterprise IDE marketplace | Team/private plugin (skills + rules) |
+| **6** | Public marketplace | Public plugin when published |
+
+### Supported across all skill sets
+
+| Capability | Detail |
+|------------|--------|
+| **Admin rights** | Not required — user or project scope only |
+| **License** | [Apache 2.0](LICENSE) |
+| **Integrity** | `SHA256SUMS` on release zips; `manifest.json` records `sourceSha` and version |
+| **Offline install** | Scripts copy local files only — no download at install time |
+| **IDE agents** | Skills, rules/instructions, and orchestration companions per product |
+| **Install scripts** | `Install-*Pack.ps1` / `.bat` in each product directory (Tier 3–4) |
+
+Tier details, path tables, and security notes live in **each product README** — the guides differ by runtime (MCP vs CLI vs Cloud tenant).
+
+### Installation by skill set
+
+| Skill set | Installer | IDEs in this repo | Scope notes | Product-specific |
+|-----------|-----------|-------------------|-------------|------------------|
+| [Commander MCP](Tosca/Commander/MCP/) | `Install-CommanderMcpPack.ps1` | Cursor, Claude, VS Code, Windsurf | VS Code: project scope | `cursor/mcp.json` for localhost MCP; optional `-VerifyManifest` |
+| [Commander CLI](Tosca/Commander/CLI/) | `Install-CliApiCommanderPack.ps1` | Cursor, Claude, VS Code, Windsurf | VS Code: project scope | Helper scripts in zip/git only (not marketplace plugins); [START-HERE.md](Tosca/Commander/CLI/START-HERE.md) |
+| [Tosca Cloud MCP](Tosca/Cloud/MCP/) | `Install-ToscaCloudMcpPack.ps1` | **Cursor** (primary export) | User scope | `-Tenant`, `-Space`, `-Env`; MCP config helper; [START-HERE.md](Tosca/Cloud/MCP/START-HERE.md) |
+
+**Releases:** [GitHub Releases](https://github.com/Tricentis/mcp-skills/releases) — tags like `tosca/commander/mcp/{version}`, `tosca/commander/cli/{version}`, `tosca/cloud/mcp/{version}`.
 
 ---
 
@@ -29,8 +67,8 @@ Automate **Tosca Commander** through the in-process HTTP MCP server while Comman
 | **Skill** | `commander-mcp` — workspace navigation, checkout, tasks, test case creation, Data Integrity |
 | **Prerequisite** | Commander 26.1+, workspace loaded, MCP on port **46248** |
 | **IDEs** | Cursor, Claude, VS Code, Windsurf |
+| **Install** | Six tiers — [README.md](Tosca/Commander/MCP/README.md) (`Install-CommanderMcpPack.ps1`) |
 | **Version** | See [manifest.json](Tosca/Commander/MCP/manifest.json) |
-| **Install** | [Tosca/Commander/MCP/README.md](Tosca/Commander/MCP/README.md) |
 
 Does **not** cover headless TCShell, TCAPI, or Remote Control — use [Commander CLI](#tosca-commander-cli--cli-api-commander) instead.
 
@@ -45,8 +83,8 @@ Automate **Tosca Commander** through **TCShell**, **TCAPI**, or **Remote Control
 | **Skill** | `cli-api-commander` — JumpToNode, checkout/check-in, batch `.tcs` scripts, execution lists, GUI RC |
 | **Prerequisite** | Commander installed; headless TCShell via `cmd` is the minimum path |
 | **IDEs** | Cursor, Claude, VS Code, Windsurf |
+| **Install** | Six tiers — [README.md](Tosca/Commander/CLI/README.md) · [START-HERE.md](Tosca/Commander/CLI/START-HERE.md) (`Install-CliApiCommanderPack.ps1`) |
 | **Version** | See [manifest.json](Tosca/Commander/CLI/manifest.json) |
-| **Install** | [Tosca/Commander/CLI/README.md](Tosca/Commander/CLI/README.md) · [START-HERE.md](Tosca/Commander/CLI/START-HERE.md) |
 
 Does **not** cover in-process Commander MCP or Data Integrity — use [Commander MCP](#tosca-commander-mcp--commander-mcp) when Commander is open.
 
@@ -62,8 +100,8 @@ Automate **Tosca Cloud** through the hosted MCP server — inventory, playlists,
 | **Journey skills** | `tosca-cloud-connect`, `tosca-cloud-basics`, authoring, execution analysis, remediation, explain |
 | **Prerequisite** | Tosca Cloud tenant, Okta auth, configured `spaceId` |
 | **IDEs** | Cursor (primary in this export) |
+| **Install** | Six tiers — [README.md](Tosca/Cloud/MCP/README.md) · [START-HERE.md](Tosca/Cloud/MCP/START-HERE.md) (`Install-ToscaCloudMcpPack.ps1`) |
 | **Version** | See [manifest.json](Tosca/Cloud/MCP/manifest.json) |
-| **Install** | [Tosca/Cloud/MCP/README.md](Tosca/Cloud/MCP/README.md) · [START-HERE.md](Tosca/Cloud/MCP/START-HERE.md) |
 
 Start with **connect** and **basics**, then route to **tosca-cloud-mcp** or a journey skill for your task.
 
@@ -83,7 +121,7 @@ mcp-skills/
 └── docs/                 # CI/CD and governance
 ```
 
-Each product path contains IDE packs (`cursor/`, `claude/`, `windsurf/`, `vscode/`), install scripts, `manifest.json`, and a product **README.md** with tiered install steps.
+Each product path contains IDE packs (`cursor/`, `claude/`, `windsurf/`, `vscode/`), tiered install scripts, `manifest.json`, and a product **README.md** with full install steps for that skill set.
 
 ---
 
