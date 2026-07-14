@@ -58,7 +58,7 @@ MCP **runtime** network calls occur when the IDE connects to the hosted endpoint
 2. Verify hash (PowerShell):
 
 ```powershell
-Get-FileHash -Path .\tosca-cloud-mcp-0.1.3-user.zip -Algorithm SHA256
+Get-FileHash -Path .\tosca-cloud-mcp-1.0.0-user.zip -Algorithm SHA256
 # Compare to SHA256SUMS
 ```
 
