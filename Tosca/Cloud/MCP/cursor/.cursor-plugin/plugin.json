@@ -1,6 +1,6 @@
 {
   "name": "tosca-cloud-mcp",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "description": "Tosca Cloud MCP \u2014 skills, rules, and hosted tenant MCP config for Cursor agents (direct cloud connection). Install via marketplace or zip/git \u2014 not both to the same profile.",
   "author": {
     "name": "Tricentis"

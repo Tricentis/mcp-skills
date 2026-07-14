@@ -1,6 +1,6 @@
 {
   "name": "tosca-cloud-mcp",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "organization": "Tricentis",
   "technology": "Tosca Cloud MCP",
   "abstract": "Agent skill for orchestrating Tosca Cloud MCPServer tools \u2014 inventory, playlists, execution, Builder, and Data Integrity workflows via Code Mode or direct tool mode.",
