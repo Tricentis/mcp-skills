@@ -8,8 +8,6 @@ Always run detection before invoking `tn`. **Neither Python nor PowerShell is re
 python3 Get-TnCloudPaths.py
 ```
 
-Maintainer repo: `python3 scripts/Get-TnCloudPaths.py`
-
 If **neither** script runs, use the manual checklist below.
 
 ## Step 2 — Read detection output
@@ -46,7 +44,7 @@ Exit codes: `0` = clear recommendation · `1` = tn not found · `2` = **ask the 
 ## Step 5 — Configure if missing
 
 ```bash
-python3 scripts/configure_tn_connection.py --tenant <tenant> --output ~/.tn/mcp.json
+python3 configure_tn_connection.py --tenant <tenant> --output ~/.tn/mcp.json
 tn --setup
 ```
 

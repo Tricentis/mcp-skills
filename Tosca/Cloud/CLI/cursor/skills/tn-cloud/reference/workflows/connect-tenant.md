@@ -16,7 +16,7 @@ Connect tenant:
 |------|--------|----------|
 | 1 | Resolve `tenant` from portal URL | Lowercase tenant slug |
 | 2 | Confirm `spaceId` (default `default`) | Space in MCP URL |
-| 3 | `python3 scripts/configure_tn_connection.py --tenant … --output ~/.tn/mcp.json` | `tosca` server entry |
+| 3 | `python3 configure_tn_connection.py --tenant … --output ~/.tn/mcp.json` | `tosca` server entry |
 | 4 | `tn --setup` | `~/.tn/appsettings.json` |
 | 5 | `echo "/tosca then list workspaces" \| tn` | Workspace list |
 
