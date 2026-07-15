@@ -155,12 +155,13 @@ These skills are provided **as-is** on an open-source cadence. They are **outsid
 
 ## Contributing
 
-Skill content is authored in internal source repositories and synced here via GitHub Actions. Direct pull requests are welcome for documentation fixes and issues. Changes to skill content may be redirected to the source repo — see [GOVERNANCE.md](GOVERNANCE.md).
+See **[CONTRIBUTIONS.md](CONTRIBUTIONS.md)** for the contribution model, source-repo workflow, and what to change here vs in a maintainer repo. Governance, approvers, and audit rules are in **[GOVERNANCE.md](GOVERNANCE.md)**.
 
 ## Governance and CI/CD
 
 | Document | Purpose |
 |----------|---------|
+| [CONTRIBUTIONS.md](CONTRIBUTIONS.md) | Contribution model and source-repo workflow |
 | [GOVERNANCE.md](GOVERNANCE.md) | Approvers, auditors, contribution rules |
 | [MAINTAINERS.md](MAINTAINERS.md) | Team roster (TBD until public launch) |
 | [docs/github-cicd-pipeline.md](docs/github-cicd-pipeline.md) | GitHub-only sync pipeline |
