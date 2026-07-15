@@ -94,10 +94,6 @@ Use **this pack** when tn is the preferred runtime. Use **Tosca.Cloud.MCP.integr
 
 For analyze / remediate / author / explain journeys, use journey skills — see [journeys-index.md](journeys-index.md). Consumer packs include `AGENTS.md.fragment` for routing.
 
-## Activation testing
-
-See [evaluations/activation.md](evaluations/activation.md) for trigger phrases (maintainer-only; stripped in consumer export).
-
 ## Out of scope
 
 | Capability | Status |

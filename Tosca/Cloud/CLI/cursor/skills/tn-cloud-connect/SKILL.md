@@ -41,7 +41,7 @@ Connect TN Cloud:
 ## Configure connection
 
 ```bash
-python3 scripts/configure_tn_connection.py \
+python3 configure_tn_connection.py \
   --tenant acme \
   --space default \
   --env prod \
@@ -51,7 +51,7 @@ python3 scripts/configure_tn_connection.py \
 Windows:
 
 ```powershell
-python scripts/configure_tn_connection.py --tenant acme --output "$env:USERPROFILE\.tn\mcp.json"
+python configure_tn_connection.py --tenant acme --output "$env:USERPROFILE\.tn\mcp.json"
 ```
 
 Then:
