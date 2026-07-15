@@ -13,8 +13,11 @@ Open-source agent skills that help customers automate Tricentis products through
 | Commander **open** with a workspace; IDE connected to **in-process MCP** (`McpServerAddIn`, port 46248) | **Commander MCP** | [Tosca/Commander/MCP/README.md](Tosca/Commander/MCP/README.md) |
 | Commander **closed**, batch/CI, workspace locked, or **TCShell / TCAPI / Remote Control** | **Commander CLI & API** | [Tosca/Commander/CLI/README.md](Tosca/Commander/CLI/README.md) |
 | **Tosca Cloud** tenant; hosted **Tosca Cloud MCP** (inventory, playlists, runs, Builder) | **Tosca Cloud MCP** | [Tosca/Cloud/MCP/README.md](Tosca/Cloud/MCP/README.md) |
+| **Tosca Cloud** + **TN CLI** (`tn`, `/tosca`, `--loop`, `--robot`) | **Tosca Cloud CLI** | [Tosca/Cloud/CLI/README.md](Tosca/Cloud/CLI/README.md) |
 
 Commander MCP and Commander CLI are complementary — use MCP when the GUI is running; use CLI when automation must be headless.
+
+**Tosca Cloud MCP** and **Tosca Cloud CLI** are complementary — use MCP for IDE-native Code Mode; use CLI when **tn** is the runtime (loop, robot, multi-provider AI).
 
 ---
 
@@ -51,8 +54,9 @@ Tier details, path tables, and security notes live in **each product README** �
 | [Commander MCP](Tosca/Commander/MCP/) | `Install-CommanderMcpPack.ps1` | Cursor, Claude, VS Code, Windsurf | VS Code: project scope | `cursor/mcp.json` for localhost MCP; optional `-VerifyManifest` |
 | [Commander CLI](Tosca/Commander/CLI/) | `Install-CliApiCommanderPack.ps1` | Cursor, Claude, VS Code, Windsurf | VS Code: project scope | Helper scripts in zip/git only (not marketplace plugins); [START-HERE.md](Tosca/Commander/CLI/START-HERE.md) |
 | [Tosca Cloud MCP](Tosca/Cloud/MCP/) | `Install-ToscaCloudMcpPack.ps1` | **Cursor** (primary export) | User scope | `-Tenant`, `-Space`, `-Env`; MCP config helper; [START-HERE.md](Tosca/Cloud/MCP/START-HERE.md) |
+| [Tosca Cloud CLI](Tosca/Cloud/CLI/) | `Install-TnCloudPack.ps1` | Cursor, Claude, Windsurf | User scope; VS Code fragment | `-Tenant`, `-Space`; tn + `configure_tn_connection.py`; [START-HERE.md](Tosca/Cloud/CLI/START-HERE.md) |
 
-**Releases:** [GitHub Releases](https://github.com/Tricentis/mcp-skills/releases) — tags like `tosca/commander/mcp/{version}`, `tosca/commander/cli/{version}`, `tosca/cloud/mcp/{version}`.
+**Releases:** [GitHub Releases](https://github.com/Tricentis/mcp-skills/releases) — tags like `tosca/commander/mcp/{version}`, `tosca/commander/cli/{version}`, `tosca/cloud/mcp/{version}`, `tosca/cloud/cli/{version}`.
 
 ---
 
@@ -105,6 +109,25 @@ Automate **Tosca Cloud** through the hosted MCP server — inventory, playlists,
 
 Start with **connect** and **basics**, then route to **tosca-cloud-mcp** or a journey skill for your task.
 
+For **tn-native** loop/robot autonomy and multi-provider AI, use [Tosca Cloud CLI](#tosca-cloud-cli--tn-cloud--journey-skills) instead of installing both to the same IDE profile.
+
+---
+
+### [Tosca Cloud CLI](Tosca/Cloud/CLI/) — `tn-cloud` + journey skills
+
+Automate **Tosca Cloud** via the **TN CLI** (`tn`) — `/tosca` mode, **`--loop`**, and **`--robot`**.
+
+| | |
+|--|--|
+| **Core skill** | `tn-cloud` — orchestration, loop, robot, DI |
+| **Journey skills** | connect, basics, analyzing ×2, remediate, authoring ×2, explain |
+| **Prerequisite** | tn CLI on PATH, tenant, `/tosca` |
+| **IDEs** | Cursor, Claude, Windsurf (+ VS Code fragment) |
+| **Install** | Six tiers — [README.md](Tosca/Cloud/CLI/README.md) · [START-HERE.md](Tosca/Cloud/CLI/START-HERE.md) (`Install-TnCloudPack.ps1`) |
+| **Version** | See [manifest.json](Tosca/Cloud/CLI/manifest.json) |
+
+Does **not** cover direct IDE MCP (Code Mode) — use [Tosca Cloud MCP](#tosca-cloud-mcp--tosca-cloud-mcp--journey-skills); on-prem Commander — [Commander CLI](#tosca-commander-cli--api--cli-api-commander).
+
 ---
 
 ## Repository layout
@@ -116,7 +139,8 @@ mcp-skills/
 │   │   ├── MCP/          # commander-mcp — in-process Commander MCP
 │   │   └── CLI/          # cli-api-commander — TCShell / TCAPI / RC
 │   └── Cloud/
-│       └── MCP/          # tosca-cloud-mcp + Tosca Cloud journey skills
+│       ├── MCP/          # tosca-cloud-mcp + Tosca Cloud journey skills (IDE MCP)
+│       └── CLI/          # tn-cloud + journey skills (TN CLI)
 ├── sync/manifests/       # Export allowlists (maintainers)
 └── docs/                 # CI/CD and governance
 ```
