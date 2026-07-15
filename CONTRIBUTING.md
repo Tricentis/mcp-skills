@@ -1,4 +1,4 @@
-# Contributions
+# Contributing
 
 How to contribute to [Tricentis/mcp-skills](https://github.com/Tricentis/mcp-skills).
 
@@ -44,7 +44,7 @@ Provenance for each drop is recorded in the product `manifest.json` (`sourceRepo
 
 Welcome without going through a source repo:
 
-- Documentation fixes in root `README.md`, `CONTRIBUTIONS.md`, `docs/`, or product `README.md` / `START-HERE.md` when the change is clearly consumer-only.
+- Documentation fixes in root `README.md`, `CONTRIBUTING.md`, `docs/`, or product `README.md` / `START-HERE.md` when the change is clearly consumer-only.
 - Issues for install problems, unclear docs, or missing coverage.
 - Dependabot and workflow fixes scoped to this repository.
 
