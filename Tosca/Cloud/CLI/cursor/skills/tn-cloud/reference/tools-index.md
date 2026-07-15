@@ -1,0 +1,75 @@
+# MCP tools index
+
+Quick lookup for agents planning tool sequences. Wire names follow `tosca_{domain}_{action}`.
+
+## apiexecution
+
+- `tosca_apiexecution_createConnection`
+- `tosca_apiexecution_deleteConnection`
+- `tosca_apiexecution_getConnection`
+- `tosca_apiexecution_listConnections`
+- `tosca_apiexecution_updateConnection`
+## builder
+
+- `tosca_builder_createApiMessage`
+- `tosca_builder_deleteApiMessage`
+- `tosca_builder_getApiMessage`
+- `tosca_builder_getModulesSummary`
+- `tosca_builder_scaffoldTestCase`
+- `tosca_builder_updateApiMessage`
+## dataintegrity
+
+- `tosca_dataintegrity_checkSchemaResult`
+- `tosca_dataintegrity_checkTestConnectionResult`
+- `tosca_dataintegrity_connection`
+- `tosca_dataintegrity_createDiDbExpertTestcase`
+- `tosca_dataintegrity_createRowByRowComparison`
+- `tosca_dataintegrity_getConnectionSchema`
+- `tosca_dataintegrity_listConnections`
+- `tosca_dataintegrity_testConnection`
+- `tosca_dataintegrity_workflow`
+## execution
+
+- `tosca_execution_getPlaylistIdsByName`
+- `tosca_execution_getRecentRunLogs`
+## inventory
+
+- `tosca_inventory_advancedSearch`
+- `tosca_inventory_createFolder`
+- `tosca_inventory_deleteFolder`
+- `tosca_inventory_modifyFolder`
+- `tosca_inventory_move`
+- `tosca_inventory_search`
+## mobile
+
+- `tosca_mobile_addCapabilitySet`
+- `tosca_mobile_createConnection`
+- `tosca_mobile_deleteCapability`
+- `tosca_mobile_deleteConnection`
+- `tosca_mobile_getConnection`
+- `tosca_mobile_listConnections`
+- `tosca_mobile_removeCapabilitySet`
+- `tosca_mobile_renameCapabilitySet`
+- `tosca_mobile_setCapability`
+- `tosca_mobile_updateConnection`
+## organization
+
+- `tosca_organization_listWorkspaces`
+## playlist
+
+- `tosca_playlist_add`
+- `tosca_playlist_analyzeTestCaseItems`
+- `tosca_playlist_applyTestCaseItemRenames`
+- `tosca_playlist_deleteById`
+- `tosca_playlist_getFailedTestSteps`
+- `tosca_playlist_getRecentRuns`
+- `tosca_playlist_run`
+- `tosca_playlist_searchByName`
+- `tosca_playlist_updateRunSchedule`
+## simulation
+
+- `tosca_simulation_create`
+- `tosca_simulation_deploy`
+- `tosca_simulation_listAgents`
+
+Full parameters and descriptions: [tools-catalog.md](tools-catalog.md)

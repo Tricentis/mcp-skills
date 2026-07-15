@@ -1,0 +1,55 @@
+# Tosca Cloud AI Agent Skills (TN CLI)
+
+Always-on baseline for coding agents driving **Tricentis Tosca Cloud** via **`tn`** (TN CLI). Detailed know-how lives in installed **`tn-*` skills**. Read **`tn-cloud-basics`** first if unfamiliar.
+
+**Prerequisite:** `tn` on PATH, `~/.tn/mcp.json` configured, AI provider via `tn --setup`. Confirm with `echo "/tosca then list workspaces" | tn`. Not connected → **`tn-cloud-connect`**.
+
+## Which skill
+
+| Task | Skill |
+|---|---|
+| **Connect** tenant / fix auth | `tn-cloud-connect` |
+| Cloud object model / tool loop | `tn-cloud-basics` |
+| Diagnose the **latest** run of a playlist | `tn-analyzing-execution-results` |
+| Trends / flakiness **over time** | `tn-analyzing-execution-history` |
+| **Apply** a fix to a test case / data | `tn-remediating-from-results` |
+| Written **manual** test → Cloud test case | `tn-authoring-manual-testcase` |
+| Description → **automated** test case | `tn-authoring-automated-testcase` |
+| **Explain** what a test case does | `tn-explaining-testcase` |
+| Tool orchestration / loop / robot / **DI** | `tn-cloud` (engineering skill) |
+
+## Guardrails
+
+1. **Read-only unless asked.** Confirm before bulk/irreversible edits.
+2. **Destructive MCP tools** require explicit user confirmation (via tn REPL).
+3. **Credentials:** never solicit or echo secrets; OAuth via tn browser flow.
+4. **Delegate to tn** — IDE agent runs terminal commands; does not call MCP directly.
+5. **Search before mutate** — resolve `entityId` via inventory search.
+
+## Work efficiently
+
+- **Cheap signals first** — `getRecentRuns` before failure attachments.
+- **Loop for multi-step** — `tn --loop` when >3 tool rounds needed.
+- **Journey skills for user stories** — `tn-cloud` for raw orchestration and DI.
+
+## Confidence
+
+Rate every diagnostic conclusion `0–10` with a one-line why: 0–3 speculative · 4–6 plausible · 7–8 strong · 9–10 near-certain.
+
+## Engineering vs journey
+
+| Layer | Skill | When |
+|-------|-------|------|
+| Journey | `tn-analyzing-*`, `tn-authoring-*`, etc. | User-story workflows |
+| Engineering | `tn-cloud` | Tool order, loop/robot, DI sequencing |
+
+## TN vs direct MCP
+
+| Use TN (this pack) | Use Tosca.Cloud.MCP.integration |
+|--------------------|--------------------------------|
+| Native OAuth, no Node | IDE Code Mode with mcp-remote |
+| `--loop` / `--robot` | One MCP call per IDE turn |
+| Multi-provider AI | IDE model only |
+| File write-back in repo | IDE-native tools |
+
+Install **one** Cloud automation path per IDE profile — not both.

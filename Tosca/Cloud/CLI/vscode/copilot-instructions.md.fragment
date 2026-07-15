@@ -1,0 +1,1 @@
+When working with **Tricentis Tosca Cloud**, delegate to the **TN CLI** (`tn`) using skills from Tosca.Cloud.IDE.integration. Read `AGENTS.md` for journey routing. Run path detection (`Get-TnCloudPaths.py`) before automation. Use `tn --loop` for multi-step tasks and `tn --robot` for monitoring.
