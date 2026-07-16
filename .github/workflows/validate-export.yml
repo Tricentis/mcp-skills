@@ -47,7 +47,7 @@ jobs:
                 exit 1
                 ;;
             esac
-          done < <(git diff --name-only "${base}...HEAD" || git diff --name-only HEAD~1 HEAD)
+          done < <(git diff --name-only --diff-filter=AM "${base}...HEAD" 2>/dev/null || git diff --name-only --diff-filter=AM HEAD~1 HEAD)
 
           bad_paths=$(find Tosca -type f \( -name '*.md' -o -name '*.json' -o -name '*.template' \) \
             -exec grep -lE 'scripts/(configure_|Get-|lib/)' {} + 2>/dev/null || true)

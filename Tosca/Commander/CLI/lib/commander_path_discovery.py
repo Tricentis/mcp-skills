@@ -551,7 +551,12 @@ def discover_commander_paths(
             "Details": {
                 "CommanderHome": resolved_home,
                 "DllPresent": rc_dll,
-                "PowerShellScript": "lib/TcShellRemoteControl.ps1",
+                "PowerShellScript": (
+                    "lib/TcShellRemoteControl.ps1"
+                    if Path(__file__).resolve().parent.name == "lib"
+                    and Path(__file__).resolve().parent.parent.name != "scripts"
+                    else "lib/TcShellRemoteControl.ps1"
+                ),
             },
         },
     ]
