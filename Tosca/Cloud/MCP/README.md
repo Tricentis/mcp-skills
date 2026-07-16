@@ -5,8 +5,9 @@ Install Tosca Cloud MCP skills from [Tricentis/mcp-skills](https://github.com/Tr
 ## Quick start
 
 1. Open the `cursor/` folder for Cursor plugin or zip install.
-2. Read `START-HERE.md` for install tiers and MCP connection steps.
-3. Run `Install-ToscaCloudMcpPack.ps1` with your tenant and space.
+2. Read `START-HERE.md` for install tiers.
+3. Run `Install-ToscaCloudMcpPack.ps1 -Ide Cursor` (skills only).
+4. Add your tenant MCP server in **Cursor → Settings → MCP**.
 
 ## Source
 

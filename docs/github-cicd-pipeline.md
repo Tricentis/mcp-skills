@@ -42,10 +42,12 @@ Version defaults to `skills/commander-mcp/metadata.json` when `-Version` is omit
 
 ## This repo (`mcp-skills`)
 
+Consumer-only: skills, user documentation, and install scripts under `Tosca/**`. No `scripts/` or `sync/` trees — export validation runs in source repos before a PR is opened.
+
 | Workflow | File | Trigger |
 |----------|------|---------|
-| Validate | `.github/workflows/validate-export.yml` | Pull requests |
-| Release | `.github/workflows/release.yml` | Push to `main` when `manifest.json` version changes |
+| Validate | `.github/workflows/validate-export.yml` | Pull requests — layout checks only (inline shell; no repo scripts executed) |
+| Release | `.github/workflows/release.yml` | Push to `main` when `manifest.json` version changes — tags derived from path + version |
 
 ## License
 
@@ -100,11 +102,10 @@ Follow **Part 6** in the [distribution plan](https://github.com/Tricentis-Tosca/
 1. Add `sync/mcp-skills-manifest.json` (or product-specific manifest) in **source repo**.
 2. Add `sync/templates/{skill-id}-user-README.md` and `skill-LICENSE.md` if needed.
 3. Extend `sync_mcp_packs.ps1` / `validate_pack.ps1` for the new skill.
-4. Copy manifest to `sync/manifests/` in **mcp-skills**.
-5. Add `CODEOWNERS` line for the new `{Product}/**` path.
-6. Add repository map row to mcp-skills root `README.md`.
-7. Define tag pattern: `{product}/{interface}/{skill}/{version}`.
-8. Run `validate_pack.ps1`, `pack_release.ps1`, and `export_mcp_skills.ps1` before first PR.
+4. Add `CODEOWNERS` line for the new `Tosca/{Product}/**` path in **mcp-skills**.
+5. Add repository map row to mcp-skills root `README.md`.
+6. Tag pattern is automatic: `tosca/{product}/{interface}/{version}` from export path (for example `Tosca/Cloud/MCP` → `tosca/cloud/mcp/{version}`).
+7. Run `validate_pack.ps1`, `pack_release.ps1`, and `export_mcp_skills.ps1` before first PR.
 
 **Per-skill invariants:**
 
@@ -120,7 +121,8 @@ Follow **Part 6** in the [distribution plan](https://github.com/Tricentis-Tosca/
 
 | Failure | Action |
 |---------|--------|
-| Forbidden path in PR | Fix export allowlist in source repo; re-export |
+| Forbidden path in PR | Fix export allowlist in source repo; re-export (forbiddenPaths enforced before PR opens) |
+| `sync/` or `scripts/` in consumer repo | Remove — maintainer assets belong in source repos only |
 | `evaluations/` in pack | Re-run `sync_mcp_packs.ps1`; verify `validate_pack.ps1` |
 | validate-export CI red | Fix diff locally; push to sync branch |
 | Rejected PR | Close; fix source; re-run export workflow |

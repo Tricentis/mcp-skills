@@ -1,12 +1,12 @@
 # Connect tenant — hosted Tosca Cloud MCP
 
-Configure the IDE for **direct** connection to the tenant's cloud-hosted MCP server.
+The user connects the IDE to their tenant's hosted MCP server. This pack does **not** write MCP config files.
 
 ```text
 Connect tenant:
-- [ ] configure_mcp_connection.py (tenant, space, env)
-- [ ] Reload IDE / enable tosca-cloud MCP
-- [ ] Okta login on first use
+- [ ] Skills installed
+- [ ] User added MCP server URL in IDE Settings
+- [ ] User signed in when IDE prompted
 - [ ] tosca_organization_listWorkspaces
 ```
 
@@ -16,8 +16,8 @@ Connect tenant:
 |------|--------|----------|
 | 1 | Resolve `tenant` from portal URL (`acme` from `acme.my.tricentis.com`) | Lowercase tenant slug |
 | 2 | Confirm `spaceId` with user (default `default`) | Space segment in MCP URL |
-| 3 | Run `python3 scripts/configure_mcp_connection.py --tenant … --space … --output ~/.cursor/mcp.json` | `mcp.json` with `mcp-remote` → hosted URL |
-| 4 | User reloads IDE; completes Okta on first MCP session | Green MCP status |
+| 3 | User adds server in **Settings → MCP** with production URL below | IDE shows server entry |
+| 4 | User reloads IDE; completes sign-in on first MCP session | Green MCP status |
 | 5 | `tosca_organization_listWorkspaces` | Workspace list |
 
 ## Production URL
@@ -26,6 +26,6 @@ Connect tenant:
 https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp
 ```
 
-Internal dev only: `my-dev.tricentis.com`. Staging: `my-test.tricentis.com`.
+Staging: `my-test.tricentis.com`. Internal dev only: `my-dev.tricentis.com`.
 
 Hand off to `tosca-cloud-basics` after step 5 succeeds.

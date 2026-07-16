@@ -4,22 +4,19 @@ Help the user connect Cursor to their **hosted** Tosca Cloud MCP server (not TAI
 
 ## Steps
 
-1. Ask for **tenant name** (e.g. `acme` from `https://acme.my.tricentis.com`) and **space id** (default `default`).
-2. Run from Tosca.Cloud.MCP.integration repo:
+1. Confirm **skills are installed** (plugin, installer, or manual copy). This pack does not configure MCP.
+2. Ask for **tenant name** (e.g. `acme` from `https://acme.my.tricentis.com`) and **space id** (default `default`).
+3. Guide the user: **Settings → MCP → Add server** with URL:
 
-```bash
-python3 scripts/configure_mcp_connection.py --tenant <tenant> --space <space> --env prod --output ~/.cursor/mcp.json
-```
+   `https://{tenant}.my.tricentis.com/{space}/_mcp/api/mcp`
 
-On Windows use `%USERPROFILE%\.cursor\mcp.json` for `--output`.
-
-3. Tell the user to **reload Cursor** and open **Settings → MCP** — enable **tosca-cloud**.
-4. On first use, complete **Okta** in the browser when `mcp-remote` opens the login flow.
+4. User **reloads Cursor** and completes **sign-in** when the IDE opens the browser.
 5. Verify: call `tosca_organization_listWorkspaces`.
 6. Load skill **tosca-cloud-basics**, then the task skill from `AGENTS.md`.
 
 ## Do not
 
+- Generate or merge `mcp.json` with scripts from this pack.
 - Route through TAIS or chatbot delegation.
 - Use `my-dev` URLs unless the user is on an internal dev tenant.
 - Ask the user to paste JWTs into chat.

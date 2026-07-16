@@ -97,7 +97,7 @@ Load [di-orchestration.md](di-orchestration.md) first, then **one** file:
 | Requirement | Notes |
 |-------------|-------|
 | Tosca Cloud tenant | `https://{tenant}.my.tricentis.com` (production) |
-| MCP connected | Okta via `scripts/configure_mcp_connection.py` or Cursor pack |
+| MCP connected | User configured tenant in IDE Settings → MCP |
 | Space configured | `spaceId` in MCP URL path |
 | Entitlements | Some tools require product entitlements |
 

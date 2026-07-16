@@ -28,8 +28,9 @@ Each product path under `Tosca/` maps to one source repo and one orphan release 
 | `Tosca/Commander/MCP/` | [Tricentis-Tosca/Tosca.Commander.MCP.Integration](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration) | `1.0.0` | `tosca/commander/mcp/` |
 | `Tosca/Cloud/MCP/` | [Tricentis-Tosca/Tosca.Cloud.MCP.integration](https://github.com/Tricentis-Tosca/Tosca.Cloud.MCP.integration) | `cloud-mcp-{version}` | `tosca/cloud/mcp/` |
 | `Tosca/Commander/CLI/` | [Tricentis-Tosca/Tosca.Commander.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration) | per manifest | `tosca/commander/cli/` |
+| `Tosca/Cloud/CLI/` | [Tricentis-Tosca/Tosca.Cloud.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Cloud.IDE.integration) | per manifest | `tosca/cloud/cli/` |
 
-Export manifests live in this repo under `sync/manifests/`. The reusable end-to-end workflow (skill-authoring gates → export → govern) is documented in the Commander MCP distribution plan linked from [GOVERNANCE.md](GOVERNANCE.md).
+Export manifests and validation scripts live in each **source repo** (for example `sync/mcp-skills-manifest.json`, `validate_pack.ps1`, `export_mcp_skills.ps1`). This repo ships the consumer tree only. The reusable end-to-end workflow is documented in the Commander MCP distribution plan linked from [GOVERNANCE.md](GOVERNANCE.md).
 
 ## Skill content workflow
 

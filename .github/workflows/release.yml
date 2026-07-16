@@ -6,6 +6,9 @@ on:
     paths:
       - "Tosca/**/manifest.json"
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: release
@@ -19,4 +22,42 @@ jobs:
       - name: Create tags and GitHub releases for changed products
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 scripts/create_product_release.py
+        run: |
+          set -euo pipefail
+
+          mapfile -t manifests < <(git diff --name-only HEAD~1 HEAD | grep -E '^Tosca/.+/manifest\.json$' || true)
+          if [ "${#manifests[@]}" -eq 0 ]; then
+            echo "No consumer manifest.json changes in this push"
+            exit 0
+          fi
+
+          for manifest in "${manifests[@]}"; do
+            dir=$(dirname "$manifest")
+            version=$(python3 -c "import json; d=json.load(open('$manifest')); print(d['version'])")
+            source_repo=$(python3 -c "import json; d=json.load(open('$manifest')); print(d.get('sourceRepo', 'source repo'))")
+            source_branch=$(python3 -c "import json; d=json.load(open('$manifest')); print(d.get('sourceBranch', 'unknown branch'))")
+            rel="${dir#Tosca/}"
+            tag="tosca/$(echo "$rel" | tr '[:upper:]' '[:lower:]')/${version}"
+            title="$(echo "$rel" | tr '/' ' ') ${version}"
+            notes="Synced from ${source_repo} branch ${source_branch}. See ${dir}/manifest.json for sourceSha."
+
+            if ! git rev-parse "$tag" >/dev/null 2>&1; then
+              git tag -a "$tag" -m "${title} from ${source_repo}"
+            else
+              echo "Tag ${tag} already exists locally"
+            fi
+
+            if ! git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+              git push origin "$tag"
+              echo "Pushed tag ${tag}"
+            else
+              echo "Tag ${tag} already on origin"
+            fi
+
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "Release ${tag} already exists"
+            else
+              gh release create "$tag" --title "$title" --notes "$notes"
+              echo "Created GitHub release ${tag}"
+            fi
+          done

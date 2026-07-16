@@ -1,18 +1,19 @@
-# Tosca Cloud MCP — Cursor plugin (demo layout)
+# Tosca Cloud MCP — Cursor plugin
 
-Install skills, rules, and MCP connection helper for **direct** hosted Cloud MCP.
+Install **skills and rules** for hosted Tosca Cloud MCP. Does not configure MCP servers.
 
 ## Quick install
 
 ```powershell
-# From repo root (Windows)
-.\scripts\Install-ToscaCloudMcpPack.ps1 -Ide Cursor
-
-# Configure tenant (all platforms)
-python3 scripts/configure_mcp_connection.py --output ~/.cursor/mcp.json
+# From consumer export root (Windows)
+.\Install-ToscaCloudMcpPack.ps1 -Ide Cursor
 ```
 
-Reload Cursor → **Settings → MCP** → enable **tosca-cloud** → `/tosca-cloud-connect` or chat "connect Tosca Cloud MCP".
+Then in Cursor: **Settings → MCP → Add server** with your tenant URL:
+
+`https://{tenant}.my.tricentis.com/{space}/_mcp/api/mcp`
+
+Reload Cursor → sign in when prompted → `/tosca-cloud-connect`.
 
 ## What installs
 
@@ -20,8 +21,7 @@ Reload Cursor → **Settings → MCP** → enable **tosca-cloud** → `/tosca-cl
 |----------|---------|
 | `skills/tosca-*` | Connect, basics, engineering, journey skills |
 | `rules/tosca-cloud-mcp.mdc` | Route agents to correct skill |
-| `mcp.json` | Merged via `configure_mcp_connection.py` (not the template alone) |
 
-Production MCP URL: `https://{tenant}.my.tricentis.com/{space}/_mcp/api/mcp`
+MCP connection is configured by the user in IDE settings (same as marketplace plugin).
 
 See [docs/installation.md](../../docs/installation.md).

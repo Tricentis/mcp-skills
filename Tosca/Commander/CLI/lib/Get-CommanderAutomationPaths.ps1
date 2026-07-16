@@ -486,7 +486,7 @@ function Get-CommanderAutomationPaths {
             CommanderHome     = $resolvedHome
             DllPresent        = [bool]($resolvedHome -and (Test-Path (Join-Path $resolvedHome 'RemoteControlObjects.dll')))
             Channel           = if ($onWindows) { Get-TcShellRemoteChannelName } else { $null }
-            PowerShellScript  = 'scripts/lib/TcShellRemoteControl.ps1'
+            PowerShellScript  = 'lib/TcShellRemoteControl.ps1'
         })
     )
 

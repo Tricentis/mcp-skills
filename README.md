@@ -134,16 +134,16 @@ Does **not** cover direct IDE MCP (Code Mode) — use [Tosca Cloud MCP](#tosca-c
 
 ```text
 mcp-skills/
-├── Tosca/
-│   ├── Commander/
-│   │   ├── MCP/          # commander-mcp — in-process Commander MCP
-│   │   └── CLI/          # cli-api-commander — TCShell / TCAPI / RC
-│   └── Cloud/
-│       ├── MCP/          # tosca-cloud-mcp + Tosca Cloud journey skills (IDE MCP)
-│       └── CLI/          # tn-cloud + journey skills (TN CLI)
-├── sync/manifests/       # Export allowlists (maintainers)
-└── docs/                 # CI/CD and governance
+└── Tosca/
+    ├── Commander/
+    │   ├── MCP/          # commander-mcp — in-process Commander MCP
+    │   └── CLI/          # cli-api-commander — TCShell / TCAPI / RC
+    └── Cloud/
+        ├── MCP/          # tosca-cloud-mcp + Tosca Cloud journey skills (IDE MCP)
+        └── CLI/          # tn-cloud + journey skills (TN CLI)
 ```
+
+Export manifests, validators, and release packaging live in each **source repo** — not here. Root `docs/` covers governance and CI for maintainers only.
 
 Each product path contains IDE packs (`cursor/`, `claude/`, `windsurf/`, `vscode/`), tiered install scripts, `manifest.json`, and a product **README.md** with full install steps for that skill set.
 
