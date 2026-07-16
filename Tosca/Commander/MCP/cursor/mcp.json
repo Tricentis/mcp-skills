@@ -1,7 +1,0 @@
-{
-  "mcpServers": {
-    "tosca-commander": {
-      "url": "http://127.0.0.1:46248/mcp"
-    }
-  }
-}
