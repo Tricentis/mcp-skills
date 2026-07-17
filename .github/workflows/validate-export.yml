@@ -3,6 +3,15 @@ name: Validate export
 on:
   pull_request:
     branches: [main]
+    paths:
+      - "Tosca/**"
+      - "LICENSE"
+      - "README.md"
+      - "SECURITY.md"
+      - ".trufflehog-exclude"
+
+permissions:
+  contents: read
 
 jobs:
   validate-export:
@@ -58,7 +67,7 @@ jobs:
           fi
 
           forbidden=$(find Tosca -type f \( -name '*.md' -o -name '*.json' -o -name '*.py' -o -name '*.ps1' -o -name '*.template' \) \
-            -exec grep -lE 'mcp-remote|0oaau7|/Users/|Documents/GitHub/' {} + 2>/dev/null || true)
+            -exec grep -lE 'mcp-remote|0oaau7|/Users/|Documents/GitHub/|Merge-CursorMcpConfig|configure_mcp_connection' {} + 2>/dev/null || true)
           if [ -n "${forbidden}" ]; then
             echo "Consumer tree must not contain maintainer leaks or mcp-remote references:"
             echo "${forbidden}"

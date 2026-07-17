@@ -8,10 +8,10 @@ GitHub-only automation for syncing skills from internal source repos to **Tricen
 
 ```text
 integration main → sync + validate → ConsumerExport staging
-                → orphan branch 1.0.0 (export only)
-                → PR to mcp-skills main
+                → orphan release branch (export only)
+                → manual PR to mcp-skills main
                 → 2 approvals + validate-export CI
-                → merge → production env → tag {product}/{interface}/{skill}/{version}
+                → merge → production env → tag + SignPath-signed installer zip
 ```
 
 Release zip (`pack_release.ps1`) and mcp-skills git tree are built from the **same** `ConsumerExport.ps1` staging — they must stay identical.
@@ -25,8 +25,8 @@ Release zip (`pack_release.ps1`) and mcp-skills git tree are built from the **sa
 **Jobs:**
 
 1. `sync_mcp_packs.ps1` + `validate_skill.py` + `validate_pack.ps1`
-2. `export_mcp_skills.ps1` — updates orphan branch **`1.0.0`** via `git worktree add --orphan`
-3. Opens PR on `Tricentis/mcp-skills` (requires `MCP_SKILLS_SYNC_TOKEN` secret)
+2. `export_mcp_skills.ps1` — updates orphan release branch via `git worktree add --orphan`
+3. Maintainer opens PR on `Tricentis/mcp-skills` (no long-lived PAT in this repo)
 
 **Manual export (local):**
 
@@ -34,7 +34,7 @@ Release zip (`pack_release.ps1`) and mcp-skills git tree are built from the **sa
 pwsh -File scripts/validate_pack.ps1
 pwsh -File scripts/pack_release.ps1                    # zip + SHA256 (parity check)
 pwsh -File scripts/export_mcp_skills.ps1 `
-  -McpSkillsPath ~/Documents/GitHub/Tricentis/mcp-skills `
+  -McpSkillsPath <local-clone-of-Tricentis/mcp-skills> `
   -UpdateReleaseBranch
 ```
 
@@ -46,8 +46,11 @@ Consumer-only: skills, user documentation, and install scripts under `Tosca/**`.
 
 | Workflow | File | Trigger |
 |----------|------|---------|
-| Validate | `.github/workflows/validate-export.yml` | Pull requests — layout checks only (inline shell; no repo scripts executed) |
-| Release | `.github/workflows/release.yml` | Push to `main` when `manifest.json` version changes — tags derived from path + version |
+| Validate | `.github/workflows/validate-export.yml` | Pull requests touching `Tosca/**` — inline shell only |
+| PR guard | `.github/workflows/pr-guard.yml` | Blocks fork PRs from modifying `.github/**` |
+| Secret scan | `.github/workflows/secret-scan.yml` | TruffleHog verified-only on `Tosca/**` |
+| Release | `.github/workflows/release.yml` | Push to `main` when `manifest.json` version changes |
+| Sign | `.github/workflows/sign-installers.yml` | After GitHub Release published — SignPath Authenticode zip |
 
 ## License
 
@@ -62,7 +65,7 @@ Configure in **Settings → Branches → Branch protection rules**:
 | Require pull request | Yes |
 | Required approvals | **2** |
 | Require review from CODEOWNERS | Yes |
-| Require status checks | `validate-export` |
+| Require status checks | `validate-export`, `trufflehog` |
 | Dismiss stale reviews | Yes |
 | Restrict force pushes | Yes |
 | Allow bypass | Nobody |
@@ -75,25 +78,27 @@ Configure in **Settings → Branches → Branch protection rules**:
 |---------|-------|
 | Required reviewers | Skill approvers (individuals OK while private) |
 | Deployment branches | `main` only |
-| Used by | `release.yml` on **every** automated release |
+| Used by | `release.yml`, `sign-installers.yml` |
 
-Creates Git tag `tosca/commander/mcp/{version}` and GitHub Release.
+Creates Git tag `tosca/commander/mcp/{version}`, GitHub Release, and SignPath-signed installer bundle.
 
 ## Secrets
 
 | Secret | Repo | Purpose |
 |--------|------|---------|
-| `MCP_SKILLS_SYNC_TOKEN` | Integration | Scoped token to open PRs on mcp-skills |
+| `SIGNPATH_API_TOKEN` | mcp-skills (`production` env) | Authenticode signing via SignPath |
+| `GITHUB_TOKEN` | mcp-skills | Default token for release tagging (scoped by environment) |
 
-Prefer a GitHub App (`tricentis-mcp-skills-sync`) over a user PAT.
+Export PRs to mcp-skills are opened by maintainers from local clones or release branches — **no** sync PAT stored in integration repos. Prefer a GitHub App if automated PR creation is added later.
 
 ## Auditor playbook
 
 1. Customer reports skill version `1.0.0`.
 2. Find tag [`tosca/commander/mcp/1.0.0`](https://github.com/Tricentis/mcp-skills/tags).
 3. Open the PR merged for that sync — note **2 approvers** in review timeline.
-4. Read PR body: source branch `1.0.0` @ SHA, workflow run URL.
+4. Read PR body: source branch @ SHA, workflow run URL.
 5. Verify `Tosca/Commander/MCP/manifest.json` `sourceSha` matches.
+6. Download signed installer zip from the GitHub Release assets.
 
 ## Adding a new product path
 
@@ -128,3 +133,4 @@ Follow **Part 6** in the [distribution plan](https://github.com/Tricentis-Tosca/
 | Rejected PR | Close; fix source; re-run export workflow |
 | Bad release | Revert merge PR on mcp-skills; re-sync from fixed source |
 | Zip ≠ export mismatch | Fix `ConsumerExport.ps1`; rebuild both artifacts |
+| Sign job failed | Verify `SIGNPATH_API_TOKEN` and `mcp-skills-installers` policy in SignPath |

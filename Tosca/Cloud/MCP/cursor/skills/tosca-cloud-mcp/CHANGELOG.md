@@ -40,7 +40,7 @@
 - `SKILL.md` routing tables — all orchestration domains and workflow templates
 - `when-to-use-mcp.md` — simulation intent; execution log routing
 - `reference/di/index.md` — DB Expert testcase workflow link
-- Prerequisites — `configure_mcp_connection.py` instead of `run-cloud.ps1`
+- Prerequisites — IDE MCP settings for hosted tenant (skills-only pack)
 - `validate_skill.py` — required files for new orchestration and workflows
 - `validate_journey_skills.py` — verifies `references/` files exist
 
@@ -50,7 +50,7 @@
 
 - `tosca-cloud-connect` journey skill — hosted tenant MCP setup and tool navigation
 - `packages/cursor-pack/` — Cursor plugin, `/tosca-cloud-connect` command
-- `configure_mcp_connection.py` — generate `mcp.json` for `{tenant}.my.tricentis.com`
+- Tenant connection via IDE Settings → MCP (no connection automation in consumer export)
 - `scripts/Install-ToscaCloudMcpPack.ps1`, `scripts/sync_mcp_packs.ps1`
 - `scripts/extract_di_reference_docs.py` — extract DI walkthroughs from MCPServer `DiWorkflowTool.cs`
 - `reference/workflows/connect-tenant.md`

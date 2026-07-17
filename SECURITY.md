@@ -30,14 +30,22 @@ Release tags (`tosca/cloud/mcp/{version}`, etc.) are created when `manifest.json
 
 ## Code signing
 
-Install scripts are published with **SHA256 checksums**. Windows **Authenticode** signing for enterprise mirrors is performed by Tricentis release engineering when publishing internal zips — not embedded in this git tree. Organizations requiring signed scripts should re-sign mirrored artifacts under their own certificate policy.
+Install scripts in git include **SHA256SUMS** for integrity checks. On each GitHub Release, `sign-installers.yml` (production environment) builds a per-product installer zip and signs it with **SignPath Authenticode** (`SIGNPATH_API_TOKEN`). Download the signed zip from release assets for enterprise deployment.
+
+```powershell
+Get-AuthenticodeSignature .\Install-ToscaCloudMcpPack.ps1
+Get-FileHash -Path .\Install-ToscaCloudMcpPack.ps1 -Algorithm SHA256
+# Compare hash to Tosca/Cloud/MCP/SHA256SUMS
+```
 
 ## Automated checks (CI)
 
 | Workflow | Purpose |
 |----------|---------|
-| `validate-export.yml` | Consumer layout; no `scripts/` or `sync/`; no maintainer path leaks |
+| `validate-export.yml` | Consumer layout; leak grep; SHA256SUMS verification |
+| `pr-guard.yml` | Blocks fork PRs from modifying `.github/**` |
 | `secret-scan.yml` | TruffleHog verified secrets scan on `Tosca/**` |
+| `sign-installers.yml` | SignPath Authenticode on release assets |
 | GitGuardian | Org-level secret detection on pull requests |
 
 ### TruffleHog (verified secrets)
