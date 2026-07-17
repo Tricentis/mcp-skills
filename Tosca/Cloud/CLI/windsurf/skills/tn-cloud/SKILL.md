@@ -8,7 +8,7 @@ description: >-
 
 # TN Cloud — CLI automation
 
-Automate Tosca Cloud through **`tn`** (Tricentis TN CLI). TN connects to hosted MCP with **native OAuth** (no `mcp-remote`), scopes tools via **`/tosca`**, and supports **REPL**, **piped**, **`--loop`**, and **`--robot`** execution.
+Automate Tosca Cloud through **`tn`** (Tricentis TN CLI). TN connects to hosted MCP with **native HTTP OAuth**, scopes tools via **`/tosca`**, and supports **REPL**, **piped**, **`--loop`**, and **`--robot`** execution.
 
 **Prerequisite:** `tn` on PATH and `~/.tn/mcp.json` configured for the tenant. Not set up → **`tn-cloud-connect`**.
 
@@ -81,7 +81,7 @@ Full index: [reference/workflows-index.md](reference/workflows-index.md)
 
 | Concern | Direct MCP (Cursor) | TN CLI (this pack) |
 |---------|---------------------|-------------------|
-| OAuth | `mcp-remote` + npx | Native HTTP OAuth in tn |
+| OAuth | IDE direct MCP OAuth | Native HTTP OAuth in tn |
 | Tool surface | IDE MCP panel | `/tosca` mode in tn |
 | Multi-step autonomy | One tool per IDE turn | `--loop` up to 25 turns |
 | Long-running tasks | Not supported | `--robot` with yield/resume |

@@ -12,7 +12,7 @@ metadata:
 
 # Connect TN to Tosca Cloud
 
-Configure **`tn`** (Tricentis TN CLI) for the user's tenant. TN uses **native HTTP OAuth** — no Node.js or `mcp-remote`.
+Configure **`tn`** (Tricentis TN CLI) for the user's tenant. TN uses **native HTTP OAuth** in the TN CLI runtime.
 
 ## Hosted endpoint
 

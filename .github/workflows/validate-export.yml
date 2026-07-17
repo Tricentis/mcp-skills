@@ -57,4 +57,31 @@ jobs:
             exit 1
           fi
 
+          forbidden=$(find Tosca -type f \( -name '*.md' -o -name '*.json' -o -name '*.py' -o -name '*.ps1' -o -name '*.template' \) \
+            -exec grep -lE 'mcp-remote|0oaau7|/Users/|Documents/GitHub/' {} + 2>/dev/null || true)
+          if [ -n "${forbidden}" ]; then
+            echo "Consumer tree must not contain maintainer leaks or mcp-remote references:"
+            echo "${forbidden}"
+            exit 1
+          fi
+
+          for product in Tosca/Cloud/CLI Tosca/Cloud/MCP Tosca/Commander/CLI Tosca/Commander/MCP; do
+            if [ ! -f "${product}/SHA256SUMS" ]; then
+              echo "Missing ${product}/SHA256SUMS"
+              exit 1
+            fi
+            while read -r expected name; do
+              file="${product}/${name}"
+              if [ ! -f "$file" ]; then
+                echo "SHA256SUMS lists missing file: $file"
+                exit 1
+              fi
+              actual=$(sha256sum "$file" | awk '{print $1}')
+              if [ "$actual" != "$expected" ]; then
+                echo "SHA256 mismatch for $file (expected $expected, got $actual)"
+                exit 1
+              fi
+            done < "${product}/SHA256SUMS"
+          done
+
           echo "validate-export: OK"

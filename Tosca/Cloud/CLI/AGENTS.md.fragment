@@ -47,7 +47,7 @@ Rate every diagnostic conclusion `0–10` with a one-line why: 0–3 speculative
 
 | Use TN (this pack) | Use Tosca.Cloud.MCP.integration |
 |--------------------|--------------------------------|
-| Native OAuth, no Node | IDE Code Mode with mcp-remote |
+| Native OAuth, no Node | IDE direct MCP OAuth |
 | `--loop` / `--robot` | One MCP call per IDE turn |
 | Multi-provider AI | IDE model only |
 | File write-back in repo | IDE-native tools |

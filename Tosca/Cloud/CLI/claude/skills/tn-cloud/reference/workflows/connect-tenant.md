@@ -1,6 +1,6 @@
 # Connect tenant — TN CLI
 
-Configure **`tn`** for hosted Tosca Cloud MCP with native OAuth (no `mcp-remote`).
+Configure **`tn`** for hosted Tosca Cloud MCP with native HTTP OAuth.
 
 ```text
 Connect tenant:

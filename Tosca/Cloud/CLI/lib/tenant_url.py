@@ -16,9 +16,6 @@ HOST_SUFFIX_BY_ENV = {
 
 DEFAULT_ENV = "prod"
 DEFAULT_SPACE = "default"
-DEFAULT_LOOPBACK_PORT = 56874
-DEFAULT_OKTA_CLIENT_ID = "0oaau7llfuawmRFYK0x7"
-DEFAULT_OAUTH_SCOPES = "profile email openid offline_access tta"
 
 
 def normalize_env(value: str | None) -> str:
@@ -85,36 +82,3 @@ def mcp_endpoint_url(tenant: str, space_id: str = DEFAULT_SPACE, env: str = DEFA
     host = tenant_gateway_host(tenant, env)
     space = (space_id or DEFAULT_SPACE).strip().strip("/")
     return f"https://{host}/{space}/_mcp/api/mcp"
-
-
-def build_mcp_server_entry(
-    tenant: str,
-    space_id: str = DEFAULT_SPACE,
-    env: str = DEFAULT_ENV,
-    *,
-    loopback_port: int = DEFAULT_LOOPBACK_PORT,
-    client_id: str = DEFAULT_OKTA_CLIENT_ID,
-    scopes: str = DEFAULT_OAUTH_SCOPES,
-    server_name: str = "tosca-cloud",
-) -> dict:
-  """Cursor mcp.json entry using mcp-remote + OAuth against hosted Cloud MCP."""
-  endpoint = mcp_endpoint_url(tenant, space_id, env)
-  client_info = f'{{"client_id":"{client_id}"}}'
-  client_metadata = f'{{"scope":"{scopes}"}}'
-  return {
-      server_name: {
-          "command": "npx",
-          "args": [
-              "-y",
-              "mcp-remote",
-              endpoint,
-              str(loopback_port),
-              "--host",
-              "127.0.0.1",
-              "--static-oauth-client-info",
-              client_info,
-              "--static-oauth-client-metadata",
-              client_metadata,
-          ],
-      }
-  }
