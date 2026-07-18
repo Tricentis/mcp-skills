@@ -27,10 +27,10 @@ Start Remote Control on the **project root** — starting on a sub-folder can ha
 
 ## Client script (PowerShell)
 
-Use `scripts/lib/TcShellRemoteControl.ps1` after path detection selects Remote Control:
+Use `lib/TcShellRemoteControl.ps1` after path detection selects Remote Control:
 
 ```powershell
-. .\scripts\lib\TcShellRemoteControl.ps1
+. .\lib\TcShellRemoteControl.ps1
 $session = Connect-TcShellRemoteControl -CommanderHome $env:COMMANDER_HOME
 Invoke-TcShellRemoteCommand -RemoteControl $session -Command 'print Name'
 Close-TcShellRemoteControl -Session $session

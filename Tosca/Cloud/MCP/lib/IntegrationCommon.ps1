@@ -58,38 +58,6 @@ function Copy-DirectoryContents {
     }
 }
 
-function Merge-CursorMcpConfig {
-    param(
-        [Parameter(Mandatory = $true)][string]$SourceMcpJson,
-        [Parameter(Mandatory = $true)][string]$TargetMcpJson
-    )
-    if (-not (Test-Path $SourceMcpJson)) {
-        throw "MCP config not found: $SourceMcpJson"
-    }
-
-    $source = Get-Content -Path $SourceMcpJson -Raw -Encoding UTF8 | ConvertFrom-Json
-    $targetDir = Split-Path $TargetMcpJson -Parent
-    if ($targetDir -and -not (Test-Path $targetDir)) {
-        New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
-    }
-
-    if (Test-Path $TargetMcpJson) {
-        $target = Get-Content -Path $TargetMcpJson -Raw -Encoding UTF8 | ConvertFrom-Json
-    } else {
-        $target = [PSCustomObject]@{ mcpServers = [PSCustomObject]@{} }
-    }
-
-    if (-not $target.PSObject.Properties['mcpServers']) {
-        $target | Add-Member -NotePropertyName mcpServers -NotePropertyValue ([PSCustomObject]@{})
-    }
-
-    foreach ($name in $source.mcpServers.PSObject.Properties.Name) {
-        $target.mcpServers | Add-Member -NotePropertyName $name -NotePropertyValue $source.mcpServers.$name -Force
-    }
-
-    $target | ConvertTo-Json -Depth 10 | Set-Content -Path $TargetMcpJson -Encoding UTF8
-}
-
 function Get-IdePackMap {
     $root = $script:RepoRoot
     return [ordered]@{

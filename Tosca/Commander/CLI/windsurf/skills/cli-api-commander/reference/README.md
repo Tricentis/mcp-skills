@@ -14,11 +14,4 @@ Multi-version TCShell reference produced by `scripts/build_tcshell_skill_docs.py
 | `tasks.md` | Hand-authored task name reference (not generated) |
 | `versions/` | Per-release bundles (24.1, 24.2, 25.1, 26.1, master) |
 
-Regenerate from local clones under `~/Documents/GitHub/Tricentis-Tosca`:
-
-```bash
-python3 scripts/build_tcshell_skill_docs.py --all-versions \
-  --commander-base ~/Documents/GitHub/Tricentis-Tosca
-```
-
 See [commander-compatibility.md](commander-compatibility.md).

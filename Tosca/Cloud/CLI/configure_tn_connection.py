@@ -8,8 +8,13 @@ import json
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "scripts/lib"))
+_SCRIPT_DIR = Path(__file__).resolve().parent
+for _lib in (_SCRIPT_DIR / "lib", _SCRIPT_DIR.parent / "scripts" / "lib"):
+    if (_lib / "tenant_url.py").is_file():
+        sys.path.insert(0, str(_lib))
+        break
+else:
+    raise SystemExit("tenant_url.py not found (expected lib/ or scripts/lib/)")
 
 from tenant_url import (  # noqa: E402
     DEFAULT_ENV,

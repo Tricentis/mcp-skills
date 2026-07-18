@@ -3,6 +3,15 @@ name: Validate export
 on:
   pull_request:
     branches: [main]
+    paths:
+      - "Tosca/**"
+      - "LICENSE"
+      - "README.md"
+      - "SECURITY.md"
+      - ".trufflehog-exclude"
+
+permissions:
+  contents: read
 
 jobs:
   validate-export:
@@ -13,5 +22,75 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Forbidden paths and required files
-        run: python3 scripts/validate_export.py
+      - name: Consumer tree layout checks
+        run: |
+          set -euo pipefail
+
+          test -f LICENSE
+          test -f README.md
+
+          if [ -d sync ] || [ -d scripts ]; then
+            echo "Maintainer-only paths must not be published (remove sync/ and scripts/ from consumer repo)"
+            exit 1
+          fi
+
+          if find Tosca -type d -name evaluations 2>/dev/null | grep -q .; then
+            echo "evaluations/ must not appear in consumer tree:"
+            find Tosca -type d -name evaluations
+            exit 1
+          fi
+
+          base=origin/main
+          if ! git rev-parse --verify "${base}" >/dev/null 2>&1; then
+            base=HEAD~1
+          fi
+
+          while IFS= read -r path; do
+            case "$path" in
+              sync/*|scripts/*)
+                echo "Forbidden path in PR: $path"
+                exit 1
+                ;;
+              Tosca/*/evaluations/*|Tosca/*/*/evaluations/*)
+                echo "Forbidden path in PR: $path"
+                exit 1
+                ;;
+            esac
+          done < <(git diff --name-only --diff-filter=AM "${base}...HEAD" 2>/dev/null || git diff --name-only --diff-filter=AM HEAD~1 HEAD)
+
+          bad_paths=$(find Tosca -type f \( -name '*.md' -o -name '*.json' -o -name '*.template' \) \
+            -exec grep -lE 'scripts/(configure_|Get-|lib/)' {} + 2>/dev/null || true)
+          if [ -n "${bad_paths}" ]; then
+            echo "Consumer docs must not reference maintainer scripts/ paths (use pack-root helpers):"
+            echo "${bad_paths}"
+            exit 1
+          fi
+
+          forbidden=$(find Tosca -type f \( -name '*.md' -o -name '*.json' -o -name '*.py' -o -name '*.ps1' -o -name '*.template' \) \
+            -exec grep -lE 'mcp-remote|0oaau7|/Users/|Documents/GitHub/|Merge-CursorMcpConfig|configure_mcp_connection' {} + 2>/dev/null || true)
+          if [ -n "${forbidden}" ]; then
+            echo "Consumer tree must not contain maintainer leaks or mcp-remote references:"
+            echo "${forbidden}"
+            exit 1
+          fi
+
+          for product in Tosca/Cloud/CLI Tosca/Cloud/MCP Tosca/Commander/CLI Tosca/Commander/MCP; do
+            if [ ! -f "${product}/SHA256SUMS" ]; then
+              echo "Missing ${product}/SHA256SUMS"
+              exit 1
+            fi
+            while read -r expected name; do
+              file="${product}/${name}"
+              if [ ! -f "$file" ]; then
+                echo "SHA256SUMS lists missing file: $file"
+                exit 1
+              fi
+              actual=$(sha256sum "$file" | awk '{print $1}')
+              if [ "$actual" != "$expected" ]; then
+                echo "SHA256 mismatch for $file (expected $expected, got $actual)"
+                exit 1
+              fi
+            done < "${product}/SHA256SUMS"
+          done
+
+          echo "validate-export: OK"

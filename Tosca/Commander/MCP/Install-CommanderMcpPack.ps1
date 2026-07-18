@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
     Installs the Commander MCP skill pack for Cursor, Claude, VS Code, or Windsurf.
+    Does not configure MCP servers — users add tosca-commander in IDE Settings -> MCP.
 #>
 [CmdletBinding()]
 param(
@@ -29,15 +30,13 @@ if ($VerifyManifest) {
 }
 
 function Install-CursorPack {
-    param([string]$TargetSkill, [string]$TargetRules, [string]$TargetMcpJson)
+    param([string]$TargetSkill, [string]$TargetRules)
     $pack = $config.PackPath
     $srcSkill = Join-Path $pack "skills/$skillId"
     $srcRules = Join-Path $pack "rules/$skillId.mdc"
-    $srcMcp = Join-Path $pack "mcp.json"
     Copy-DirectoryContents -Source $srcSkill -Destination $TargetSkill
     New-Item -ItemType Directory -Force -Path $TargetRules | Out-Null
     Copy-Item -Path $srcRules -Destination (Join-Path $TargetRules "$skillId.mdc") -Force
-    Merge-CursorMcpConfig -SourceMcpJson $srcMcp -TargetMcpJson $TargetMcpJson
 }
 
 function Install-ClaudePack {
@@ -90,8 +89,7 @@ function Install-WindsurfPack {
 if ($Scope -eq "User") {
     switch ($Ide) {
         "Cursor"   {
-            Install-CursorPack -TargetSkill $config.UserSkill -TargetRules $config.UserRules `
-                -TargetMcpJson (Join-Path $env:USERPROFILE ".cursor/mcp.json")
+            Install-CursorPack -TargetSkill $config.UserSkill -TargetRules $config.UserRules
         }
         "Claude"   { Install-ClaudePack -TargetSkill $config.UserSkill }
         "VSCode"   { throw "VSCode/Copilot user-scope install is not supported; use -Scope Project." }
@@ -102,8 +100,7 @@ if ($Scope -eq "User") {
     switch ($Ide) {
         "Cursor"   {
             Install-CursorPack -TargetSkill (Join-Path $ProjectPath $config.ProjectSkill) `
-                -TargetRules (Join-Path $ProjectPath $config.ProjectRules) `
-                -TargetMcpJson (Join-Path $ProjectPath ".cursor/mcp.json")
+                -TargetRules (Join-Path $ProjectPath $config.ProjectRules)
         }
         "Claude"   {
             Install-ClaudePack -TargetSkill (Join-Path $ProjectPath $config.ProjectSkill)
@@ -118,9 +115,16 @@ if ($Scope -eq "User") {
     Write-Host "Installed $Ide MCP pack to project: $ProjectPath"
 }
 
+Write-Host ""
 Write-Host "Invoke skill: /$skillId (Cursor/Claude) or @$skillId (Windsurf)"
+Write-Host ""
+Write-Host "Next steps:"
+Write-Host "  1. Open Commander 26.1+ with a workspace"
 if ($Ide -eq "Cursor") {
-    Write-Host "Cursor: open Customize (sidebar) and confirm skills, rules, and tosca-commander MCP are enabled."
+    Write-Host "  2. Cursor -> Settings -> MCP -> add server tosca-commander"
+    Write-Host "  3. URL: http://127.0.0.1:46248/mcp (DEBUG builds: port 8080)"
+    Write-Host "  4. Reload Cursor; confirm skills and rules are enabled"
 } else {
-    Write-Host "Requires Commander MCP server (default port 46248) with workspace open."
+    Write-Host "  2. Configure Commander MCP in your IDE (http://127.0.0.1:46248/mcp)"
 }
+Write-Host "  5. Verify: get_workspace_info"

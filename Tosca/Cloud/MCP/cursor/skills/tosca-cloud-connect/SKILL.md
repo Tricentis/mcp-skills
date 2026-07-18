@@ -1,20 +1,22 @@
 ---
 name: tosca-cloud-connect
 description: >-
-  Connects the IDE to hosted Tosca Cloud MCP for a tenant — tenant URL, space, Okta login,
-  and first connectivity check. Use when setting up Tosca Cloud MCP, fixing 401 errors,
-  or before any other Tosca Cloud skill. Does NOT cover TAIS chatbot delegation.
+  Verifies hosted Tosca Cloud MCP connectivity and routes to the right Cloud skills.
+  Use when the user is setting up Cloud MCP, fixing 401 errors, or before other Tosca Cloud skills.
+  Does NOT configure MCP servers — the user adds their tenant in IDE Settings -> MCP.
 license: LicenseRef-Tricentis-Internal
 metadata:
   author: Tricentis
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Connect Tosca Cloud MCP
 
-Direct IDE connection to the **hosted** MCP server for the user's tenant. No local MCPServer process for customers.
+This skill pack **installs agent skills only**. Connecting to Tosca Cloud MCP works like any IDE plugin: the **user** (or IT) adds their tenant server in **Settings → MCP**. The IDE handles authentication on first use.
 
-## Hosted endpoint
+## Hosted endpoint (user-supplied)
+
+Production URL pattern:
 
 ```text
 https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp
@@ -26,49 +28,31 @@ https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp
 | Staging | `{tenant}.my-test.tricentis.com` |
 | Internal dev | `{tenant}.my-dev.tricentis.com` |
 
-`tenant` is the name before `.my.tricentis.com` (same as the Tosca Cloud portal URL).
+`tenant` is the slug from the Tosca Cloud portal (`acme` from `https://acme.my.tricentis.com`). Confirm `spaceId` with the user (often `default`).
 
 ## Setup checklist
 
 ```text
 Connect Tosca Cloud MCP:
-- [ ] Know tenant name and space id
-- [ ] Run configure_mcp_connection.py or install Cursor pack
-- [ ] Enable tosca-cloud MCP in IDE settings
-- [ ] Complete Okta browser login on first connect
+- [ ] Skills installed (marketplace plugin, zip/git installer, or manual copy)
+- [ ] User added MCP server in IDE Settings with their tenant URL
+- [ ] User completed browser sign-in when IDE prompted
 - [ ] Verify: tosca_organization_listWorkspaces
 - [ ] Load tosca-cloud-basics, then task-specific skill
 ```
 
-## Configure connection
+## Configure in Cursor (user action)
 
-From **Tosca.Cloud.MCP.integration** repo:
+1. **Settings → MCP → Add server** (or edit an existing Tosca Cloud entry).
+2. Set the server URL to the tenant pattern above (include `spaceId` in the path).
+3. **Reload** Cursor if needed.
+4. On first connect, complete **Okta / SSO** in the browser when the IDE opens it.
 
-```bash
-python3 scripts/configure_mcp_connection.py \
-  --tenant acme \
-  --space default \
-  --env prod \
-  --output ~/.cursor/mcp.json
-```
-
-Or interactive (prompts for tenant):
-
-```bash
-python3 scripts/configure_mcp_connection.py --output ~/.cursor/mcp.json
-```
-
-Windows (Cursor user profile):
-
-```powershell
-python scripts/configure_mcp_connection.py --tenant acme --output "$env:USERPROFILE\.cursor\mcp.json"
-```
-
-Reload Cursor after saving `mcp.json`. First MCP use opens **Okta** via `mcp-remote` loopback OAuth.
+Do **not** run scripts to generate `mcp.json` on the user's machine unless IT explicitly requires it — this pack does not ship connection automation.
 
 ## Verify connectivity
 
-Call once after login or when tools fail with 401:
+After the user connects in IDE settings:
 
 ```
 tosca_organization_listWorkspaces
@@ -77,8 +61,8 @@ tosca_organization_listWorkspaces
 | Result | Action |
 |--------|--------|
 | Workspace list returned | Proceed — load `tosca-cloud-basics` or task skill |
-| 401 / unauthorized | Re-authenticate: toggle MCP off/on in settings or re-run configure |
-| Connection refused | Check `mcp.json` URL matches tenant + space; confirm network/VPN if required |
+| 401 / unauthorized | User re-authenticates via Settings → MCP (toggle off/on or re-add server) |
+| Connection refused | Confirm URL, space id, network/VPN with user |
 | Empty workspaces | Confirm space id with user |
 
 ## Navigating many MCP tools
@@ -94,23 +78,21 @@ After connect, do **not** load the full tool catalog at once.
 | Raw tool order / Code Mode | `tosca-cloud-mcp` engineering skill |
 | Data Integrity | `tosca_dataintegrity_workflow` first, then one DI reference file |
 
-Engineering skill routes by domain: inventory → playlist → builder → DI. Journey skills handle user stories.
-
 ## Security
 
 - Never paste JWTs or refresh tokens into chat.
-- OAuth tokens are managed by `mcp-remote` / the IDE MCP layer.
+- OAuth tokens stay in the IDE MCP client — not in this skill pack.
 - Destructive tools still require user confirmation per `AGENTS.md`.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| Wrong tenant in URL | Re-run configure with correct tenant or full portal URL |
-| OAuth loop fails | Ensure loopback port `56874` is free; retry in browser |
+| Wrong tenant in URL | User updates MCP server URL in IDE settings |
+| OAuth fails | Retry sign-in from Settings → MCP; check corporate browser/SSO policy |
 | Tools missing | Check product entitlements; some tools are license-gated |
 
 ## Related
 
-- Repo `docs/installation.md` — full install matrix
+- `tosca-cloud-mcp/reference/workflows/connect-tenant.md` — step-by-step for agents
 - `tosca-cloud-mcp/when-to-use-mcp.md` — readiness after connect

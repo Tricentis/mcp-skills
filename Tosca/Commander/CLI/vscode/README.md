@@ -10,10 +10,10 @@ From the release zip root:
 .\Install-CliApiCommanderPack.ps1 -Ide VSCode -Scope Project -ProjectPath "C:\path\to\repo"
 ```
 
-Or from this repo:
+Or from the consumer export root (`Tosca/Commander/CLI`):
 
 ```powershell
-..\..\scripts\Install-CliApiCommanderPack.ps1 -Ide VSCode -Scope Project
+.\Install-CliApiCommanderPack.ps1 -Ide VSCode -Scope Project
 ```
 
 ## Artifacts

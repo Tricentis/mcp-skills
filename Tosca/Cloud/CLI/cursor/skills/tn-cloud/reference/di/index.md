@@ -18,5 +18,3 @@ Read **one** workflow file that matches the user's scenario:
 | DB Expert testcase | [../workflows/di-db-expert-testcase.md](../workflows/di-db-expert-testcase.md) |
 
 Cloud DI tools use async polling for schema and test-connection operations. Wire names: `tosca_dataintegrity_*`.
-
-Regenerate from MCPServer when `DiWorkflowTool.cs` changes: `python3 scripts/extract_di_reference_docs.py`.

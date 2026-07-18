@@ -18,11 +18,11 @@
 Run path detection with **whichever detector executes** — `.ps1` or `.py` (same JSON). If neither runs, use the manual checklist in [path-selection.md](path-selection.md) and read `commander-versions.json` / `tcapi-compatibility.json` from the pack.
 
 ```powershell
-.\scripts\Get-CommanderAutomationPaths.ps1
+.\Get-CommanderAutomationPaths.ps1
 ```
 
 ```bash
-python3 scripts/Get-CommanderAutomationPaths.py
+python3 Get-CommanderAutomationPaths.py
 ```
 
 Read `Runtimes` and `Paths[TCAPI].Details.AvailableHosts` before choosing TCAPI.
@@ -30,9 +30,9 @@ Read `Runtimes` and `Paths[TCAPI].Details.AvailableHosts` before choosing TCAPI.
 If PowerShell **is** available, optional detail:
 
 ```powershell
-.\scripts\Get-TcApiRuntime.ps1
+.\Get-TcApiRuntime.ps1
 # or
-.\scripts\Invoke-TcApi.ps1 -DetectOnly
+.\Invoke-TcApi.ps1 -DetectOnly
 ```
 
 Detection is **version-aware** for Commander **24.1, 24.2, 25.1, 26.1, and master**. It reads:
@@ -90,10 +90,10 @@ $ws.GetProject().Search('=>SUBPARTS:TestCase') | ForEach-Object { $_.Name }
 $ws.Save(); $api.CloseWorkspace()
 ```
 
-Helpers: dot-source `scripts/lib/TcApiSession.ps1` (Add-Type + reflection fallback).
+Helpers: dot-source `lib/TcApiSession.ps1` (Add-Type + reflection fallback).
 
 ```powershell
-.\scripts\Invoke-TcApi.ps1 -Workspace C:\Projects\Demo.tws -ScriptPath .\search-testcases.ps1
+.\Invoke-TcApi.ps1 -Workspace C:\Projects\Demo.tws -ScriptPath .\search-testcases.ps1
 ```
 
 ## dotnet script path (when PowerShell unavailable or agent prefers C#)
@@ -114,7 +114,7 @@ Write `.csx` with placeholder paths (patched at run time):
 Run:
 
 ```powershell
-.\scripts\Invoke-TcApi.ps1 -Workspace C:\Projects\Demo.tws -ScriptPath .\search-testcases.csx
+.\Invoke-TcApi.ps1 -Workspace C:\Projects\Demo.tws -ScriptPath .\search-testcases.csx
 ```
 
 `Invoke-TcApi.ps1` replaces `COMMANDER_HOME` in `#r` lines before calling `dotnet script`.

@@ -124,11 +124,3 @@ listConnections → schema (async) → createRowByRowComparison
 |------|-----|
 | Tool order, polling, parameters | `tn-cloud` (this skill) |
 | User-story diagnose/author/explain | Journey skills — `AGENTS.md` |
-
-## Reference regeneration
-
-```bash
-python3 scripts/build_mcp_skill_docs.py
-```
-
-Source: `~/Documents/GitHub/Tricentis-Tosca/MCPServer` (see `reference/cloud-mcp-versions.json`).

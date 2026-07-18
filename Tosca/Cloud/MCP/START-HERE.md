@@ -15,37 +15,31 @@ Other IDEs: use a future adapter pack from mcp-skills when published. **This exp
 ```text
 Can use Cursor marketplace?
 ├─ YES → Tier 5 (team) or Tier 6 (public)
-│         Skills + rules only. Need installer + MCP config helper? Also get release zip.
+│         Skills + rules only. Zip/git adds Install-ToscaCloudMcpPack.ps1.
 └─ NO
    ├─ Scripts blocked?     → Tier 1: copy cursor/skills and cursor/rules manually
    ├─ No GitHub access?    → Tier 2: IT mirror + verify SHA256 → Tier 1 or 3
-   ├─ PowerShell OK?       → Tier 3: extract zip → Install-ToscaCloudMcpPack.ps1 -Ide Cursor -Tenant <tenant>
+   ├─ PowerShell OK?       → Tier 3: extract zip → Install-ToscaCloudMcpPack.ps1 -Ide Cursor
    └─ Git clone OK?        → Tier 4: clone mcp-skills path Tosca/Cloud/MCP → run installer
 ```
 
-## 3. Quick command (Tier 3)
+## 3. Connect MCP (user action)
 
-```powershell
-.\Install-ToscaCloudMcpPack.ps1 -Ide Cursor -Tenant acme -Space default -Env prod
-```
+This pack **does not** write `mcp.json`. In Cursor:
 
-Or configure MCP only:
-
-```bash
-python3 configure_mcp_connection.py --tenant acme --space default --env prod
-```
+1. **Settings → MCP → Add server**
+2. URL: `https://{tenant}.my.tricentis.com/{space}/_mcp/api/mcp`
+3. Reload; sign in when prompted
 
 ## 4. Verify connection
 
-Reload Cursor → Settings → MCP → enable **tosca-cloud** → run `tosca_organization_listWorkspaces`.
-
-Slash command: `/tosca-cloud-connect`
+Run `tosca_organization_listWorkspaces`. Slash command: `/tosca-cloud-connect`
 
 ## 5. Bundled skills
 
 | Skill | Purpose |
 |-------|---------|
-| `tosca-cloud-connect` | Connect hosted MCP tenant |
+| `tosca-cloud-connect` | Verify hosted MCP tenant connection |
 | `tosca-cloud-basics` | Cloud object model |
 | `tosca-cloud-mcp` | Engineering / tool orchestration |
 | `tosca-analyzing-execution-results` | Latest run diagnosis |

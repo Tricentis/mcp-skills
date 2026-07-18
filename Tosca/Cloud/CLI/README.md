@@ -163,7 +163,7 @@ Use before first automation session. See skill `tn-cloud` → `path-selection.md
 
 | Concern | TN CLI (this pack) | Tosca.Cloud.MCP.integration |
 |---------|-------------------|----------------------------|
-| OAuth | Native in tn | mcp-remote + npx |
+| OAuth | Native in tn | IDE direct MCP OAuth |
 | Tool surface | `/tosca` in tn REPL | IDE MCP panel |
 | Multi-step | `tn --loop` | One tool per IDE turn |
 | Long-running | `tn --robot` | Not supported |

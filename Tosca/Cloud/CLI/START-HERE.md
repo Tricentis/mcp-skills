@@ -62,7 +62,7 @@ See `AGENTS.md.fragment` for full journey routing.
 
 | Use this pack (TN CLI) | Use Tosca.Cloud.MCP.integration |
 |------------------------|----------------------------------|
-| Native OAuth via tn | IDE Code Mode + mcp-remote |
+| Native OAuth via tn | IDE direct MCP OAuth |
 | `--loop` / `--robot` | One MCP tool per IDE turn |
 
 Install **one** Cloud automation path per IDE profile — not both.

@@ -1,0 +1,21 @@
+name: PR guard
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/**"
+
+permissions:
+  contents: read
+
+jobs:
+  block-fork-workflow-edits:
+    name: block-fork-workflow-edits
+    runs-on: ubuntu-stepsecurity-x64
+    if: github.event.pull_request.head.repo.full_name != github.repository
+    steps:
+      - name: Reject workflow changes from forks
+        run: |
+          echo "::error::Pull requests from forks cannot modify .github/ workflows or Actions config."
+          exit 1

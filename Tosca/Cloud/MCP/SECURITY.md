@@ -1,6 +1,6 @@
 # Security — Tosca Cloud MCP pack
 
-IT and security review checklist for the Tosca Cloud MCP integration (`tosca-cloud-mcp`). This pack adds **agent skills, rules, and MCP client configuration** for connecting to the **hosted** Tosca Cloud MCP endpoint — not a local MCP server binary.
+IT and security review checklist for the Tosca Cloud MCP integration (`tosca-cloud-mcp`). This pack adds **agent skills and rules** for use with the **hosted** Tosca Cloud MCP endpoint. Users configure the MCP server in their IDE — this pack does not ship connection automation.
 
 ## Summary
 
@@ -9,18 +9,18 @@ IT and security review checklist for the Tosca Cloud MCP integration (`tosca-clo
 | **Publisher** | Tricentis — [Tricentis-Tosca/Tosca.Cloud.MCP.integration](https://github.com/Tricentis-Tosca/Tosca.Cloud.MCP.integration) |
 | **Install scope** | User profile (default) or project checkout — **no admin** for the IDE pack |
 | **Runtime network** | **Yes** — MCP client connects to `https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp` via OAuth (Okta) |
-| **Secrets** | OAuth tokens managed by the IDE MCP client (`mcp-remote`); pack does not ship credentials |
+| **Secrets** | OAuth tokens managed by the IDE MCP client; pack does not ship credentials or write `mcp.json` |
 | **Integrity** | Release zip published with `SHA256SUMS` on GitHub Releases |
 
 ## What ships where
 
 | Artifact | Contents | Scripts? |
 |----------|----------|----------|
-| **Release zip** (`tosca-cloud-mcp-{version}-user.zip`) | Cursor skills, rules, install scripts, MCP config helper | Yes (user-run) |
+| **Release zip** (`tosca-cloud-mcp-{version}-user.zip`) | Cursor skills, rules, skills installer | Yes (user-run) |
 | **Cursor plugin** | Skills + rules + commands | **No** standalone scripts in plugin tree |
-| **mcp-skills export** | Same consumer tree under `Tosca/Cloud/MCP/cursor/` | Install scripts at export root |
+| **mcp-skills export** | Same consumer tree under `Tosca/Cloud/MCP/cursor/` | Install script at export root |
 
-**Plugin vs zip:** Marketplace plugins install skills and rules. For `configure_mcp_connection.py` and full installer, use the release zip or mcp-skills export.
+**Plugin vs zip:** Both install skills and rules. Zip/git adds `Install-ToscaCloudMcpPack.ps1`. MCP connection is always configured by the user in IDE settings.
 
 ## Hosted MCP endpoint
 
@@ -38,16 +38,14 @@ https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp
 |------|---------|
 | `%USERPROFILE%\.cursor\skills\tosca-*\` | Cursor skills (9 bundled) |
 | `%USERPROFILE%\.cursor\rules\tosca-cloud-mcp.mdc` | Cursor rule (`alwaysApply: false`) |
-| `%USERPROFILE%\.cursor\mcp.json` | Merged MCP server entry for `tosca-cloud` |
 
-The installer **does not** modify `%ProgramFiles%`, registry, or Windows services.
+The installer **does not** modify `%ProgramFiles%`, registry, Windows services, or `mcp.json`.
 
 ## Script behavior
 
 | Script | Reads | Writes | Network |
 |--------|-------|--------|---------|
-| `Install-ToscaCloudMcpPack.ps1` | Pack source | Profile skill/rule paths, optional `mcp.json` | No (local files only) |
-| `configure_mcp_connection.py` | CLI args | `~/.cursor/mcp.json` or project MCP config | No at install time |
+| `Install-ToscaCloudMcpPack.ps1` | Pack source | Profile skill/rule paths | No (local files only) |
 | `pack_release.py` | Repo sources | `dist/*.zip`, `SHA256SUMS` | No |
 
 MCP **runtime** network calls occur when the IDE connects to the hosted endpoint — governed by IDE MCP policy and customer firewall rules.

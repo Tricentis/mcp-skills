@@ -1,5 +1,5 @@
 {
-  "baseDirectory": "~/Documents/GitHub/Tricentis-Tosca",
+  "baseDirectory": ".",
   "defaultVersion": "26.1",
   "versions": {
     "24.1": {
@@ -23,5 +23,5 @@
       "label": "Tosca Commander master (development)"
     }
   },
-  "notes": "Paths are resolved relative to baseDirectory. Override with TCSHELL_COMMANDER_BASE env var or -CommanderBase parameter."
+  "notes": "Maintainers: set TCSHELL_COMMANDER_BASE to your Tricentis-Tosca clone root. Consumers use Get-CommanderAutomationPaths at pack root."
 }

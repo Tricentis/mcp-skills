@@ -1,10 +1,16 @@
 # Commander MCP — install guide
 
-Install **commander-mcp** skills in your IDE **without admin rights**. All methods install the same content (skills, rules, and Cursor MCP config) — pick what your organization allows.
+Install **commander-mcp** skills from [Tricentis/mcp-skills](https://github.com/Tricentis/mcp-skills).
 
-**Prerequisite:** Tosca Commander **26.1+** open with a workspace, and your IDE connected to the Commander MCP server (default port **46248**).
+**Prerequisite:** Tosca Commander **26.1+** open with a workspace.
 
 For **TCShell / TCAPI / Remote Control** when Commander is closed, use [Tosca.Commander.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration).
+
+## Quick start
+
+1. Read `START-HERE.md` for install tiers.
+2. Run `Install-CommanderMcpPack.ps1 -Ide Cursor` (skills and rules only).
+3. Add **tosca-commander** in **Cursor → Settings → MCP** (`http://127.0.0.1:46248/mcp`).
 
 ## What you get
 
@@ -12,7 +18,8 @@ For **TCShell / TCAPI / Remote Control** when Commander is closed, use [Tosca.Co
 |------|---------|
 | `commander-mcp` skill | Orchestration for Commander MCP tools (Code Mode or direct tool mode) |
 | IDE rules / instructions | When to use checkout, save, DI workflows |
-| `cursor/mcp.json` | Cursor MCP server entry for `tosca-commander` |
+
+This export does **not** ship `mcp.json`. Configure MCP in your IDE.
 
 ## Choose your install tier
 
@@ -27,8 +34,6 @@ For **TCShell / TCAPI / Remote Control** when Commander is closed, use [Tosca.Co
 
 Pick **one** tier and **one** scope (user or project). Do not install via plugin and zip/git to the same profile paths.
 
-> **Maintainers:** Skill authoring, build, and export scripts live in the internal source repo ([Tosca.Commander.MCP.Integration `scripts/`](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration/tree/main/scripts)). This directory ships **install scripts only**.
-
 ---
 
 ## Tier 1: Manual folder copy
@@ -41,9 +46,8 @@ Copy from this directory (`Tosca/Commander/MCP/`) with File Explorer or an appro
 |-----------|-----|
 | `cursor/skills/commander-mcp/` | `%USERPROFILE%\.cursor\skills\commander-mcp\` |
 | `cursor/rules/commander-mcp.mdc` | `%USERPROFILE%\.cursor\rules\commander-mcp.mdc` |
-| `cursor/mcp.json` | Merge into `%USERPROFILE%\.cursor\mcp.json` |
 
-Merge `mcp.json` — add the `tosca-commander` entry if the file already exists:
+Add MCP in **Cursor → Settings → MCP**:
 
 ```json
 {
@@ -55,7 +59,7 @@ Merge `mcp.json` — add the `tosca-commander` entry if the file already exists:
 }
 ```
 
-Or add the server in **Cursor → Customize → MCP** (Cursor 3.8+).
+DEBUG Commander builds use port **8080**.
 
 ### Claude Code (user scope)
 
@@ -85,9 +89,10 @@ Configure Commander MCP in Claude Code settings separately.
 |-----------|-------------------|
 | `cursor/skills/commander-mcp/` | `.cursor/skills/commander-mcp/` |
 | `cursor/rules/commander-mcp.mdc` | `.cursor/rules/commander-mcp.mdc` |
-| `cursor/mcp.json` | `.cursor/mcp.json` (merge if exists) |
 | `windsurf/skills/commander-mcp/` | `.codeium/windsurf/skills/commander-mcp/` |
 | `windsurf/rules/commander-mcp.md` | `.codeium/windsurf/rules/commander-mcp.md` |
+
+Configure `.cursor/mcp.json` or IDE MCP settings for project scope as needed.
 
 ---
 
@@ -97,9 +102,11 @@ Configure Commander MCP in Claude Code settings separately.
 |---------|----------------|
 | **SHA256** | Verify release zip against `SHA256SUMS` before extract (Tier 2–3). |
 | **sourceSha** | `manifest.json` records the integration-repo commit used to build this tree. |
-| **Localhost MCP only** | Pack `mcp.json` points to `http://127.0.0.1:46248/mcp` — no remote endpoints. |
+| **Localhost MCP only** | User-configured endpoint `http://127.0.0.1:46248/mcp` — no remote endpoints in this pack. |
 | **No network in installer** | Install scripts copy local files only; they do not download or execute remote code. |
 | **Optional verify** | `.\Install-CommanderMcpPack.ps1 -Ide Cursor -VerifyManifest` checks `manifest.json` before copy. |
+
+See [SECURITY.md](SECURITY.md) for IT review checklist.
 
 Pick **one** install method per profile (marketplace **or** zip/git) to avoid duplicate skills.
 
@@ -127,12 +134,6 @@ Install-CommanderMcpPack.bat -Ide Cursor
 .\Install-CommanderMcpPack.ps1 -Ide Cursor
 ```
 
-Optional manifest check before copy:
-
-```powershell
-.\Install-CommanderMcpPack.ps1 -Ide Cursor -VerifyManifest
-```
-
 Supported `-Ide` values: `Cursor`, `Claude`, `VSCode`, `Windsurf`.
 
 **Project scope:**
@@ -153,8 +154,6 @@ cd mcp-skills/Tosca/Commander/MCP
 .\Install-CommanderMcpPack.ps1 -Ide Cursor
 ```
 
-Also available for Claude, Windsurf, and VS Code (project scope).
-
 ---
 
 ## Tier 5: Team / private marketplace
@@ -162,10 +161,8 @@ Also available for Claude, Windsurf, and VS Code (project scope).
 When your organization publishes **commander-mcp** to a Cursor or Claude team marketplace:
 
 1. Install the plugin from **Customize** (Cursor 3.8+) or your org Claude marketplace.
-2. Enable **tosca-commander** MCP (`http://127.0.0.1:46248/mcp`).
+2. Enable **tosca-commander** MCP in IDE settings (`http://127.0.0.1:46248/mcp`).
 3. Confirm `/commander-mcp` skill and rules are active.
-
-DEBUG Commander builds use port **8080** — add a second MCP entry if needed.
 
 ---
 
@@ -193,21 +190,10 @@ When published to public Cursor or Claude marketplaces, install from **Customize
 
 Both are required for automation.
 
-## MCP client setup
-
-| Setting | Value |
-|---------|-------|
-| Transport | HTTP |
-| Server name | `tosca-commander` |
-| URL | `http://127.0.0.1:46248/mcp` |
-| DEBUG builds | Port **8080** |
-
-Verify with MCP tool `get_workspace_info` after Commander opens a workspace.
-
 ## Validate installation
 
 1. Skill `/commander-mcp` appears in your IDE.
-2. **tosca-commander** MCP is enabled (Cursor: Customize → MCP).
+2. **tosca-commander** MCP is enabled (Cursor: Settings → MCP).
 3. Commander is open with a workspace.
 4. Run read-only test: `get_workspace_info`.
 
@@ -218,3 +204,7 @@ These skills are provided on an **open-source cadence** — outside Tricentis pr
 ## License
 
 Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). See [repository LICENSE](../../../LICENSE).
+
+## Source
+
+Exported from `Tricentis-Tosca/Tosca.Commander.MCP.Integration`. See `manifest.json` for `sourceRepo`, `sourceSha`, and version.

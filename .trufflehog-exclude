@@ -1,0 +1,6 @@
+# Exclude historical changelog mentions and test fixture passwords.
+.*CHANGELOG\.md$
+.*output-patterns\.md$
+.*cli-from-source\.md$
+.*cli-flags\.md$
+.*commands\.md$

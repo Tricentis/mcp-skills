@@ -22,12 +22,12 @@ Use **whichever detector executes** in the IDE terminal (same JSON shape). Try o
 
 ```powershell
 # When PowerShell is available — includes Remote Control session probe
-.\scripts\Get-CommanderAutomationPaths.ps1 -Workspace "C:\Projects\Demo.tws"
+.\Get-CommanderAutomationPaths.ps1 -Workspace "C:\Projects\Demo.tws"
 ```
 
 ```bash
 # When Python is available and allowed to run
-python3 scripts/Get-CommanderAutomationPaths.py --workspace "C:/Projects/Demo.tws"
+python3 Get-CommanderAutomationPaths.py --workspace "C:/Projects/Demo.tws"
 ```
 
 On Windows, try `python` if `python3` is not on PATH. **Neither script is required** — headless TCShell via cmd always works when Commander is installed and the workspace is unlocked.
@@ -56,11 +56,11 @@ Every detection result includes:
 Override version when path detection is ambiguous (use whichever detector runs):
 
 ```powershell
-.\scripts\Get-CommanderAutomationPaths.ps1 -CommanderVersion 25.1
+.\Get-CommanderAutomationPaths.ps1 -CommanderVersion 25.1
 ```
 
 ```bash
-python3 scripts/Get-CommanderAutomationPaths.py --commander-version 24.1
+python3 Get-CommanderAutomationPaths.py --commander-version 24.1
 ```
 
 Or read `COMMANDER_VERSION` from `%USERPROFILE%\.tricentis\tcshell-ide.env` and [commander-versions.json](reference/commander-versions.json) when no detector runs.
@@ -156,7 +156,7 @@ Check `Paths[TCAPI].Details.AvailableHosts`:
 Only when `Paths[RemoteControl].Available` is true **and** `AnyPowerShell` is true:
 
 ```powershell
-. .\scripts\lib\TcShellRemoteControl.ps1
+. .\lib\TcShellRemoteControl.ps1
 $rc = Connect-TcShellRemoteControl -CommanderHome $env:COMMANDER_HOME
 Invoke-TcShellRemoteCommand -RemoteControl $rc -Command 'print Name'
 Close-TcShellRemoteControl -Session $rc

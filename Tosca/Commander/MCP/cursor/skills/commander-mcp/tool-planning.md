@@ -139,13 +139,3 @@ execute_test_suite ...
 | Task not in list | Re-run `list_available_tasks` after selection/checkout change |
 | DI license | Stop; inform user DI is not licensed |
 | Another execute_test_suite in progress | Poll `execute_test_suite_status` until complete |
-
-## Reference regeneration
-
-Tool names and descriptions are generated from the **master** clone:
-
-```bash
-python3 scripts/build_mcp_skill_docs.py
-```
-
-Clone path: `~/Documents/GitHub/Tricentis-Tosca/Tricentis.ToscaCommander`. Override with `--commander-repo` or `--commander-base`.
