@@ -96,12 +96,11 @@ Creates Git tag `tosca/commander/mcp/{version}` and GitHub Release.
 
 Configure on **`production` environment** for `export-mcp-skills.yml`:
 
-| Secret / variable | Purpose |
-|-------------------|---------|
-| `SIGNPATH_API_TOKEN` | SignPath API key |
-| `SIGNPATH_ORGANIZATION_ID` | SignPath organization ID |
-| `SIGNPATH_SIGNINGPOLICY_SLUG` | Installer signing policy |
-| `SIGNPATH_PROJECT_SLUG` | Repository variable — SignPath project |
+| Secret | Purpose |
+|--------|---------|
+| `OP_SERVICE_ACCOUNT_TOKEN` | 1Password service account — read-only access to SignPath item in **`TAIS-SECRETS-PROD`** |
+
+SignPath credentials (`api_token`, `organization_id`, `project_slug`, `signing_policy_slug`) are stored in 1Password item **`SignPath mcp-skills-installers`**. CI loads them at runtime via `1password/load-secrets-action`. See [signpath-1password-setup.md](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration/blob/main/docs/signpath-1password-setup.md).
 
 Export PRs to mcp-skills are opened by maintainers from signed release branches.
 
@@ -147,4 +146,4 @@ Follow **Part 6** in the [distribution plan](https://github.com/Tricentis-Tosca/
 | Rejected PR | Close; fix source; re-run export workflow |
 | Bad release | Revert merge PR on mcp-skills; re-sync from fixed source |
 | Zip ≠ export mismatch | Fix `ConsumerExport.ps1`; rebuild both artifacts |
-| Sign job failed | Verify SignPath secrets/policy on **integration repo** `production` environment |
+| Sign job failed | Verify 1Password item in **`TAIS-SECRETS-PROD`** and `OP_SERVICE_ACCOUNT_TOKEN` on integration repo **`production`** |
