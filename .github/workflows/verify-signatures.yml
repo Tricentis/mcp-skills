@@ -1,0 +1,47 @@
+name: Verify signatures
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "Tosca/**"
+  push:
+    branches: [main]
+    paths:
+      - "Tosca/**"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-signatures:
+    name: verify-signatures
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Verify Authenticode on product installers
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $products = @(
+            "Tosca/Cloud/CLI",
+            "Tosca/Cloud/MCP",
+            "Tosca/Commander/CLI",
+            "Tosca/Commander/MCP"
+          )
+          $failures = @()
+          foreach ($product in $products) {
+            if (-not (Test-Path $product)) { continue }
+            Get-ChildItem -Path $product -File -Include *.ps1, *.bat | ForEach-Object {
+              $sig = Get-AuthenticodeSignature -FilePath $_.FullName
+              if ($sig.Status -ne "Valid") {
+                $failures += "$($_.FullName): $($sig.Status)"
+              } else {
+                Write-Host "OK $($_.FullName) -> $($sig.SignerCertificate.Subject)"
+              }
+            }
+          }
+          if ($failures.Count -gt 0) {
+            Write-Error ("Unsigned or invalid installer scripts:`n" + ($failures -join "`n") + "`n`nPublish through source repo export CI (SignPath) before opening mcp-skills PR.")
+          }

@@ -7,14 +7,14 @@ GitHub-only automation for syncing skills from internal source repos to **Tricen
 ## Flow
 
 ```text
-integration main → sync + validate → ConsumerExport staging
-                → orphan release branch (export only)
-                → manual PR to mcp-skills main
-                → 2 approvals + validate-export CI
-                → merge → production env → tag + SignPath-signed installer zip
+integration main → sync + validate → export staging
+                → SignPath sign (private repo CI)
+                → orphan release branch → PR to mcp-skills main
+                → verify-signatures + validate-export CI
+                → merge → production env → git tag
 ```
 
-Release zip (`pack_release.ps1`) and mcp-skills git tree are built from the **same** `ConsumerExport.ps1` staging — they must stay identical.
+Release zip (`pack_release.ps1`) and mcp-skills git tree are built from the **same** consumer export staging — they must stay identical. **Signing runs on the staging tree in private integration repos**, not on mcp-skills.
 
 ## Source repo (`Tosca.Commander.MCP.Integration`)
 
@@ -46,11 +46,11 @@ Consumer-only: skills, user documentation, and install scripts under `Tosca/**`.
 
 | Workflow | File | Trigger |
 |----------|------|---------|
-| Validate | `.github/workflows/validate-export.yml` | Pull requests touching `Tosca/**` — inline shell only |
+| Validate | `.github/workflows/validate-export.yml` | Pull requests touching `Tosca/**` |
+| Verify signatures | `.github/workflows/verify-signatures.yml` | Authenticode Valid on product installers |
 | PR guard | `.github/workflows/pr-guard.yml` | Blocks fork PRs from modifying `.github/**` |
 | Secret scan | `.github/workflows/secret-scan.yml` | TruffleHog verified-only on `Tosca/**` |
 | Release | `.github/workflows/release.yml` | Push to `main` when `manifest.json` version changes |
-| Sign | `.github/workflows/sign-installers.yml` | After GitHub Release published — SignPath Authenticode zip |
 
 ## License
 
@@ -65,7 +65,7 @@ Configure in **Settings → Branches → Branch protection rules**:
 | Require pull request | Yes |
 | Required approvals | **2** |
 | Require review from CODEOWNERS | Yes |
-| Require status checks | `validate-export`, `trufflehog` |
+| Require status checks | `validate-export`, `verify-signatures`, `trufflehog` |
 | Dismiss stale reviews | Yes |
 | Restrict force pushes | Yes |
 | Allow bypass | Nobody |
@@ -78,18 +78,32 @@ Configure in **Settings → Branches → Branch protection rules**:
 |---------|-------|
 | Required reviewers | Skill approvers (individuals OK while private) |
 | Deployment branches | `main` only |
-| Used by | `release.yml`, `sign-installers.yml` |
+| Used by | `release.yml` on mcp-skills (tags only; no signing secrets) |
 
-Creates Git tag `tosca/commander/mcp/{version}`, GitHub Release, and SignPath-signed installer bundle.
+Creates Git tag `tosca/commander/mcp/{version}` and GitHub Release.
 
 ## Secrets
 
-| Secret | Repo | Purpose |
-|--------|------|---------|
-| `SIGNPATH_API_TOKEN` | mcp-skills (`production` env) | Authenticode signing via SignPath |
-| `GITHUB_TOKEN` | mcp-skills | Default token for release tagging (scoped by environment) |
+### mcp-skills (public consumer repo)
 
-Export PRs to mcp-skills are opened by maintainers from local clones or release branches — **no** sync PAT stored in integration repos. Prefer a GitHub App if automated PR creation is added later.
+| Secret | Purpose |
+|--------|---------|
+| `GITHUB_TOKEN` | Default token for release tagging (scoped by environment) |
+
+**No SignPath or sync PAT on this repo.**
+
+### Integration repos (private source)
+
+Configure on **`production` environment** for `export-mcp-skills.yml`:
+
+| Secret / variable | Purpose |
+|-------------------|---------|
+| `SIGNPATH_API_TOKEN` | SignPath API key |
+| `SIGNPATH_ORGANIZATION_ID` | SignPath organization ID |
+| `SIGNPATH_SIGNINGPOLICY_SLUG` | Installer signing policy |
+| `SIGNPATH_PROJECT_SLUG` | Repository variable — SignPath project |
+
+Export PRs to mcp-skills are opened by maintainers from signed release branches.
 
 ## Auditor playbook
 
@@ -98,7 +112,7 @@ Export PRs to mcp-skills are opened by maintainers from local clones or release 
 3. Open the PR merged for that sync — note **2 approvers** in review timeline.
 4. Read PR body: source branch @ SHA, workflow run URL.
 5. Verify `Tosca/Commander/MCP/manifest.json` `sourceSha` matches.
-6. Download signed installer zip from the GitHub Release assets.
+6. Download signed installers from git (Authenticode Valid) or verify SHA256 against `SHA256SUMS`.
 
 ## Adding a new product path
 
@@ -133,4 +147,4 @@ Follow **Part 6** in the [distribution plan](https://github.com/Tricentis-Tosca/
 | Rejected PR | Close; fix source; re-run export workflow |
 | Bad release | Revert merge PR on mcp-skills; re-sync from fixed source |
 | Zip ≠ export mismatch | Fix `ConsumerExport.ps1`; rebuild both artifacts |
-| Sign job failed | Verify `SIGNPATH_API_TOKEN` and `mcp-skills-installers` policy in SignPath |
+| Sign job failed | Verify SignPath secrets/policy on **integration repo** `production` environment |

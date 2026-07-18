@@ -30,7 +30,18 @@ Release tags (`tosca/cloud/mcp/{version}`, etc.) are created when `manifest.json
 
 ## Code signing
 
-Install scripts in git include **SHA256SUMS** for integrity checks. On each GitHub Release, `sign-installers.yml` (production environment) builds a per-product installer zip and signs it with **SignPath Authenticode** (`SIGNPATH_API_TOKEN`). Download the signed zip from release assets for enterprise deployment.
+Install scripts are **Authenticode-signed in private source repos** before export (SignPath via `export-mcp-skills.yml`). This public repo stores the signed bytes and `SHA256SUMS` for integrity checks.
+
+**Do not configure SignPath secrets here.** Configure on each integration repo `production` environment:
+
+| Secret / variable | Purpose |
+|-------------------|---------|
+| `SIGNPATH_API_TOKEN` | SignPath API key |
+| `SIGNPATH_ORGANIZATION_ID` | SignPath org |
+| `SIGNPATH_SIGNINGPOLICY_SLUG` | Policy for installer scripts |
+| `SIGNPATH_PROJECT_SLUG` (variable) | SignPath project |
+
+Verify locally or in CI:
 
 ```powershell
 Get-AuthenticodeSignature .\Install-ToscaCloudMcpPack.ps1
@@ -43,9 +54,9 @@ Get-FileHash -Path .\Install-ToscaCloudMcpPack.ps1 -Algorithm SHA256
 | Workflow | Purpose |
 |----------|---------|
 | `validate-export.yml` | Consumer layout; leak grep; SHA256SUMS verification |
+| `verify-signatures.yml` | Authenticode Valid on product `.ps1` / `.bat` installers |
 | `pr-guard.yml` | Blocks fork PRs from modifying `.github/**` |
 | `secret-scan.yml` | TruffleHog verified secrets scan on `Tosca/**` |
-| `sign-installers.yml` | SignPath Authenticode on release assets |
 | GitGuardian | Org-level secret detection on pull requests |
 
 ### TruffleHog (verified secrets)
