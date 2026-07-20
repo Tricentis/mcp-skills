@@ -38,6 +38,21 @@ Installer does **not** modify system directories or IDE MCP config (unlike Tosca
 | `Get-TnCloudPaths.py` | No |
 | `tn` (user-run) | Yes — Tosca Cloud + AI provider |
 
+## PowerShell execution policy
+
+Install scripts are **Authenticode-signed** by Tricentis. Default install does **not** use `-ExecutionPolicy Bypass`; scripts honor the machine policy (`AllSigned`, `RemoteSigned`, etc.) when the Tricentis publisher is trusted.
+
+```powershell
+.\Install-TnCloudPack.ps1
+# or double-click Install-TnCloudPack.bat
+```
+
+**Fallback** (unsigned dev checkout, or publisher not in your trust store — only with security team approval):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Install-TnCloudPack.ps1
+```
+
 ## TN runtime security
 
 - Tool approvals in REPL for write/edit and non-auto-approved MCP

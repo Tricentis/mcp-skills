@@ -291,19 +291,10 @@ def probe_remote_control_via_powershell(commander_home: str, runtimes: dict[str,
     if not ps:
         return False, "Remote Control session probe requires PowerShell or a custom .NET host loading RemoteControlObjects.dll."
 
-    script = f"""
-$ErrorActionPreference = 'Stop'
-$env:COMMANDER_HOME = '{commander_home.replace("'", "''")}'
-. '{Path(__file__).resolve().parent / "TcShellRemoteControl.ps1"}'
-try {{
-  $rc = Connect-TcShellRemoteControl -CommanderHome $env:COMMANDER_HOME
-  if ($rc) {{ 'OK' }}
-}} catch {{ exit 1 }}
-finally {{ Close-TcShellRemoteControl }}
-"""
+    probe_script = Path(__file__).resolve().parent / "TcShellRemoteControl.ps1"
     try:
         proc = subprocess.run(
-            [ps, "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
+            [ps, "-NoProfile", "-File", str(probe_script), "-ProbeSession", "-CommanderHome", commander_home],
             capture_output=True,
             text=True,
             timeout=20,

@@ -30,7 +30,7 @@ Release tags (`tosca/cloud/mcp/{version}`, etc.) are created when `manifest.json
 
 ## Code signing
 
-Install scripts are **Authenticode-signed in private source repos** before export (SignPath via `export-mcp-skills.yml`). This public repo stores the signed bytes and `SHA256SUMS` for integrity checks.
+Install scripts are **Authenticode-signed in private source repos** before export (SignPath via `export-mcp-skills.yml`). This public repo stores the signed bytes and `SHA256SUMS` for integrity checks. **Default `.bat` launchers do not pass `-ExecutionPolicy Bypass`** — see each product `SECURITY.md` for the documented fallback.
 
 **Do not configure SignPath secrets on this repo.** Signing runs in private integration repos; credentials live in **1Password vault `TAIS-SECRETS-PROD`**. Each integration repo's `production` environment holds only `OP_SERVICE_ACCOUNT_TOKEN` (read-only service account).
 

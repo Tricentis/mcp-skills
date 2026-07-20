@@ -425,7 +425,7 @@ function Invoke-TcApiInRecommendedHost {
     $exe = Resolve-TcApiPowerShellExecutable -Runtime $Runtime
     if (-not $exe) { throw 'No suitable PowerShell host found for this Commander version.' }
 
-    $argList = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $ScriptPath)
+    $argList = @('-NoProfile', '-File', $ScriptPath)
     foreach ($key in $BoundParameters.Keys) {
         if ($key -in @('DetectOnly', 'Prefer')) { continue }
         $val = $BoundParameters[$key]
