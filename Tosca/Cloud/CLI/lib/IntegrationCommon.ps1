@@ -7,25 +7,31 @@ if ((Split-Path $_libParent -Leaf) -eq "lib") {
     $script:RepoRoot = $_libParent
 }
 
-$script:EngineeringSkillId = "tn-cloud"
-$script:PackageName = "tn-cloud-IDE"
+$script:EngineeringSkillId = "tosca-cloud"
+$script:PackageName = "tosca-cloud-IDE"
 
 function Get-RepoRoot { return $script:RepoRoot }
 
 function Get-EngineeringSkillId { return $script:EngineeringSkillId }
 
-function Get-TnSkillIds {
+function Get-ToscaSkillIds {
     param([Parameter(Mandatory = $true)][string]$SkillsRoot)
     if (-not (Test-Path $SkillsRoot)) {
         throw "Skills directory not found: $SkillsRoot"
     }
     $ids = @()
     foreach ($dir in Get-ChildItem -Path $SkillsRoot -Directory) {
-        if ($dir.Name -eq $script:EngineeringSkillId -or $dir.Name -like "tn-*") {
+        if ($dir.Name -eq $script:EngineeringSkillId -or $dir.Name -like "tosca-*" -or $dir.Name -eq "toscactl-reference") {
             $ids += $dir.Name
         }
     }
     return $ids | Select-Object -Unique | Sort-Object
+}
+
+# Backward-compatible alias for install scripts
+function Get-TnSkillIds {
+    param([Parameter(Mandatory = $true)][string]$SkillsRoot)
+    Get-ToscaSkillIds -SkillsRoot $SkillsRoot
 }
 
 function Test-PackManifest {

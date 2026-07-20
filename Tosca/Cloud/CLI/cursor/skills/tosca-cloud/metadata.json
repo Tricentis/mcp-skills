@@ -1,0 +1,5 @@
+{
+  "name": "tosca-cloud",
+  "version": "1.1.0",
+  "description": "Tosca Cloud automation via toscactl (default) and tn for CLI gaps."
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate or merge ~/.tn/mcp.json for hosted Tosca Cloud MCP (native TN OAuth)."""
+"""Generate ~/.tn/mcp.json for tn gap workflows (Builder, DI, loop, robot). Primary runtime is toscactl."""
 
 from __future__ import annotations
 

@@ -1,76 +1,56 @@
-# START HERE — TN Cloud CLI pack (consumer)
+# START HERE — Tosca Cloud CLI pack (consumer)
 
-Install **9 skills** for automating Tosca Cloud via the **TN CLI** (`tn`, `/tosca`, `--loop`, `--robot`).
+Install **24 skills** for automating Tosca Cloud via **toscactl** (default) and **tn** (CLI gaps).
+
+Install toscactl: [tosca-cli README](https://github.com/Tricentis-Tosca/tosca-cli#installation)
 
 ## 1. Pick install tier
 
 | Tier | When | Action |
 |------|------|--------|
-| **1** | Manual / air-gapped | Copy skill folders from `cursor/skills/` (or claude/windsurf) to your IDE user skills path |
-| **2** | Zip download | Verify SHA256 → extract → Tier 1 or Tier 3 |
-| **3** | Script install | `Install-TnCloudPack.ps1 -Ide Cursor -Tenant <tenant>` |
+| **1** | Manual | Copy skill folders from `cursor/skills/` to IDE user skills path |
+| **2** | Zip | Verify SHA256 → extract → Tier 1 or 3 |
+| **3** | Script | `Install-ToscaCloudPack.ps1 -Ide Cursor -Tenant <tenant>` |
 | **4** | Git | Clone mcp-skills `Tosca/Cloud/CLI` → Tier 3 |
-| **5–6** | Marketplace | Cursor / Claude plugin when published (see `cursor/.cursor-plugin/`) |
 
 ## 2. Prerequisites
 
-- `tn` on PATH
-- Python 3 (for `configure_tn_connection.py` and `Get-TnCloudPaths.py`)
+- `toscactl` on PATH
+- Python 3 (for `verify_toscactl.py`, `Get-TnCloudPaths.py`, `configure_tn_connection.py`)
 - Tosca Cloud tenant
 
-## 3. Configure tn
+## 3. Configure toscactl (default)
 
-```powershell
-.\Install-TnCloudPack.ps1 -Ide Cursor -Tenant <tenant> -Space default
+```bash
+toscactl login --url <tenant>.my.tricentis.com
+toscactl workspaces set "My Workspace"
+python3 verify_toscactl.py
 ```
 
-Or config only:
+Or script install:
+
+```powershell
+.\Install-ToscaCloudPack.ps1 -Ide Cursor -Tenant <tenant>
+```
+
+## 4. Configure tn (gap workflows only)
+
+Required for Builder author/remediate, DI, loop, robot:
 
 ```bash
 python3 configure_tn_connection.py --tenant <tenant> --output ~/.tn/mcp.json
 tn --setup
 ```
 
-## 4. Verify
+## 5. Verify
 
 ```bash
-echo "/tosca then list workspaces" | tn
+toscactl config --json --silent
 python3 Get-TnCloudPaths.py
 ```
 
-## 5. Pick IDE
+## 6. Read first
 
-| IDE | User skills path |
-|-----|------------------|
-| Cursor | `~/.cursor/skills/` |
-| Claude | `~/.claude/skills/` |
-| Windsurf | `~/.codeium/windsurf/skills/` |
-| VS Code | Project `.github/copilot-instructions.md` (fragment in `vscode/`) |
+Load **`tosca-cloud-basics`** then the journey skill for your task. See `AGENTS.md.fragment` in the install root.
 
-## 6. First task
-
-| I want to… | Skill |
-|------------|-------|
-| Fix setup / 401 | `tn-cloud-connect` |
-| Why did my run fail? | `tn-analyzing-execution-results` |
-| Run playlist autonomously | `tn-cloud` → loop-autonomous |
-| Explain a test case | `tn-explaining-testcase` |
-
-See `AGENTS.md.fragment` for full journey routing.
-
-## 7. TN vs direct IDE MCP
-
-| Use this pack (TN CLI) | Use Tosca.Cloud.MCP.integration |
-|------------------------|----------------------------------|
-| Native OAuth via tn | IDE direct MCP OAuth |
-| `--loop` / `--robot` | One MCP tool per IDE turn |
-
-Install **one** Cloud automation path per IDE profile — not both.
-
-## 8. Security
-
-See `SECURITY.md`. Installer copies local files only; OAuth runs when **you** invoke `tn`.
-
-## Source
-
-Exported from [Tricentis-Tosca/Tosca.Cloud.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Cloud.IDE.integration). Version and `sourceSha` in `manifest.json`.
+Gap table: [cli-gaps.md](cli-gaps.md)

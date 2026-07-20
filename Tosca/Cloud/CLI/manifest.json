@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "packageName": "tn-cloud-IDE",
+  "version": "1.1.0",
+  "packageName": "tosca-cloud-IDE",
   "installScope": "User",
   "adminRequired": false,
   "supportedIdes": [
@@ -11,8 +11,8 @@
   ],
   "license": "Apache-2.0",
   "sourceRepo": "Tricentis-Tosca/Tosca.Cloud.IDE.integration",
-  "sourceBranch": "cloud-cli-1.0.0",
-  "sourceSha": "2a2f99e7fad1fd6bae066b96ede4b572719a0ee8",
-  "syncedAt": "2026-07-17T16:16:08.173499+00:00",
-  "generatedAt": "2026-07-17T16:16:08.173499+00:00"
+  "sourceBranch": "cloud-cli-1.1.0",
+  "sourceSha": "8683286c1eefa61981d33ca3230da309101d25ea",
+  "syncedAt": "2026-07-20T17:07:06.222602+00:00",
+  "generatedAt": "2026-07-20T17:07:06.222602+00:00"
 }

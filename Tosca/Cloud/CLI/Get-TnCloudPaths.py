@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Detect tn CLI availability and ~/.tn configuration."""
+"""Detect toscactl and tn CLI availability; recommend runtime path."""
 
 from __future__ import annotations
 
@@ -31,6 +31,23 @@ def detect_tn() -> dict:
     return {"available": bool(tn_path), "path": tn_path or "", "version": version}
 
 
+def detect_toscactl() -> dict:
+    cli_path = shutil.which("toscactl")
+    version = ""
+    if cli_path:
+        try:
+            proc = subprocess.run(
+                [cli_path, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            version = (proc.stdout or proc.stderr).strip()
+        except (subprocess.TimeoutExpired, OSError):
+            version = "unknown"
+    return {"available": bool(cli_path), "path": cli_path or "", "version": version}
+
+
 def read_mcp_config() -> dict:
     mcp_path = home_tn_dir() / "mcp.json"
     if not mcp_path.is_file():
@@ -55,34 +72,86 @@ def read_appsettings() -> dict:
     return {"configured": bool(active), "path": str(apps_path), "active_provider": active}
 
 
-def build_paths(tn: dict, mcp: dict, apps: dict) -> list[dict]:
+def read_toscactl_config(cli_path: str) -> dict:
+    if not cli_path:
+        return {"ready": False, "tenant_url": "", "workspace_name": ""}
+    try:
+        proc = subprocess.run(
+            [cli_path, "config", "--json", "--silent"],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        if proc.returncode != 0:
+            return {"ready": False, "tenant_url": "", "workspace_name": ""}
+        data = json.loads(proc.stdout or "{}")
+        return {
+            "ready": bool(data.get("current_url") and data.get("workspace_id")),
+            "tenant_url": data.get("current_url", ""),
+            "workspace_name": data.get("workspace_name", ""),
+        }
+    except (json.JSONDecodeError, subprocess.TimeoutExpired, OSError):
+        return {"ready": False, "tenant_url": "", "workspace_name": ""}
+
+
+def build_tn_paths(tn: dict, mcp: dict, apps: dict) -> list[dict]:
     ready = tn["available"] and mcp.get("tosca_url") and apps["configured"]
-    paths = [
-        {"id": "Repl", "available": ready, "hostRequired": "terminal", "notes": "tn then /tosca"},
-        {"id": "Piped", "available": ready, "hostRequired": "terminal", "notes": "echo prompt | tn"},
-        {"id": "Loop", "available": ready, "hostRequired": "terminal", "notes": "tn --loop"},
-        {"id": "Robot", "available": ready, "hostRequired": "terminal", "notes": "tn --robot"},
+    return [
+        {"id": "Repl", "available": ready, "runtime": "tn", "notes": "tn then /tosca"},
+        {"id": "Piped", "available": ready, "runtime": "tn", "notes": "echo prompt | tn"},
+        {"id": "Loop", "available": ready, "runtime": "tn", "notes": "tn --loop (gap workflows)"},
+        {"id": "Robot", "available": ready, "runtime": "tn", "notes": "tn --robot"},
     ]
-    return paths
 
 
-def recommend(paths: list[dict], tn: dict) -> dict:
+def recommend(toscactl: dict, tosca_cfg: dict, tn: dict, mcp: dict, apps: dict) -> dict:
+    if toscactl["available"] and tosca_cfg.get("ready"):
+        return {
+            "pathId": "Toscactl",
+            "runtime": "toscactl",
+            "userPromptRequired": False,
+            "reason": "Default: toscactl ready for connect/search/run/diagnose",
+        }
+    if toscactl["available"]:
+        return {
+            "pathId": None,
+            "runtime": "toscactl",
+            "userPromptRequired": True,
+            "reason": "Run toscactl login and workspaces set",
+        }
+    if tn["available"] and mcp.get("tosca_url") and apps["configured"]:
+        return {
+            "pathId": "Piped",
+            "runtime": "tn",
+            "userPromptRequired": False,
+            "reason": "toscactl missing; tn gap path available",
+        }
     if not tn["available"]:
-        return {"pathId": None, "userPromptRequired": True, "reason": "tn not on PATH"}
-    available = [p for p in paths if p["available"]]
-    if not available:
-        return {"pathId": None, "userPromptRequired": True, "reason": "Configure ~/.tn/mcp.json and appsettings.json"}
-    return {"pathId": "Piped", "userPromptRequired": False, "reason": "Default single-shot via piped tn"}
+        return {"pathId": None, "runtime": None, "userPromptRequired": True, "reason": "Install toscactl or tn"}
+    return {
+        "pathId": None,
+        "runtime": "tn",
+        "userPromptRequired": True,
+        "reason": "Configure toscactl or ~/.tn/mcp.json + tn --setup",
+    }
 
 
 def main() -> int:
     tn = detect_tn()
+    toscactl = detect_toscactl()
     mcp = read_mcp_config()
     apps = read_appsettings()
-    paths = build_paths(tn, mcp, apps)
-    selection = recommend(paths, tn)
+    tosca_cfg = read_toscactl_config(toscactl["path"])
+    tn_paths = build_tn_paths(tn, mcp, apps)
+    selection = recommend(toscactl, tosca_cfg, tn, mcp, apps)
 
     payload = {
+        "ToscactlAvailable": toscactl["available"],
+        "ToscactlPath": toscactl["path"],
+        "ToscactlVersion": toscactl["version"],
+        "ToscactlReady": tosca_cfg.get("ready", False),
+        "ToscactlTenantUrl": tosca_cfg.get("tenant_url", ""),
+        "ToscactlWorkspace": tosca_cfg.get("workspace_name", ""),
         "TnAvailable": tn["available"],
         "TnPath": tn["path"],
         "TnVersion": tn["version"],
@@ -91,16 +160,16 @@ def main() -> int:
         "ToscaMcpUrl": mcp.get("tosca_url", ""),
         "ProviderConfigured": apps["configured"],
         "ActiveProvider": apps["active_provider"],
-        "Paths": paths,
+        "TnPaths": tn_paths,
         "Selection": selection,
     }
     print(json.dumps(payload, indent=2))
 
-    if not tn["available"]:
-        return 1
+    if selection.get("runtime") == "toscactl" and tosca_cfg.get("ready"):
+        return 0
     if selection.get("userPromptRequired"):
         return 2
-    return 0
+    return 1
 
 
 if __name__ == "__main__":
