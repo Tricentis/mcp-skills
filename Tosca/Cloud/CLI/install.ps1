@@ -1,1 +1,1 @@
-& "$PSScriptRoot/Install-TnCloudPack.ps1" @args
+& "$PSScriptRoot/Install-ToscaCloudPack.ps1" @args

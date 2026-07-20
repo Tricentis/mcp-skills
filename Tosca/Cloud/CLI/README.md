@@ -1,24 +1,24 @@
 # TN Cloud IDE pack — consumer install
 
-Automate **Tosca Cloud** via the **TN CLI** (`tn`): `/tosca` mode, native MCP OAuth, **`--loop`** (multi-step autonomy), and **`--robot`** (long-running tasks). This pack ships **9 agent skills**, IDE rules, and helper scripts — not the tn binary itself.
+Automate **Tosca Cloud** via the **tosca-cli hybrid** (`tn`): `/tosca` mode, native MCP OAuth, **`--loop`** (multi-step autonomy), and **`--robot`** (long-running tasks). This pack ships **9 agent skills**, IDE rules, and helper scripts — not the tn binary itself.
 
 ## What you get
 
 | Component | Purpose |
 |-----------|---------|
-| **9 skills** | `tn-cloud` (engineering) + 8 journey skills (connect, basics, analyze, author, remediate, explain) |
+| **9 skills** | `tosca-cloud` (engineering) + 8 journey skills (connect, basics, analyze, author, remediate, explain) |
 | **IDE rules** | Cursor / Windsurf always-on routing to tn |
 | **`configure_tn_connection.py`** | Write `~/.tn/mcp.json` for your tenant |
 | **`Get-TnCloudPaths.py`** | Detect tn, config, and recommended execution path |
-| **`Install-TnCloudPack.ps1`** | Copy skills + optional tn config (local files only) |
+| **`Install-ToscaCloudPack.ps1`** | Copy skills + optional tn config (local files only) |
 
 ### Skills
 
 | Skill | Purpose |
 |-------|---------|
-| `tn-cloud` | Orchestration, loop, robot, DI, all MCP workflows |
-| `tn-cloud-connect` | Tenant setup, OAuth, fix 401 |
-| `tn-cloud-basics` | Cloud object model |
+| `tosca-cloud` | Orchestration, loop, robot, DI, all MCP workflows |
+| `tosca-cloud-connect` | Tenant setup, OAuth, fix 401 |
+| `tosca-cloud-basics` | Cloud object model |
 | `tn-analyzing-execution-results` | Diagnose **latest** run (read-only) |
 | `tn-analyzing-execution-history` | Trends / flakiness over time |
 | `tn-remediating-from-results` | Apply fixes from failures |
@@ -38,7 +38,7 @@ See `AGENTS.md.fragment` for journey routing.
 ## Quick start (Tier 3)
 
 ```powershell
-.\Install-TnCloudPack.ps1 -Ide Cursor -Tenant <tenant> -Space default -VerifyManifest
+.\Install-ToscaCloudPack.ps1 -Ide Cursor -Tenant <tenant> -Space default -VerifyManifest
 tn --setup
 ```
 
@@ -59,7 +59,7 @@ No scripts. Copy skill folders from the IDE pack subfolder to your user profile.
 | Copy from | To |
 |-----------|-----|
 | `cursor/skills/tn-*` | `%USERPROFILE%\.cursor\skills\` (macOS/Linux: `~/.cursor/skills/`) |
-| `cursor/rules/tn-cloud.mdc` | `%USERPROFILE%\.cursor\rules\` |
+| `cursor/rules/tosca-cloud.mdc` | `%USERPROFILE%\.cursor\rules\` |
 
 **Claude Code**
 
@@ -72,7 +72,7 @@ No scripts. Copy skill folders from the IDE pack subfolder to your user profile.
 | Copy from | To |
 |-----------|-----|
 | `windsurf/skills/tn-*` | `~/.codeium/windsurf/skills/` |
-| `windsurf/rules/tn-cloud.md` | `~/.codeium/windsurf/rules/` |
+| `windsurf/rules/tosca-cloud.md` | `~/.codeium/windsurf/rules/` |
 
 Then configure tn:
 
@@ -83,7 +83,7 @@ tn --setup
 
 ### Tier 2 — Zip + integrity verify
 
-1. Download `tn-cloud-IDE-{version}-user.zip` and `SHA256SUMS` from GitHub Releases
+1. Download `tosca-cloud-IDE-{version}-user.zip` and `SHA256SUMS` from GitHub Releases
 2. Verify hash matches
 3. Extract and proceed with **Tier 1** or **Tier 3**
 
@@ -94,9 +94,9 @@ Release artifacts include `manifest.json` with `sourceSha` for supply-chain audi
 From extracted zip or git checkout of this folder:
 
 ```powershell
-.\Install-TnCloudPack.ps1 -Ide Cursor -Tenant <tenant> -Space default
+.\Install-ToscaCloudPack.ps1 -Ide Cursor -Tenant <tenant> -Space default
 # or
-.\Install-TnCloudPack.bat -Ide Cursor -Tenant <tenant>
+.\Install-ToscaCloudPack.bat -Ide Cursor -Tenant <tenant>
 ```
 
 | Parameter | Description |
@@ -120,7 +120,7 @@ echo "/tosca then list workspaces" | tn
 git clone https://github.com/Tricentis/mcp-skills.git
 cd mcp-skills/Tosca/Cloud/CLI
 # checkout tag tosca/cloud/cli/1.0.0 when released
-.\Install-TnCloudPack.ps1 -Ide Cursor -Tenant <tenant>
+.\Install-ToscaCloudPack.ps1 -Ide Cursor -Tenant <tenant>
 tn --setup
 ```
 
@@ -128,7 +128,7 @@ Or sparse checkout of `Tosca/Cloud/CLI` only (see [mcp-skills README](https://gi
 
 ### Tier 5 — Cursor marketplace plugin
 
-When published: install **tn-cloud** plugin from Cursor marketplace. Plugin ships skills + rules only. For `configure_tn_connection.py` and path detection, also use Tier 2/3 zip **or** copy scripts from this tree.
+When published: install **tosca-cloud** plugin from Cursor marketplace. Plugin ships skills + rules only. For `configure_tn_connection.py` and path detection, also use Tier 2/3 zip **or** copy scripts from this tree.
 
 **Do not** install marketplace plugin and run Tier 3 to the same profile — pick one delivery path per IDE.
 
@@ -142,7 +142,7 @@ When published: install from Claude plugin directory (`claude/.claude-plugin/plu
 
 This pack does not install a VS Code extension. For Copilot:
 
-1. Run `Install-TnCloudPack.ps1 -Ide VSCode -Scope Project` in your repo, **or**
+1. Run `Install-ToscaCloudPack.ps1 -Ide VSCode -Scope Project` in your repo, **or**
 2. Merge `vscode/copilot-instructions.md.fragment` into `.github/copilot-instructions.md`
 3. Copy `AGENTS.md.fragment` to project `AGENTS.md` if desired
 4. Use terminal + `tn` for Cloud automation
@@ -155,13 +155,13 @@ This pack does not install a VS Code extension. For Copilot:
 python3 Get-TnCloudPaths.py
 ```
 
-Use before first automation session. See skill `tn-cloud` → `path-selection.md` after install.
+Use before first automation session. See skill `tosca-cloud` → `path-selection.md` after install.
 
 ---
 
-## TN CLI vs direct IDE MCP
+## tosca-cli hybrid vs direct IDE MCP
 
-| Concern | TN CLI (this pack) | Tosca.Cloud.MCP.integration |
+| Concern | tosca-cli hybrid (this pack) | Tosca.Cloud.MCP.integration |
 |---------|-------------------|----------------------------|
 | OAuth | Native in tn | IDE direct MCP OAuth |
 | Tool surface | `/tosca` in tn REPL | IDE MCP panel |
@@ -186,7 +186,7 @@ Install **one** Cloud automation stack per IDE profile.
 
 | Symptom | Action |
 |---------|--------|
-| 401 / auth errors | Skill `tn-cloud-connect`; re-run `tn --setup` |
+| 401 / auth errors | Skill `tosca-cloud-connect`; re-run `tn --setup` |
 | tn not found | Install tn; re-run `Get-TnCloudPaths.py` |
 | Skills not loading | Reload IDE; confirm skills path from Tier 1 table |
 
@@ -198,6 +198,6 @@ Maintained in [Tricentis-Tosca/Tosca.Cloud.IDE.integration](https://github.com/T
 
 Distributed via [Tricentis/mcp-skills](https://github.com/Tricentis/mcp-skills) at **`Tosca/Cloud/CLI`**.
 
-Package: **`tn-cloud-IDE`** · Release tag: **`tosca/cloud/cli/1.0.0`**
+Package: **`tosca-cloud-IDE`** · Release tag: **`tosca/cloud/cli/1.0.0`**
 
 See `manifest.json` in this folder for version, `sourceSha`, and sync timestamp.

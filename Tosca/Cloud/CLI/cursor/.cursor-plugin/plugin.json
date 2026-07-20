@@ -1,7 +1,7 @@
 {
-  "name": "tn-cloud",
-  "version": "1.0.0",
-  "description": "Tosca Cloud automation via TN CLI for Cursor agents \u2014 skills and rules (no scripts in plugin). Install release zip for path detectors and configure_tn_connection.py. Install via marketplace or zip/git \u2014 not both to the same profile.",
+  "name": "tosca-cloud",
+  "version": "1.1.0",
+  "description": "Tosca Cloud automation via toscactl (default) and tn (gaps) for Cursor agents. Install via marketplace or zip/git \u2014 not both to the same profile.",
   "author": {
     "name": "Tricentis"
   },
@@ -15,6 +15,7 @@
     "tricentis",
     "tosca",
     "cloud",
+    "toscactl",
     "tn",
     "cli"
   ],
