@@ -65,6 +65,21 @@ Get-FileHash -Path .\commander-mcp-1.0.1-user.zip -Algorithm SHA256
 
 3. Mirror verified artifacts internally before wide distribution.
 
+## PowerShell execution policy
+
+Install scripts are **Authenticode-signed** by Tricentis. Default install does **not** use `-ExecutionPolicy Bypass`; scripts honor the machine policy (`AllSigned`, `RemoteSigned`, etc.) when the Tricentis publisher is trusted.
+
+```powershell
+.\Install-CommanderMcpPack.ps1
+# or double-click Install-CommanderMcpPack.bat
+```
+
+**Fallback** (unsigned dev checkout, or publisher not in your trust store — only with security team approval):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Install-CommanderMcpPack.ps1
+```
+
 ## Agent permissions
 
 Skills are Markdown instructions. They do not sandbox the IDE agent — when active, the agent may invoke MCP tools and terminal commands per IDE policy. Rules use `alwaysApply: false` (opt-in routing).

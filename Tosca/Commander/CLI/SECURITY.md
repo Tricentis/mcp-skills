@@ -64,7 +64,24 @@ Get-FileHash -Path .\cli-api-commander-IDE-1.0.0-user.zip -Algorithm SHA256
 
 3. Mirror verified artifacts internally (Tier 2) before wide distribution.
 
-**Code signing:** Releases are SHA256-checksummed only. Organizations requiring Authenticode or minisign may re-sign mirrored zips under their own certificate policy.
+**Code signing:** Release `.ps1` / `.bat` installers and `lib/*.ps1` helpers are **Authenticode-signed** by Tricentis before mcp-skills export. Verify with `Get-AuthenticodeSignature` and compare file hashes to `SHA256SUMS`.
+
+## PowerShell execution policy
+
+Default install does **not** use `-ExecutionPolicy Bypass`; scripts honor the machine policy (`AllSigned`, `RemoteSigned`, etc.) when the Tricentis publisher is trusted.
+
+```powershell
+.\Install-CliApiCommanderPack.ps1
+# or double-click Install-CliApiCommanderPack.bat
+```
+
+Runtime helpers (`Get-TcApiRuntime.ps1`, `TcShellRemoteControl.ps1`, etc.) spawn child PowerShell with `-File` only — no Bypass.
+
+**Fallback** (unsigned dev checkout, or publisher not in your trust store — only with security team approval):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Install-CliApiCommanderPack.ps1
+```
 
 ## Agent permissions
 

@@ -74,6 +74,14 @@ jobs:
             exit 1
           fi
 
+          bypass=$(find Tosca -type f \( -name '*.ps1' -o -name '*.bat' \) \
+            -exec grep -lE 'ExecutionPolicy[[:space:]]+Bypass|ExecutionPolicy'"'"', '"'"'Bypass'"'"'' {} + 2>/dev/null || true)
+          if [ -n "${bypass}" ]; then
+            echo "Install scripts must not use -ExecutionPolicy Bypass (use Authenticode signing; document fallback in SECURITY.md only):"
+            echo "${bypass}"
+            exit 1
+          fi
+
           for product in Tosca/Cloud/CLI Tosca/Cloud/MCP Tosca/Commander/CLI Tosca/Commander/MCP; do
             if [ ! -f "${product}/SHA256SUMS" ]; then
               echo "Missing ${product}/SHA256SUMS"

@@ -1,4 +1,8 @@
 #Requires -Version 5.1
+param(
+    [switch]$ProbeSession,
+    [string]$CommanderHome
+)
 <#
 .SYNOPSIS
   Connect to Commander Remote Control via named-pipe IPC (RemoteControlObjects.dll).
@@ -119,4 +123,20 @@ function Close-TcShellRemoteControl {
 
 function Get-TcShellRemoteChannelName {
     return $script:RcPipeName
+}
+
+if ($ProbeSession) {
+    $ErrorActionPreference = 'Stop'
+    if ($CommanderHome) { $env:COMMANDER_HOME = $CommanderHome }
+    try {
+        $rc = Connect-TcShellRemoteControl -CommanderHome $env:COMMANDER_HOME
+        if ($rc) { Write-Output 'OK'; exit 0 }
+        exit 1
+    }
+    catch {
+        exit 1
+    }
+    finally {
+        Close-TcShellRemoteControl
+    }
 }
