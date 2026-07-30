@@ -62,9 +62,11 @@ Get-FileHash -Path .\tosca-cloud-mcp-1.0.0-user.zip -Algorithm SHA256
 
 3. Mirror verified artifacts internally before wide distribution.
 
+**Code signing:** Release `.ps1` installers and `lib/*.ps1` helpers are **Authenticode-signed** by Tricentis before mcp-skills export. Verify with `Get-AuthenticodeSignature` and compare file hashes to `SHA256SUMS`.
+
 ## PowerShell execution policy
 
-Install scripts are **Authenticode-signed** by Tricentis. Default install does **not** use `-ExecutionPolicy Bypass`; scripts honor the machine policy (`AllSigned`, `RemoteSigned`, etc.) when the Tricentis publisher is trusted.
+Default install does **not** use `-ExecutionPolicy Bypass`; scripts honor the machine policy (`AllSigned`, `RemoteSigned`, etc.) when the Tricentis publisher is trusted.
 
 ```powershell
 .\Install-ToscaCloudMcpPack.ps1
