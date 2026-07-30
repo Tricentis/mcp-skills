@@ -108,7 +108,3 @@ Use the Tosca Cloud portal UI or REST APIs directly.
 ## Journey skills (tester workflows)
 
 For analyze / remediate / author / explain journeys, use the PM journey skills in this repo — see root [AGENTS.md](../../AGENTS.md). Engineering skill handles tool orchestration; journey skills handle user-story workflows.
-
-## Activation testing
-
-See [evaluations/activation.md](evaluations/activation.md) for trigger phrases and negative scenarios.

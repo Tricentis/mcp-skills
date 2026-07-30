@@ -91,5 +91,5 @@ Report security concerns via your Tricentis support channel or a private GitHub 
 
 ## Related docs
 
-- [docs/START-HERE.md](docs/START-HERE.md) — install decision tree
-- [docs/installation.md](docs/installation.md) — full install guide
+- [START-HERE.md](START-HERE.md) — install decision tree
+- [README.md](README.md) — full install guide

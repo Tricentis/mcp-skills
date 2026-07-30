@@ -1,6 +1,6 @@
 # Reference bundle (generated)
 
-Multi-version TCShell reference produced by `scripts/build_tcshell_skill_docs.py --all-versions`.
+Multi-version TCShell reference bundled with the **cli-api-commander** skill.
 
 | File | Purpose |
 |------|---------|
