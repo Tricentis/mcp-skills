@@ -61,6 +61,8 @@ Get-FileHash -Path .\tosca-cloud-mcp-1.0.0-user.zip -Algorithm SHA256
 
 3. Extract the zip only after hash verification succeeds.
 
+Release `.ps1` installers are **Authenticode-signed** by Tricentis before export to this repository. Verify with `Get-AuthenticodeSignature` and compare file hashes to `SHA256SUMS`.
+
 ## PowerShell execution policy
 
 Install scripts are **Authenticode-signed** by Tricentis. Default install does **not** use `-ExecutionPolicy Bypass`; scripts honor the machine policy (`AllSigned`, `RemoteSigned`, etc.) when the Tricentis publisher is trusted.
