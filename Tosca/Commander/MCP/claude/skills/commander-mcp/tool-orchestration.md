@@ -251,7 +251,7 @@ On error: **stop**, diagnose, revise the plan — do not blindly retry the same 
 | Save after every single attribute | One save at mutation group end |
 | Skip DI skill docs | Read [di-orchestration.md](di-orchestration.md) before DI tools |
 | Parallel `execute_test_suite` | Strictly sequential + poll |
-| MCP when Commander closed | IDE.integration TCShell/TCAPI |
+| MCP when Commander closed | [Commander CLI](../../../../CLI/README.md) TCShell/TCAPI |
 
 ---
 

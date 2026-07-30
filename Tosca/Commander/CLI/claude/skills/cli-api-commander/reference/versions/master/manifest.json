@@ -2,8 +2,6 @@
   "commanderVersion": "master",
   "commanderLabel": "Tosca Commander master (development)",
   "commanderDirectory": "Tricentis.ToscaCommander",
-  "generatedAt": "2026-06-25T21:10:13Z",
-  "commanderRepo": "Tricentis-Tosca/Tricentis.ToscaCommander",
   "sources": {
     "readme": "commander/TCCore/TCShell/TCShell_Readme.txt",
     "interpreter": "commander/TCCore/TCShell/TCShellInterpreter.cs",

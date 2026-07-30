@@ -138,7 +138,7 @@ task "Checkout"
 save
 ```
 
-## Source references (Tricentis.ToscaCommander)
+## Implementation references
 
 | Topic | Location |
 |-------|----------|

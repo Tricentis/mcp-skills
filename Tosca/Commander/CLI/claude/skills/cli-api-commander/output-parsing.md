@@ -58,7 +58,7 @@ Compare ambiguous output against golden fixtures — **do not load all of `refer
 2. Note the test fixture name (e.g. `TcShellCommandTests.SetNewTestCaseAndJumpToItByNodePath.verified`).
 3. Search `reference/output-patterns.md` for that fixture's `##` heading and read **only that section**.
 
-Generated from `UnitTests/TCShell/*.verified.txt` in Tricentis.ToscaCommander. Use the version bundle under `reference/versions/<version>/` when detection reports a non-default Commander version.
+Generated from Tosca Commander TCShell unit test verified output (`*.verified.txt`). Use the version bundle under `reference/versions/<version>/` when detection reports a non-default Commander version.
 
 ## Tips for agents
 

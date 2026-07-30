@@ -4,10 +4,10 @@ description: >-
   Creates an automated test case in Tosca Cloud from a description, reusing existing modules. Use when
   the user wants a new automated test built from available Cloud modules. Does NOT cover UI module
   scanning or manual-only tests (use tosca-authoring-manual-testcase).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "0.1.0"
+  version: "1.0.0"
 ---
 
 # Author automated test case — Tosca Cloud

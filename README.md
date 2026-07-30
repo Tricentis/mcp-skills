@@ -10,7 +10,7 @@ Open-source agent skills that help customers automate Tricentis products through
 
 | Your situation | Skill set | Install guide |
 |----------------|-----------|---------------|
-| Commander **open** with a workspace; IDE connected to **in-process MCP** (`McpServerAddIn`, port 46248) | **Commander MCP** | [Tosca/Commander/MCP/README.md](Tosca/Commander/MCP/README.md) |
+| Commander **open** with a workspace; IDE connected to **in-process MCP** (localhost; default port **46248**, configurable in Commander) | **Commander MCP** | [Tosca/Commander/MCP/README.md](Tosca/Commander/MCP/README.md) |
 | Commander **closed**, batch/CI, workspace locked, or **TCShell / TCAPI / Remote Control** | **Commander CLI & API** | [Tosca/Commander/CLI/README.md](Tosca/Commander/CLI/README.md) |
 | **Tosca Cloud** tenant; hosted **Tosca Cloud MCP** (inventory, playlists, runs, Builder) | **Tosca Cloud MCP** | [Tosca/Cloud/MCP/README.md](Tosca/Cloud/MCP/README.md) |
 | **Tosca Cloud** + **TN CLI** (`tn`, `/tosca`, `--loop`, `--robot`) | **Tosca Cloud CLI** | [Tosca/Cloud/CLI/README.md](Tosca/Cloud/CLI/README.md) |
@@ -40,7 +40,7 @@ Every product path uses the same **six-tier enterprise install model**. Pick **o
 |------------|--------|
 | **Admin rights** | Not required — user or project scope only |
 | **License** | [Apache 2.0](LICENSE) |
-| **Integrity** | `SHA256SUMS` on release zips; `manifest.json` records `sourceSha` and version |
+| **Integrity** | `SHA256SUMS` in each product directory; version in `manifest.json` |
 | **Offline install** | Scripts copy local files only — no download at install time |
 | **IDE agents** | Skills, rules/instructions, and orchestration companions per product |
 | **Install scripts** | `Install-*Pack.ps1` / `.bat` in each product directory (Tier 3–4) |
@@ -69,7 +69,7 @@ Automate **Tosca Commander** through the in-process HTTP MCP server while Comman
 | | |
 |--|--|
 | **Skill** | `commander-mcp` — workspace navigation, checkout, tasks, test case creation, Data Integrity |
-| **Prerequisite** | Commander 26.1+, workspace loaded, MCP on port **46248** |
+| **Prerequisite** | Commander 26.1+, workspace loaded, MCP on localhost (default port **46248**; use Commander MCP settings if changed) |
 | **IDEs** | Cursor, Claude, VS Code, Windsurf |
 | **Install** | Six tiers — [README.md](Tosca/Commander/MCP/README.md) (`Install-CommanderMcpPack.ps1`) |
 | **Version** | See [manifest.json](Tosca/Commander/MCP/manifest.json) |
@@ -103,7 +103,7 @@ Automate **Tosca Cloud** through the hosted MCP server — inventory, playlists,
 | **Core skill** | `tosca-cloud-mcp` — search, playlists, runs, Builder, DI orchestration |
 | **Journey skills** | `tosca-cloud-connect`, `tosca-cloud-basics`, authoring, execution analysis, remediation, explain |
 | **Prerequisite** | Tosca Cloud tenant, Okta auth, configured `spaceId` |
-| **IDEs** | Cursor (primary in this export) |
+| **IDEs** | Cursor (primary in this repo) |
 | **Install** | Six tiers — [README.md](Tosca/Cloud/MCP/README.md) · [START-HERE.md](Tosca/Cloud/MCP/START-HERE.md) (`Install-ToscaCloudMcpPack.ps1`) |
 | **Version** | See [manifest.json](Tosca/Cloud/MCP/manifest.json) |
 
@@ -143,9 +143,7 @@ mcp-skills/
         └── CLI/          # tn-cloud + journey skills (TN CLI)
 ```
 
-Export manifests, validators, and release packaging live in each **source repo** — not here. Root `docs/` covers governance and CI for maintainers only.
-
-Each product path contains IDE packs (`cursor/`, `claude/`, `windsurf/`, `vscode/`), tiered install scripts, `manifest.json`, and a product **README.md** with full install steps for that skill set.
+Each product path contains IDE packs (`cursor/`, `claude/`, `windsurf/`, `vscode/`), install scripts, `manifest.json`, and a product **README.md** with full install steps for that skill set.
 
 ---
 
@@ -155,17 +153,16 @@ These skills are provided **as-is** on an open-source cadence. They are **outsid
 
 ## Contributing
 
-See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the contribution model, source-repo workflow, and what to change here vs in a maintainer repo. Governance, approvers, and audit rules are in **[GOVERNANCE.md](GOVERNANCE.md)**.
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for how to open issues and pull requests. Release and project scope: **[GOVERNANCE.md](GOVERNANCE.md)**.
 
-## Governance and CI/CD
+## Project docs
 
 | Document | Purpose |
 |----------|---------|
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution model and source-repo workflow |
-| [GOVERNANCE.md](GOVERNANCE.md) | Approvers, auditors, contribution rules |
-| [MAINTAINERS.md](MAINTAINERS.md) | Team roster (TBD until public launch) |
-| [docs/github-cicd-pipeline.md](docs/github-cicd-pipeline.md) | GitHub-only sync pipeline |
-| [docs/branch-protection.md](docs/branch-protection.md) | Branch protection checklist |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
+| [GOVERNANCE.md](GOVERNANCE.md) | Releases and scope |
+| [MAINTAINERS.md](MAINTAINERS.md) | Contact maintainers |
+| [SECURITY.md](SECURITY.md) | Vulnerability reporting and integrity checks |
 
 ## Trademark
 

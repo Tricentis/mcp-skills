@@ -48,5 +48,3 @@ Over full `get_di_connection_schema` on large Oracle/DB2 schemas.
 ## License
 
 DI tools are license-gated. If tools return license errors, stop and inform the user.
-
-Regenerate DI reference from Commander with `scripts/extract_di_reference_docs.py`.

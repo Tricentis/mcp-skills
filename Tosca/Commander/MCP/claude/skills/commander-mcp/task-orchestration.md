@@ -13,7 +13,7 @@ Task workflow:
 - [ ] save_workspace — if task mutated workspace
 ```
 
-TCShell analog: `Task "Create Template Instance"`, `TaskOnEach` — see IDE.integration `reference/commands.md`.
+TCShell analog: `Task "Create Template Instance"`, `TaskOnEach` — see [reference/commands.md](../../../../CLI/claude/skills/cli-api-commander/reference/commands.md).
 
 ## Contents
 

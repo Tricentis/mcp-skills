@@ -27,7 +27,7 @@ MCP readiness:
 - [When to prompt the user](#when-to-prompt-the-user)
 - [Agent workflow (mandatory)](#agent-workflow-mandatory)
 
-For Commander **closed**, batch/CI, or workspace file locked by a headless process, use **[Tosca.Commander.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration)** (TCShell / TCAPI / Remote Control) instead.
+For Commander **closed**, batch/CI, or workspace file locked by a headless process, use the **[Commander CLI pack](../../../../CLI/README.md)** (TCShell / TCAPI / Remote Control) instead.
 
 ## Step 1 — Is MCP the right path?
 
@@ -37,7 +37,7 @@ For Commander **closed**, batch/CI, or workspace file locked by a headless proce
 | Commander **closed** | **No** | Headless TCShell or TCAPI |
 | User wants CI/unattended with no GUI | **No** | Headless TCShell |
 | Commander open but MCP not configured | **No** | Close Commander → TCShell, or configure MCP |
-| "Automate what I see" without MCP | **No** | Remote Control (last resort, IDE.integration) |
+| "Automate what I see" without MCP | **No** | Remote Control (last resort — [Commander CLI](../../../../CLI/claude/skills/cli-api-commander/remote-control.md)) |
 | Data Integrity comparison/validation | **Yes** (if licensed) | No TCShell equivalent — MCP-only |
 
 MCP runs **in-process** in the open Commander GUI. It shares the workspace with the user — no second workspace lock, no separate `TCShell.exe` process.
@@ -53,7 +53,7 @@ get_workspace_info
 | Field / signal | Agent action |
 |----------------|--------------|
 | Workspace path returned | Proceed — workspace is active |
-| Error / connection refused | Stop — ask user to open Commander, load workspace, check MCP port (**46248**, **8080** in DEBUG) |
+| Error / connection refused | Stop — ask user to open Commander, load workspace, check MCP port in Commander settings (default **46248**; DEBUG often **8080**) |
 | `IsMultiUser` (or equivalent) | Read [workspace-orchestration.md](workspace-orchestration.md) — checkout/check-in rules apply |
 
 Optional context read:
@@ -119,7 +119,7 @@ Both modes use the same tool ordering from [tool-orchestration.md](tool-orchestr
 ```
 1. get_workspace_info          → MCP ready? multi-user?
 2. Classify intent             → read / mutate / task / DI
-3. If not MCP-appropriate      → point to IDE.integration (TCShell/TCAPI)
+3. If not MCP-appropriate      → point to Commander CLI pack (TCShell/TCAPI)
 4. Draft Code Mode script OR direct-tool plan  → code-mode.md / direct-tool-mode.md
 5. If UserPromptRequired       → ask user
 6. Execute plan step-by-step
@@ -144,4 +144,4 @@ If any of 1–3 fail, do not proceed with MCP automation — fix connectivity or
 | Per-tool when/how | [tool-orchestration.md](tool-orchestration.md) |
 | Checkout, save, check-in | [workspace-orchestration.md](workspace-orchestration.md) |
 | DI sequencing | [di-orchestration.md](di-orchestration.md) |
-| Headless automation | IDE.integration: `path-selection.md` |
+| Headless automation | [Commander CLI](../../../../CLI/README.md): [path-selection.md](../../../../CLI/claude/skills/cli-api-commander/path-selection.md) |

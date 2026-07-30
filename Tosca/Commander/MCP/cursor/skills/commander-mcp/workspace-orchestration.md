@@ -4,7 +4,7 @@ MCP shares the **same workspace** as the Commander GUI. Multi-user checkout rule
 
 **Progressive disclosure:** read when planning workspace mutations; pair with [tool-orchestration.md](tool-orchestration.md) for tool order.
 
-Analog in IDE.integration: [workspace-checkout.md](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration/blob/main/packages/core/skills/tcshell-commander/workspace-checkout.md) (TCShell `checkouttree` / `checkinall`).
+Analog in Commander CLI skill: [workspace-checkout.md](../../../../CLI/cursor/skills/cli-api-commander/workspace-checkout.md) (TCShell `checkouttree` / `checkinall`).
 
 ## Contents
 
@@ -188,7 +188,7 @@ Mutation planned?
 | Workspace file lock blocks second process | Same GUI workspace — no lock conflict |
 | Must close Commander for headless | Commander must stay open |
 
-When the user cannot keep Commander open, switch to IDE.integration headless path — MCP cannot run.
+When the user cannot keep Commander open, switch to the [Commander CLI pack](../../../../CLI/README.md) headless path — MCP cannot run.
 
 ## Related
 

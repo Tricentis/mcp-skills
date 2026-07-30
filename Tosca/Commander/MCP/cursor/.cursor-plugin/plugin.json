@@ -1,6 +1,6 @@
 {
   "name": "commander-mcp",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Tosca Commander MCP automation — skills, rules, and Commander MCP server config for Cursor agents. Install via marketplace or zip/git — not both to the same profile.",
   "author": {
     "name": "Tricentis"

@@ -3,13 +3,13 @@ name: tosca-cloud-mcp
 description: >-
   Automates Tosca Cloud via the cloud MCP server — inventory search, playlists, execution
   runs, Builder test cases, and Data Integrity. Use for Tosca Cloud automation, /tosca-cloud-mcp,
-  MCPServer, or when Tosca Cloud MCP tools connect. Does NOT cover tester journey workflows (see
+  hosted Tosca Cloud MCP, or when Tosca Cloud MCP tools connect. Does NOT cover tester journey workflows (see
   AGENTS.md journey skills).
 ---
 
 # Tosca Cloud MCP — space automation
 
-Automate Tosca Cloud through the **HTTP MCP server** (`MCPServer`). Requires a connected tenant with valid Okta bearer token and configured `spaceId`.
+Automate Tosca Cloud through the **hosted HTTP MCP server** at `https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp`. Requires a connected tenant with valid Okta bearer token and configured `spaceId`.
 
 **MCP tool names:** bare names (`tosca_inventory_search`) when Tosca Cloud is the only MCP server; `tosca-cloud:tosca_inventory_search` when multiple servers are connected.
 

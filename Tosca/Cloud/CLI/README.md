@@ -1,12 +1,12 @@
 # TN Cloud IDE pack — consumer install
 
-Automate **Tosca Cloud** via the **tosca-cli hybrid** (`tn`): `/tosca` mode, native MCP OAuth, **`--loop`** (multi-step autonomy), and **`--robot`** (long-running tasks). This pack ships **9 agent skills**, IDE rules, and helper scripts — not the tn binary itself.
+Automate **Tosca Cloud** via the **tosca-cli hybrid** (`tn`): `/tosca` mode, native MCP OAuth, **`--loop`** (multi-step autonomy), and **`--robot`** (long-running tasks). This pack ships **24 agent skills**, IDE rules, and helper scripts — not the tn binary itself.
 
 ## What you get
 
 | Component | Purpose |
 |-----------|---------|
-| **9 skills** | `tosca-cloud` (engineering) + 8 journey skills (connect, basics, analyze, author, remediate, explain) |
+| **24 skills** | `tosca-cloud` orchestration + journey skills + toscactl command skills (see `cursor/skills/`) |
 | **IDE rules** | Cursor / Windsurf always-on routing to tn |
 | **`configure_tn_connection.py`** | Write `~/.tn/mcp.json` for your tenant |
 | **`Get-TnCloudPaths.py`** | Detect tn, config, and recommended execution path |
@@ -19,18 +19,18 @@ Automate **Tosca Cloud** via the **tosca-cli hybrid** (`tn`): `/tosca` mode, nat
 | `tosca-cloud` | Orchestration, loop, robot, DI, all MCP workflows |
 | `tosca-cloud-connect` | Tenant setup, OAuth, fix 401 |
 | `tosca-cloud-basics` | Cloud object model |
-| `tn-analyzing-execution-results` | Diagnose **latest** run (read-only) |
-| `tn-analyzing-execution-history` | Trends / flakiness over time |
-| `tn-remediating-from-results` | Apply fixes from failures |
-| `tn-authoring-manual-testcase` | Written manual test → Cloud testcase |
-| `tn-authoring-automated-testcase` | Description → automated testcase |
-| `tn-explaining-testcase` | Explain what a testcase does |
+| `tosca-analyzing-execution-results` | Diagnose **latest** run (read-only) |
+| `tosca-analyzing-execution-history` | Trends / flakiness over time |
+| `tosca-remediating-from-results` | Apply fixes from failures |
+| `tosca-authoring-manual-testcase` | Written manual test → Cloud testcase |
+| `tosca-authoring-automated-testcase` | Description → automated testcase |
+| `tosca-explaining-testcase` | Explain what a testcase does |
 
 See `AGENTS.md.fragment` for journey routing.
 
 ## Prerequisites
 
-1. **tn** CLI on PATH — build from [Tricentis-UX/tn](https://github.com/Tricentis-UX/tn) or your internal distribution
+1. **tn** CLI on PATH — install **tn** per your Tricentis distribution (must be on PATH)
 2. Tosca Cloud tenant with MCP entitlement
 3. Python 3 (for helper scripts)
 4. PowerShell 5+ (Tier 3 installer on Windows; macOS/Linux via `pwsh`)
@@ -58,20 +58,20 @@ No scripts. Copy skill folders from the IDE pack subfolder to your user profile.
 
 | Copy from | To |
 |-----------|-----|
-| `cursor/skills/tn-*` | `%USERPROFILE%\.cursor\skills\` (macOS/Linux: `~/.cursor/skills/`) |
+| `cursor/skills/tosca-*` | `%USERPROFILE%\.cursor\skills\` (macOS/Linux: `~/.cursor/skills/`) |
 | `cursor/rules/tosca-cloud.mdc` | `%USERPROFILE%\.cursor\rules\` |
 
 **Claude Code**
 
 | Copy from | To |
 |-----------|-----|
-| `claude/skills/tn-*` | `~/.claude/skills/` |
+| `claude/skills/tosca-*` | `~/.claude/skills/` |
 
 **Windsurf**
 
 | Copy from | To |
 |-----------|-----|
-| `windsurf/skills/tn-*` | `~/.codeium/windsurf/skills/` |
+| `windsurf/skills/tosca-*` | `~/.codeium/windsurf/skills/` |
 | `windsurf/rules/tosca-cloud.md` | `~/.codeium/windsurf/rules/` |
 
 Then configure tn:
@@ -87,7 +87,7 @@ tn --setup
 2. Verify hash matches
 3. Extract and proceed with **Tier 1** or **Tier 3**
 
-Release artifacts include `manifest.json` with `sourceSha` for supply-chain audit.
+Verify integrity with `SHA256SUMS` in this folder.
 
 ### Tier 3 — Installer script (recommended)
 
@@ -161,7 +161,7 @@ Use before first automation session. See skill `tosca-cloud` → `path-selection
 
 ## tosca-cli hybrid vs direct IDE MCP
 
-| Concern | tosca-cli hybrid (this pack) | Tosca.Cloud.MCP.integration |
+| Concern | tosca-cli hybrid (this pack) | [Tosca Cloud MCP](../MCP/README.md) |
 |---------|-------------------|----------------------------|
 | OAuth | Native in tn | IDE direct MCP OAuth |
 | Tool surface | `/tosca` in tn REPL | IDE MCP panel |
@@ -176,7 +176,7 @@ Install **one** Cloud automation stack per IDE profile.
 ## Security
 
 - Installer performs **local file copies only** — no network at install time
-- Release zip signed by SHA256 on GitHub Releases; `manifest.json` records `sourceRepo` and `sourceSha`
+- Release zip verified by SHA256 on GitHub Releases; pack version in `manifest.json`
 - OAuth and Cloud API calls occur when **you** run `tn` — tokens live in `~/.tn/`
 - See `SECURITY.md` for full IT review checklist
 
@@ -192,12 +192,10 @@ Install **one** Cloud automation stack per IDE profile.
 
 ---
 
-## Source
+## Version and releases
 
-Maintained in [Tricentis-Tosca/Tosca.Cloud.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Cloud.IDE.integration).
+Pack version is in [`manifest.json`](manifest.json) (currently **1.0.0**). Install from [GitHub Releases](https://github.com/Tricentis/mcp-skills/releases) tag `tosca/cloud/cli/{version}`; verify with `SHA256SUMS` in this folder.
 
-Distributed via [Tricentis/mcp-skills](https://github.com/Tricentis/mcp-skills) at **`Tosca/Cloud/CLI`**.
+Package name: **`tosca-cloud-IDE`**
 
-Package: **`tosca-cloud-IDE`** · Release tag: **`tosca/cloud/cli/1.0.0`**
-
-See `manifest.json` in this folder for version, `sourceSha`, and sync timestamp.
+For security review, see [`SECURITY.md`](SECURITY.md).

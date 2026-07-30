@@ -1,6 +1,4 @@
 {
-  "generatedAt": "2026-07-01T00:00:00Z",
-  "commanderRepo": "<commander-repo>",
   "commanderVersion": "master",
   "toolCount": 23,
   "tools": [
@@ -27,6 +25,5 @@
     "get_di_connection_schema",
     "parse_di_lineage_mapping",
     "run_di_sql_statement"
-  ],
-  "sourceRoot": "<commander-mcp-tools>"
+  ]
 }

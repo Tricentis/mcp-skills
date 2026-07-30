@@ -69,10 +69,7 @@ function Install-VSCodePack {
     $tcshellInstr = Join-Path $PackPath "instructions/cli-api-commander.instructions.md"
     Copy-Item -Path $tcshellInstr -Destination (Join-Path $TargetGithub "instructions/cli-api-commander.instructions.md") -Force
 
-    $agentsFragment = Join-Path $repoRoot "packages/core/snippets/AGENTS.md.fragment"
-    if (-not (Test-Path $agentsFragment)) {
-        $agentsFragment = Join-Path $repoRoot "AGENTS.md.fragment"
-    }
+    $agentsFragment = Join-Path $repoRoot "AGENTS.md.fragment"
     if (Test-Path $agentsFragment) {
         $agentsDest = Join-Path (Split-Path $TargetGithub -Parent) "AGENTS.md"
         if (-not (Test-Path $agentsDest)) {

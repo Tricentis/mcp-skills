@@ -1,6 +1,6 @@
 {
   "name": "commander-mcp",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Tosca Commander MCP automation with Code Mode workflows for Claude Code agents. Install via marketplace or zip/git — not both to the same profile.",
   "author": {
     "name": "Tricentis"

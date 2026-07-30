@@ -34,15 +34,14 @@ jobs:
           for manifest in "${manifests[@]}"; do
             dir=$(dirname "$manifest")
             version=$(python3 -c "import json; d=json.load(open('$manifest')); print(d['version'])")
-            source_repo=$(python3 -c "import json; d=json.load(open('$manifest')); print(d.get('sourceRepo', 'source repo'))")
-            source_branch=$(python3 -c "import json; d=json.load(open('$manifest')); print(d.get('sourceBranch', 'unknown branch'))")
+            package=$(python3 -c "import json; d=json.load(open('$manifest')); print(d.get('packageName', 'pack'))")
             rel="${dir#Tosca/}"
             tag="tosca/$(echo "$rel" | tr '[:upper:]' '[:lower:]')/${version}"
             title="$(echo "$rel" | tr '/' ' ') ${version}"
-            notes="Synced from ${source_repo} branch ${source_branch}. See ${dir}/manifest.json for sourceSha."
+            notes="Tricentis MCP Skills release: ${package} ${version}. Install from ${dir}/ — see README and SHA256SUMS for integrity verification."
 
             if ! git rev-parse "$tag" >/dev/null 2>&1; then
-              git tag -a "$tag" -m "${title} from ${source_repo}"
+              git tag -a "$tag" -m "${title}"
             else
               echo "Tag ${tag} already exists locally"
             fi

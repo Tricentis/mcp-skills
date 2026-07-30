@@ -81,7 +81,7 @@ def main() -> int:
     print(json.dumps(payload, indent=2))
 
     if not cli["available"]:
-        print("Install toscactl: https://github.com/Tricentis-Tosca/tosca-cli#installation", file=sys.stderr)
+        print("Install toscactl per your Tricentis distribution and ensure it is on PATH.", file=sys.stderr)
         return 1
     if not config.get("configured"):
         print("Run: toscactl login --url <tenant>.my.tricentis.com", file=sys.stderr)

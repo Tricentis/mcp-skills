@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.0.0",
   "packageName": "tosca-cloud-IDE",
   "installScope": "User",
   "adminRequired": false,
@@ -9,10 +9,5 @@
     "VSCode",
     "Windsurf"
   ],
-  "license": "Apache-2.0",
-  "sourceRepo": "Tricentis-Tosca/Tosca.Cloud.IDE.integration",
-  "sourceBranch": "cloud-cli-1.1.0",
-  "sourceSha": "d0790102adb013365bda4403a575220cbb21ed29",
-  "syncedAt": "2026-07-30T18:01:35.518559+00:00",
-  "generatedAt": "2026-07-30T18:01:35.518559+00:00"
+  "license": "Apache-2.0"
 }

@@ -23,5 +23,5 @@
       "label": "Tosca Commander master (development)"
     }
   },
-  "notes": "Maintainers: set TCSHELL_COMMANDER_BASE to your Tricentis-Tosca clone root. Consumers use Get-CommanderAutomationPaths at pack root."
+  "notes": "Consumers: run Get-CommanderAutomationPaths at the Commander CLI pack root to resolve version bundles."
 }

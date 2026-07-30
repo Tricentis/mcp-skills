@@ -1,8 +1,8 @@
-# Shared PowerShell helpers for Tosca Commander IDE integration scripts.
+# Shared PowerShell helpers for Commander CLI pack install scripts.
 
 $_libParent = Split-Path $PSScriptRoot -Parent
 if ((Split-Path $_libParent -Leaf) -eq "scripts") {
-    # Running from repo: PSScriptRoot is scripts/lib, so go up two levels
+    # Legacy layout: PSScriptRoot is scripts/lib — go up two levels to pack root
     $script:RepoRoot = Split-Path $_libParent -Parent
 } else {
     # Running from distribution zip: PSScriptRoot is <root>/lib, go up one level
@@ -14,26 +14,28 @@ function Get-RepoRoot {
 }
 
 function Get-CoreSkillPath {
-    return Join-Path $script:RepoRoot "packages/core/skills/cli-api-commander"
+    foreach ($ide in @("cursor", "claude", "windsurf")) {
+        $path = Join-Path $script:RepoRoot "$ide/skills/$(Get-SkillId)"
+        if (Test-Path $path) { return $path }
+    }
+    throw "Skill path not found under $($script:RepoRoot)"
 }
 
 function Get-CoreRulesPath {
-    return Join-Path $script:RepoRoot "packages/core/rules"
+    foreach ($ide in @("cursor", "claude", "windsurf")) {
+        $path = Join-Path $script:RepoRoot "$ide/rules"
+        if (Test-Path $path) { return $path }
+    }
+    throw "Rules path not found under $($script:RepoRoot)"
 }
 
 function Copy-DirectoryContents {
     param(
         [Parameter(Mandatory = $true)][string]$Source,
-        [Parameter(Mandatory = $true)][string]$Destination,
-        [string[]]$ExcludeDirNames = @()
+        [Parameter(Mandatory = $true)][string]$Destination
     )
     if (-not (Test-Path $Source)) {
         throw "Source not found: $Source"
-    }
-    if ($ExcludeDirNames.Count -gt 0) {
-        . (Join-Path $PSScriptRoot "ConsumerExport.ps1")
-        Copy-TreeExcluding -Source $Source -Destination $Destination -ExcludeDirNames $ExcludeDirNames
-        return
     }
     New-Item -ItemType Directory -Force -Path $Destination | Out-Null
     Copy-Item -Path (Join-Path $Source "*") -Destination $Destination -Recurse -Force
@@ -179,21 +181,13 @@ function Resolve-IdePackPath {
     if (Test-Path $short) {
         return $short
     }
-    $long = Join-Path $script:RepoRoot "packages/$FolderName-pack"
-    if (Test-Path $long) {
-        return $long
-    }
-    throw "IDE pack not found for '$FolderName' under $($script:RepoRoot) (expected '$FolderName/' or 'packages/$FolderName-pack/')"
+    throw "IDE pack not found: $FolderName/ under $($script:RepoRoot)"
 }
 
 function Get-CommanderVersionsManifest {
-    foreach ($path in @(
-        (Join-Path $script:RepoRoot "commander-versions.json"),
-        (Join-Path $script:RepoRoot "packages/core/reference/commander-versions.json")
-    )) {
-        if (Test-Path $path) {
-            return Get-Content $path -Raw | ConvertFrom-Json
-        }
+    $path = Join-Path $script:RepoRoot "commander-versions.json"
+    if (Test-Path $path) {
+        return Get-Content $path -Raw | ConvertFrom-Json
     }
     throw "Commander versions manifest not found under $($script:RepoRoot)"
 }

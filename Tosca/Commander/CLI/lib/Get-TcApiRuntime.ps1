@@ -103,7 +103,7 @@ function Get-DotNetScriptRuntimeInfo {
 }
 
 function Get-TcApiCompatibilityManifest {
-    $path = Join-Path (Get-RepoRoot) 'packages/core/reference/tcapi-compatibility.json'
+    $path = Join-Path (Get-RepoRoot) 'tcapi-compatibility.json'
     if (-not (Test-Path $path)) {
         throw "TCAPI compatibility manifest not found: $path"
     }

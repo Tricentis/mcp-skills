@@ -6,9 +6,9 @@ IT and security review checklist for the Tosca Commander MCP integration (`comma
 
 | Property | Value |
 |----------|--------|
-| **Publisher** | Tricentis — [Tricentis-Tosca/Tosca.Commander.MCP.Integration](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration) |
+| **Publisher** | Tricentis — [mcp-skills](https://github.com/Tricentis/mcp-skills) (Commander MCP pack) |
 | **Install scope** | User profile (default) or project checkout — **no admin** for the IDE pack |
-| **Runtime network** | **Localhost only** — MCP client connects to `http://127.0.0.1:46248/mcp` (DEBUG builds may use port **8080**) |
+| **Runtime network** | **Localhost only** — MCP client connects to `http://127.0.0.1:<port>/mcp` (default port **46248**; DEBUG often **8080**). Use the port from **Commander MCP configuration**. |
 | **Secrets** | No credentials shipped; Commander workspace auth is handled by the local MCP server |
 | **Integrity** | Release zip published with `SHA256SUMS` on GitHub Releases |
 
@@ -25,8 +25,10 @@ IT and security review checklist for the Tosca Commander MCP integration (`comma
 ## Local MCP endpoint
 
 ```text
-http://127.0.0.1:46248/mcp
+http://127.0.0.1:<port>/mcp
 ```
+
+Replace `<port>` with the MCP port from Commander settings (default **46248**; DEBUG often **8080**).
 
 - Transport: HTTP to Commander's embedded MCP server
 - Requires Tosca Commander **26.1+** open with a workspace
@@ -49,7 +51,6 @@ The installer **does not** modify `%ProgramFiles%`, registry, Windows services, 
 | Script | Reads | Writes | Network |
 |--------|-------|--------|---------|
 | `Install-CommanderMcpPack.ps1` | Pack source | Profile skill/rule paths | No (local files only) |
-| `pack_release.ps1` | Repo sources | `dist/*.zip`, `SHA256SUMS` | No |
 
 MCP **runtime** calls occur when the IDE connects to localhost Commander — governed by IDE MCP policy and local firewall rules.
 
@@ -59,11 +60,11 @@ MCP **runtime** calls occur when the IDE connects to localhost Commander — gov
 2. Verify hash (PowerShell):
 
 ```powershell
-Get-FileHash -Path .\commander-mcp-1.0.1-user.zip -Algorithm SHA256
+Get-FileHash -Path .\commander-mcp-1.0.0-user.zip -Algorithm SHA256
 # Compare to SHA256SUMS
 ```
 
-3. Mirror verified artifacts internally before wide distribution.
+3. Extract the zip only after hash verification succeeds.
 
 ## PowerShell execution policy
 

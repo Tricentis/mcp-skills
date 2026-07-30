@@ -4,7 +4,7 @@ description: >-
   Analyzes Tosca Cloud execution trends over multiple playlist runs — flakiness, recurring failures,
   and pass-rate changes via toscactl. Use for trends, flaky tests, or historical failures. Read-only.
   Does NOT cover single-run diagnosis (use tosca-analyzing-execution-results).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
   version: "1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "tosca-cloud",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Tosca Cloud automation via toscactl (default) and tn (gaps) for Cursor agents. Install via marketplace or zip/git \u2014 not both to the same profile.",
   "author": {
     "name": "Tricentis"

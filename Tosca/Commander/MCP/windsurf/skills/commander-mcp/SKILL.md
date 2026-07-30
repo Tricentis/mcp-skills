@@ -5,7 +5,7 @@ description: >-
   workspace — checkout, tasks, test cases, and Data Integrity. Use for Tosca
   automation, /commander-mcp, tosca-commander, McpServerAddIn, or when Commander
   MCP tools connect. Does NOT cover headless TCShell, TCAPI, Remote Control, or
-  CI when Commander is closed (use Tosca.Commander.IDE.integration).
+  CI when Commander is closed (use Commander CLI pack).
 ---
 
 # Commander MCP — workspace automation
@@ -73,9 +73,9 @@ Do **not** open the catalog at session start.
 |-------------|-------|
 | Commander 26.1+ | MCP add-in |
 | Workspace open | Active workspace |
-| MCP connected | Port **46248** (8080 DEBUG) |
+| MCP connected | Port from Commander MCP settings (default **46248**; DEBUG often **8080**) |
 | DI license | For Data Integrity tools |
 
 ## When MCP is unavailable
 
-Use **Tosca.Commander.IDE.integration** (TCShell / TCAPI / Remote Control).
+Use the **[Commander CLI pack](../../../../CLI/README.md)** skill (TCShell / TCAPI / Remote Control).

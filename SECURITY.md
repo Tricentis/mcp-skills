@@ -1,17 +1,17 @@
 # Security — Tricentis mcp-skills
 
-Consumer repository for Tosca agent skills packs. Maintainer export tooling lives in the source integration repos — not in this tree.
+Open-source distribution of Tosca agent skill packs for IDE agents and CLI automation.
 
 ## Reporting vulnerabilities
 
-Report security concerns via your Tricentis support channel or a **private** [GitHub Security Advisory](https://github.com/Tricentis/mcp-skills/security/advisories) on this repository. Do not open public issues for exploitable findings.
+Report security concerns via a **private** [GitHub Security Advisory](https://github.com/Tricentis/mcp-skills/security/advisories) on this repository. Do not open public issues for exploitable findings.
 
 ## What ships here
 
 | Path | Contents |
 |------|----------|
 | `Tosca/Cloud/MCP` | Hosted Cloud MCP skills (Cursor-first) |
-| `Tosca/Cloud/CLI` | TN CLI skills + `configure_tn_connection.py` |
+| `Tosca/Cloud/CLI` | TN CLI skills + helper scripts |
 | `Tosca/Commander/MCP` | Local Commander MCP skills |
 | `Tosca/Commander/CLI` | TCShell / TCAPI / Remote Control skills + helpers |
 
@@ -26,39 +26,19 @@ Get-FileHash -Path .\Install-ToscaCloudMcpPack.ps1 -Algorithm SHA256
 # Compare to Tosca/Cloud/MCP/SHA256SUMS
 ```
 
-Release tags (`tosca/cloud/mcp/{version}`, etc.) are created when `manifest.json` changes on `main`. Verify `sourceSha` in each product `manifest.json` against the integration-repo commit used to build the export.
+Release tags (`tosca/cloud/mcp/{version}`, etc.) are created when `manifest.json` version changes on `main`.
 
 ## Code signing
 
-Install scripts are **Authenticode-signed in private source repos** before export (SignPath via `export-mcp-skills.yml`). This public repo stores the signed bytes and `SHA256SUMS` for integrity checks. **Default `.bat` launchers do not pass `-ExecutionPolicy Bypass`** — see each product `SECURITY.md` for the documented fallback.
+Windows install scripts (`.ps1`, `.bat`) are **Authenticode-signed** by Tricentis. Default `.bat` launchers do **not** pass `-ExecutionPolicy Bypass` — see each product `SECURITY.md` for the documented fallback.
 
-**Do not configure SignPath secrets on this repo.** Signing runs in private integration repos; credentials live in **1Password vault `TAIS-SECRETS-PROD`**. Each integration repo's `production` environment holds only `OP_SERVICE_ACCOUNT_TOKEN` (read-only service account).
-
-Setup guide: [Tosca.Commander.MCP.Integration `docs/signpath-1password-setup.md`](https://github.com/Tricentis-Tosca/Tosca.Commander.MCP.Integration/blob/main/docs/signpath-1password-setup.md)
-
-Verify locally or in CI:
+Verify locally:
 
 ```powershell
 Get-AuthenticodeSignature .\Install-ToscaCloudMcpPack.ps1
 Get-FileHash -Path .\Install-ToscaCloudMcpPack.ps1 -Algorithm SHA256
 # Compare hash to Tosca/Cloud/MCP/SHA256SUMS
 ```
-
-## Automated checks (CI)
-
-| Workflow | Purpose |
-|----------|---------|
-| `validate-export.yml` | Consumer layout; leak grep; SHA256SUMS verification |
-| `verify-signatures.yml` | Authenticode Valid on product `.ps1` / `.bat` installers |
-| `pr-guard.yml` | Blocks fork PRs from modifying `.github/**` |
-| `secret-scan.yml` | TruffleHog verified secrets scan on `Tosca/**` |
-| GitGuardian | Org-level secret detection on pull requests |
-
-### TruffleHog (verified secrets)
-
-Scheduled on every pull request and push to `main`. Scope: `Tosca/**` only. Policy: **`--only-verified`** — unverified pattern matches (test fixtures, documentation examples) are excluded via `.trufflehog-exclude`.
-
-**Last manual scan (2026-07-16):** no verified secrets detected in the consumer tree after remediating hardcoded Okta client material from exported Cloud CLI helpers.
 
 ## Product-specific security docs
 

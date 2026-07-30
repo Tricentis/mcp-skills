@@ -9,7 +9,7 @@ How to read test case structure when no dedicated Builder read tool exists.
 | Resolve by name | `tosca_inventory_search(artifactType: testCase)` |
 | Module catalog | `tosca_builder_getModulesSummary` |
 | API message bodies | `tosca_builder_getApiMessage` (when test uses API messages) |
-| **Not available** | `tosca_builder_getTestCaseDetail` — planned MCPServer outcome tool |
+| **Not available** | `tosca_builder_getTestCaseDetail` — planned cloud MCP outcome tool |
 
 ## Interim read path
 
@@ -24,6 +24,6 @@ How to read test case structure when no dedicated Builder read tool exists.
 - Modules + API messages resolved → confidence 7–8 for flow summary
 - User-provided context + inventory → adjust accordingly
 
-## MCPServer roadmap
+## Future MCP tool
 
-`tosca_builder_getTestCaseDetail` (Phase 1 outcome tool) will replace the interim chain. Track in `docs/mcp-server-improvement-proposal.md`.
+`tosca_builder_getTestCaseDetail` will replace the interim chain when published on the hosted Tosca Cloud MCP server.

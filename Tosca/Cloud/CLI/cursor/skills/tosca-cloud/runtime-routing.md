@@ -1,8 +1,6 @@
 # Runtime routing — toscactl vs tn
 
-**Default:** use **`toscactl`**. Use **`tn`** only for documented CLI gaps until [tosca-cli](https://github.com/Tricentis-Tosca/tosca-cli) ships the suggested command.
-
-Gap table: [docs/cli-gaps.md](../../../../docs/cli-gaps.md) (maintainer) · consumer packs link to engineering skill.
+**Default:** use **`toscactl`**. Use **`tn`** only for workflows marked **`[tn]`** in journey skills or listed as tn-only in the decision table below.
 
 ## Decision table
 
@@ -32,4 +30,4 @@ Journey skills mark steps with **`[toscactl]`** or **`[tn]`**. Follow the tag �
 
 ## Exit criteria
 
-When a gap row closes in tosca-cli, update the skill step to `[toscactl]` only and remove the tn fallback for that step.
+When **toscactl** supports a workflow previously routed to **tn**, update the skill step to `[toscactl]` only and remove the tn fallback for that step.

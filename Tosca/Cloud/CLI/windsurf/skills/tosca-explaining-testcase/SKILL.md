@@ -4,7 +4,7 @@ description: >-
   Explains what a Tosca Cloud test case does in plain language. Uses toscactl for discovery and tn
   for Builder step-tree read (CLI gap). Read-only. Does NOT cover execution failure diagnosis
   (use tosca-analyzing-execution-results).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
   version: "1.0.0"
@@ -16,7 +16,7 @@ Plain-language summary of a test case's purpose and steps. **Read-only.** **Hybr
 
 **Prerequisite:** `tosca-cloud-connect`. For step tree: tn configured (`configure_tn_connection.py`).
 
-Gap: [docs/cli-gaps.md](../../docs/cli-gaps.md) P0 Builder read.
+Runtime: **tn** for Builder step-tree read — see [runtime-routing.md](../tosca-cloud/runtime-routing.md).
 
 ## Session checklist
 

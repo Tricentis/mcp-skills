@@ -1,7 +1,4 @@
 {
-  "generatedAt": "2026-07-14T17:48:24Z",
-  "cloudRepo": "Tricentis-Tosca/MCPServer",
-  "cloudVersion": "main",
   "toolCount": 51,
   "tools": [
     "tosca_apiexecution_createConnection",
@@ -56,6 +53,5 @@
     "tosca_simulation_deploy",
     "tosca_simulation_listAgents"
   ],
-  "sourceRoot": "src/McpService/Tools",
   "namingConvention": "tosca_{domain}_{action}"
 }

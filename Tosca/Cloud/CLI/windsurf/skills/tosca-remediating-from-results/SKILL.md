@@ -4,7 +4,7 @@ description: >-
   Applies fixes to Tosca Cloud test artifacts after failure analysis. Verify via toscactl; mutations
   via tn (Builder/playlist-item CLI gaps). Requires user approval for destructive changes. Does NOT
   cover read-only analysis (use tosca-analyzing-execution-results).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
   version: "1.0.0"
@@ -16,7 +16,7 @@ Apply ranked fixes from analysis. **Mutating** — confirm scope before edits. *
 
 **Prerequisite:** diagnosis from `tosca-analyzing-execution-results` or user-provided failure detail. tn configured for mutation steps.
 
-Gap: [docs/cli-gaps.md](../../docs/cli-gaps.md) P0/P1 Builder and playlist-item rename.
+Runtime: **tn** for Builder mutations and playlist-item rename — see [runtime-routing.md](../tosca-cloud/runtime-routing.md).
 
 ## Session checklist
 

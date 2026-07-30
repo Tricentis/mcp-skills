@@ -4,10 +4,10 @@ description: >-
   Creates a manual test case in Tosca Cloud from a written specification or user story. Use when the
   user provides manual test steps in prose and wants a Cloud test case created. Does NOT cover
   automated module-based authoring (use tosca-authoring-automated-testcase).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "0.1.0"
+  version: "1.0.0"
 ---
 
 # Author manual test case — Tosca Cloud

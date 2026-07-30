@@ -4,10 +4,10 @@ description: >-
   Verifies hosted Tosca Cloud MCP connectivity and routes to the right Cloud skills.
   Use when the user is setting up Cloud MCP, fixing 401 errors, or before other Tosca Cloud skills.
   Does NOT configure MCP servers — the user adds their tenant in IDE Settings -> MCP.
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "0.2.0"
+  version: "1.0.0"
 ---
 
 # Connect Tosca Cloud MCP

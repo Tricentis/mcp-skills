@@ -6,10 +6,10 @@ description: >-
   or recent run and asks what went wrong, why tests failed, how to fix them, or for a summary of the
   last run. Read-only: explains and recommends but does not change artifacts (hand off to
   tosca-remediating-from-results to apply fixes).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "0.1.0"
+  version: "1.0.0"
 ---
 
 # Analyze Tosca Cloud execution results

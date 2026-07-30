@@ -64,7 +64,7 @@ function Install-VSCodePack {
 
     $agentsFragment = Join-Path $srcDir "AGENTS.md.fragment"
     if (-not (Test-Path $agentsFragment)) {
-        $agentsFragment = Join-Path $repoRoot "packages/core/snippets/AGENTS.md.fragment"
+        $agentsFragment = Join-Path $repoRoot "vscode/AGENTS.md.fragment"
     }
     $agentsDest = Join-Path (Split-Path $TargetGithub -Parent) "AGENTS.md"
     if (-not (Test-Path $agentsDest)) {
@@ -122,10 +122,10 @@ Write-Host "Next steps:"
 Write-Host "  1. Open Commander 26.1+ with a workspace"
 if ($Ide -eq "Cursor") {
     Write-Host "  2. Cursor -> Settings -> MCP -> add server tosca-commander"
-    Write-Host "  3. URL: http://127.0.0.1:46248/mcp (DEBUG builds: port 8080)"
+    Write-Host "  3. URL: http://127.0.0.1:<port>/mcp (port from Commander MCP settings; default 46248, DEBUG often 8080)"
     Write-Host "  4. Reload Cursor; confirm skills and rules are enabled"
 } else {
-    Write-Host "  2. Configure Commander MCP in your IDE (http://127.0.0.1:46248/mcp)"
+    Write-Host "  2. Configure Commander MCP in your IDE (http://127.0.0.1:<port>/mcp — use Commander MCP settings)"
 }
 Write-Host "  5. Verify: get_workspace_info"
 

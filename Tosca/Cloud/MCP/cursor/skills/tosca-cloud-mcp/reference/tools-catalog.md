@@ -1,6 +1,6 @@
 # Tosca Cloud MCP tools catalog
 
-Generated from `MCPServer` → `src/McpService/Tools`. Load **tool-planning.md** from the skill root to build **Code Mode** sequences.
+Generated from the Tosca Cloud MCP tool registry. Load **tool-planning.md** from the skill root to build **Code Mode** sequences.
 
 > **Progressive disclosure:** open parameter details only for tools in your plan. For Data Integrity, load **di-orchestration.md** then one file from **reference/di/index.md**.
 

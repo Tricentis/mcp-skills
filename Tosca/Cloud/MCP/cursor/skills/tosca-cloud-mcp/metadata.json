@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "organization": "Tricentis",
   "technology": "Tosca Cloud MCP",
-  "abstract": "Agent skill for orchestrating Tosca Cloud MCPServer tools \u2014 inventory, playlists, execution, Builder, and Data Integrity workflows via Code Mode or direct tool mode.",
+  "abstract": "Agent skill for orchestrating Tosca Cloud MCP tools — inventory, playlists, execution, Builder, and Data Integrity workflows via Code Mode or direct tool mode.",
   "mcpServer": "tosca-cloud",
-  "mcpEndpoint": "http://127.0.0.1:3000/mcp",
+  "mcpEndpoint": "https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp",
   "toolCount": 51,
   "slashCommand": "/tosca-cloud-mcp",
   "namingConvention": "tosca_{domain}_{action}"

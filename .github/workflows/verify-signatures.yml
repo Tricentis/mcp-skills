@@ -54,7 +54,7 @@ jobs:
             }
             $valid = @($statuses | Where-Object { $_.Status -eq "Valid" })
             if ($valid.Count -eq 0) {
-              Write-Host "SKIP $product (no Authenticode-signed .ps1 yet — export via SignPath when ready)"
+              Write-Host "SKIP $product (no Authenticode-signed .ps1 in this checkout yet)"
               continue
             }
 
@@ -67,5 +67,5 @@ jobs:
             }
           }
           if ($failures.Count -gt 0) {
-            Write-Error ("Unsigned or invalid installer scripts:`n" + ($failures -join "`n") + "`n`nPublish through source repo export CI (SignPath) before opening mcp-skills PR.")
+            Write-Error ("Unsigned or invalid installer scripts:`n" + ($failures -join "`n") + "`n`nEnsure release .ps1 files are Authenticode-signed before merge.")
           }
