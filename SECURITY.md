@@ -30,7 +30,7 @@ Release tags (`tosca/cloud/mcp/{version}`, etc.) are created when `manifest.json
 
 ## Code signing
 
-Windows install scripts (`.ps1`, `.bat`) are **Authenticode-signed** by Tricentis. Default `.bat` launchers do **not** pass `-ExecutionPolicy Bypass` — see each product `SECURITY.md` for the documented fallback.
+Windows install scripts (`.ps1`, `.bat`) are **Authenticode-signed** by Tricentis before export to this repository. Default `.bat` launchers do **not** pass `-ExecutionPolicy Bypass` — see each product `SECURITY.md` for the documented fallback.
 
 Verify locally:
 
