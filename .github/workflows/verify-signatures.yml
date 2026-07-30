@@ -33,12 +33,36 @@ jobs:
           $failures = @()
           foreach ($product in $products) {
             if (-not (Test-Path $product)) { continue }
-            Get-ChildItem -Path $product -File -Include *.ps1, *.bat | ForEach-Object {
-              $sig = Get-AuthenticodeSignature -FilePath $_.FullName
-              if ($sig.Status -ne "Valid") {
-                $failures += "$($_.FullName): $($sig.Status)"
+
+            # -Include without a path wildcard is a no-op; use -Filter. .bat is not Authenticode-capable.
+            $files = @(Get-ChildItem -Path $product -File -Filter *.ps1 -ErrorAction SilentlyContinue)
+            $lib = Join-Path $product "lib"
+            if (Test-Path $lib) {
+              $files += @(Get-ChildItem -Path $lib -File -Filter *.ps1 -ErrorAction SilentlyContinue)
+            }
+            if ($files.Count -eq 0) {
+              Write-Host "SKIP $product (no .ps1 installers)"
+              continue
+            }
+
+            $statuses = foreach ($file in $files) {
+              [pscustomobject]@{
+                Path = $file.FullName
+                Status = (Get-AuthenticodeSignature -FilePath $file.FullName).Status
+                Subject = (Get-AuthenticodeSignature -FilePath $file.FullName).SignerCertificate.Subject
+              }
+            }
+            $valid = @($statuses | Where-Object { $_.Status -eq "Valid" })
+            if ($valid.Count -eq 0) {
+              Write-Host "SKIP $product (no Authenticode-signed .ps1 yet — export via SignPath when ready)"
+              continue
+            }
+
+            foreach ($row in $statuses) {
+              if ($row.Status -ne "Valid") {
+                $failures += "$($row.Path): $($row.Status)"
               } else {
-                Write-Host "OK $($_.FullName) -> $($sig.SignerCertificate.Subject)"
+                Write-Host "OK $($row.Path) -> $($row.Subject)"
               }
             }
           }
