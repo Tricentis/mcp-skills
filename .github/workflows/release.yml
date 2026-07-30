@@ -4,7 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "Tosca/**/manifest.json"
+      - "Tosca/*/*/manifest.json"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -22,13 +24,19 @@ jobs:
       - name: Create tags and GitHub releases for changed products
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
 
-          mapfile -t manifests < <(git diff --name-only HEAD~1 HEAD | grep -E '^Tosca/.+/manifest\.json$' || true)
-          if [ "${#manifests[@]}" -eq 0 ]; then
-            echo "No consumer manifest.json changes in this push"
-            exit 0
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            mapfile -t manifests < <(find Tosca -mindepth 2 -maxdepth 2 -name manifest.json | sort)
+            echo "Manual run; checking all product manifests for missing releases"
+          else
+            mapfile -t manifests < <(git diff --name-only HEAD~1 HEAD | grep -E '^Tosca/[^/]+/[^/]+/manifest\.json$' || true)
+            if [ "${#manifests[@]}" -eq 0 ]; then
+              mapfile -t manifests < <(find Tosca -mindepth 2 -maxdepth 2 -name manifest.json | sort)
+              echo "No manifest changes in push; checking all product manifests for missing releases"
+            fi
           fi
 
           for manifest in "${manifests[@]}"; do
