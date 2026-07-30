@@ -39,7 +39,7 @@ In **multi-user** workspaces, objects must be **checked out** before modificatio
 | Task `Checkout` / `CheckoutTree` | Check out before edit |
 | `CheckIn` / `CheckInAll` | Persist to common repository |
 
-TCShell examples (from `TCShellInterpreter`):
+TCShell examples (supported Commander releases):
 
 ```
 # After open on multi-user workspace — checkout project tree before import/modify
@@ -147,7 +147,7 @@ save
 | Remote Control + JumpTo | `commander/TCAddIns/RemoteControlAddIn/CommandHandling/RemoteCommandInterpreter.cs` |
 | RC UI takeover | `commander/TCAddIns/RemoteControlAddIn/Remoting/RemoteControl.cs` (`TakeControllFromUser`) |
 | AI in-process automation | `commander/TCAddIns/AI/McpServerAddIn/` (out of scope for this skill) |
-| Checkout in TCShell | `commander/TCCore/TCShell/TCShellInterpreter.cs` (`CheckOutTreeTask`) |
+| Checkout in TCShell | TCShell `CheckOutTreeTask` (supported Commander releases) |
 | `ChangesAllowed` | `commander/API/TCAPIObjects/Objects/TCObject.cs` |
 
 ## Summary for skill routing

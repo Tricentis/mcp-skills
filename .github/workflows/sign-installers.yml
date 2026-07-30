@@ -1,0 +1,60 @@
+name: Sign installers
+
+# Prefer source integration Export to mcp-skills (SignPath). This workflow re-signs
+# in-tree product installers when org secrets are configured on Tricentis/mcp-skills.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sign:
+    name: sign-all-products
+    runs-on: windows-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup SignPath
+        uses: Tricentis-Tosca/tosca-templates/.github/actions/signpath/setup/1/@main
+        with:
+          project-slug: "${{ vars.SIGNPATH_PROJECT_SLUG }}"
+          organization-id: "${{ secrets.SIGNPATH_ORGANIZATION_ID }}"
+          signing-policy: "${{ secrets.SIGNPATH_SIGNINGPOLICY_SLUG }}"
+          api-key: "${{ secrets.SIGNPATH_API_TOKEN }}"
+
+      - name: Sign consumer installers
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $products = @(
+            "Tosca/Commander/MCP",
+            "Tosca/Commander/CLI",
+            "Tosca/Cloud/MCP",
+            "Tosca/Cloud/CLI"
+          )
+          foreach ($product in $products) {
+            Write-Host "=== Signing $product ==="
+            ./.github/scripts/sign_consumer_installers.ps1 -StagingDir $product
+          }
+
+      - name: Commit signed installers and SHA256SUMS
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Tosca/Commander/MCP/ Tosca/Commander/CLI/ Tosca/Cloud/MCP/ Tosca/Cloud/CLI/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "$(cat <<'EOF'
+Sign consumer installers and refresh SHA256SUMS.
+
+Authenticode-sign product .ps1 installers via SignPath and regenerate SHA256SUMS for validate-export.
+EOF
+)"
+          git push

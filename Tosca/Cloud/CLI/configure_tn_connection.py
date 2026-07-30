@@ -42,6 +42,7 @@ def build_tn_tosca_server(tenant: str, space: str, env: str) -> dict:
             "url": endpoint,
             "modes": ["tosca"],
             "oauth": {
+                # Okta OAuth client name for Tosca Cloud MCP (not a repository reference).
                 "clientId": "MCPServer",
                 "scopes": ["tta"],
             },

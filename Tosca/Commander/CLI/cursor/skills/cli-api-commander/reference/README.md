@@ -6,7 +6,7 @@ Multi-version TCShell reference bundled with the **cli-api-commander** skill.
 |------|---------|
 | `commands.md` | Full `TCShell_Readme.txt` — search one command; use `cli-from-source.md` for flags |
 | `cli-flags.md` | Startup samples + readme CLI section — use `cli-from-source.md` for flags |
-| **`cli-from-source.md`** | **CLI flags from `TCShellInterpreter.cs`** (incl. `-auth`, `-healthCheck`; version-aware) |
+| **`cli-from-source.md`** | **CLI flags from TCShell** (incl. `-auth`, `-healthCheck`; version-aware) |
 | **`examples-catalog.md`** | **Sample folder topic index** |
 | **`scenarios-index.md`** | **Verified test → scenario map** (with per-version availability) |
 | `examples-index.md` | Full sample script contents — one `##` section via `examples-catalog.md` |

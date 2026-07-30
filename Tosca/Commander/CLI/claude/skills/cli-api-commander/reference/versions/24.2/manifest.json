@@ -4,7 +4,7 @@
   "commanderDirectory": "Tricentis.ToscaCommander.242",
   "sources": {
     "readme": "commander/TCCore/TCShell/TCShell_Readme.txt",
-    "interpreter": "commander/TCCore/TCShell/TCShellInterpreter.cs",
+    "interpreter": "TCShell CLI (supported Commander releases)",
     "sampleCount": 23,
     "verifiedOutputCount": 0
   }
