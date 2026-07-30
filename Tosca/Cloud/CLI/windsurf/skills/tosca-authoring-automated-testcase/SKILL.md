@@ -3,7 +3,7 @@ name: tosca-authoring-automated-testcase
 description: >-
   Creates an automated test case in Tosca Cloud from a description, reusing modules. Module discovery
   via toscactl; scaffold via tn (CLI gap). Does NOT cover manual-only tests or UI module scanning.
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
   version: "1.0.0"
@@ -15,7 +15,7 @@ Build automated tests from existing Cloud modules. **Hybrid:** toscactl discover
 
 **Prerequisite:** `tosca-cloud-connect`. tn configured for scaffold step.
 
-Gap: [docs/cli-gaps.md](../../docs/cli-gaps.md) P0 Builder scaffold.
+Runtime: **tn** for Builder scaffold — see [runtime-routing.md](../tosca-cloud/runtime-routing.md).
 
 ## Guardrails
 

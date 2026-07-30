@@ -3,7 +3,7 @@ name: tosca-authoring-manual-testcase
 description: >-
   Creates a manual test case in Tosca Cloud from a written specification. Uses tn for scaffold (CLI
   gap). Does NOT cover automated module-based authoring (use tosca-authoring-automated-testcase).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
   version: "1.0.0"
@@ -15,7 +15,7 @@ Convert written manual steps into a Cloud test case. **tn only** until toscactl 
 
 **Prerequisite:** `tosca-cloud-connect` + tn gap setup (`configure_tn_connection.py`, `tn --setup`).
 
-Gap: [docs/cli-gaps.md](../../docs/cli-gaps.md) P0 manual test case creation.
+Runtime: **tn** for manual test case creation — see [runtime-routing.md](../tosca-cloud/runtime-routing.md).
 
 ## Session checklist
 

@@ -5,10 +5,10 @@ description: >-
   inventory and Builder. Use when the user asks what a test case covers, how it works, or wants a
   walkthrough. Read-only. Does NOT cover execution failure diagnosis (use
   tosca-analyzing-execution-results).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "0.1.0"
+  version: "1.0.0"
 ---
 
 # Explain Tosca Cloud test case

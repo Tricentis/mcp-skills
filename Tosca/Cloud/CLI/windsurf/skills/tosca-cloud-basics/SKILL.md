@@ -4,7 +4,7 @@ description: >-
   Explains how to work with Tricentis Tosca Cloud through toscactl: workspaces, assets, playlists,
   runs, and the core command loop. Use as foundation before other Tosca Cloud skills. Builder/DI/mobile
   gaps use tn — see runtime-routing.md. Does NOT cover detailed DI orchestration (use tosca-cloud).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
   version: "1.0.0"
@@ -12,7 +12,7 @@ metadata:
 
 # Tosca Cloud basics
 
-Foundational orientation for driving Tosca Cloud via **`toscactl`**. Gap domains (Builder mutations, DI, mobile) delegate to **`tn`** — see [runtime-routing.md](../packages/core/skills/tosca-cloud/runtime-routing.md).
+Foundational orientation for driving Tosca Cloud via **`toscactl`**. Gap domains (Builder mutations, DI, mobile) delegate to **`tn`** — see [runtime-routing.md](../tosca-cloud/runtime-routing.md).
 
 **Prerequisite:** `toscactl login` + workspace set. Verify: `python3 verify_toscactl.py`.
 
@@ -68,4 +68,4 @@ Details: [references/toscactl-building-blocks.md](references/toscactl-building-b
 
 ## Mutations
 
-toscactl supports playlist/workspace/dataset lifecycle. Builder and inventory folder mutations require **tn** until CLI gaps close — see [docs/cli-gaps.md](../../docs/cli-gaps.md).
+toscactl supports playlist/workspace/dataset lifecycle. Builder and inventory folder mutations require **tn** — see [runtime-routing.md](../tosca-cloud/runtime-routing.md).

@@ -1,7 +1,7 @@
 # TCShell CLI flags (from source)
 
 > Commander version context: **24.2**
-> Generated from `TCShellInterpreter.cs` ShowUsage() + ReadArguments()
+> Generated from supported Commander TCShell CLI releases.
 > Generated at: 2026-06-25T21:10:13Z
 
 Use this file for flags **missing from** `TCShell_Readme.txt` (see `commands.md`).
@@ -9,7 +9,7 @@ Always confirm the customer's Commander version before using version-specific fl
 
 ## Universal flags (24.1, 24.2, 25.1, 26.1, master)
 
-These flags exist in `TCShellInterpreter.cs` and are handled in `ReadArguments` for every supported release:
+These flags are handled by the TCShell CLI for every supported release:
 
 | Flag | Purpose |
 |------|---------|

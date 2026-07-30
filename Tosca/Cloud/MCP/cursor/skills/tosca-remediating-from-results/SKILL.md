@@ -5,10 +5,10 @@ description: >-
   playlist item renames, and Builder updates. Use when the user asks to fix, update, or remediate
   failing tests after diagnosis. Requires explicit user approval for destructive changes. Does NOT
   cover read-only analysis (use tosca-analyzing-execution-results).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "0.1.0"
+  version: "1.0.0"
 ---
 
 # Remediate Tosca Cloud tests from results

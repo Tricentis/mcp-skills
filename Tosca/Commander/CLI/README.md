@@ -4,7 +4,7 @@ Install **cli-api-commander** skills in your IDE **without admin rights**. All m
 
 **Prerequisite:** Tosca Commander installed for runtime automation. Headless TCShell via `cmd` is the minimum path — no Python or PowerShell required.
 
-For **in-process MCP** when Commander is open, use [Tosca/Commander/MCP](https://github.com/Tricentis/mcp-skills/tree/main/Tosca/Commander/MCP) in [Tricentis/mcp-skills](https://github.com/Tricentis/mcp-skills).
+For **in-process MCP** when Commander is open, use [Commander MCP](../MCP/README.md) in this repository.
 
 ## What you get
 
@@ -40,7 +40,7 @@ Pick **one** tier and **one** scope (user or project). Do not install via plugin
 | Control | What it means |
 |---------|----------------|
 | **SHA256** | Verify release zip against `SHA256SUMS` before extract (Tier 2–3). |
-| **sourceSha** | `manifest.json` records the integration-repo commit used to build this tree. |
+| **Version** | `manifest.json` records pack version; match to [GitHub Release](https://github.com/Tricentis/mcp-skills/releases) tag. |
 | **No network in installer** | Install scripts copy local files only. |
 | **Local automation only** | No MCP server; shell/stdio against installed Commander. |
 

@@ -3,12 +3,12 @@ name: tosca-cloud
 description: >-
   Automates Tosca Cloud via toscactl (default) and tn for CLI gaps. Use for Tosca Cloud CLI,
   toscactl commands, or tn --loop for Builder/DI/mobile gaps. Does NOT cover on-prem Commander
-  (use Tosca.Commander.IDE.integration).
+  (use Commander CLI pack in this repository — ../../../../../Commander/CLI/README.md).
 ---
 
 # Tosca Cloud — hybrid CLI automation
 
-**Default runtime:** **`toscactl`**. **Gap runtime:** **`tn`** (`/tosca` MCP, `--loop`, `--robot`) until [tosca-cli](https://github.com/Tricentis-Tosca/tosca-cli) closes gaps — see [runtime-routing.md](runtime-routing.md) and [docs/cli-gaps.md](../../../docs/cli-gaps.md).
+**Default runtime:** **`toscactl`**. **Gap runtime:** **`tn`** (`/tosca` MCP, `--loop`, `--robot`) for Builder, DI, mobile, loop, and robot — see [runtime-routing.md](runtime-routing.md).
 
 **Prerequisite:** `toscactl login` + workspace set. For gap workflows: `configure_tn_connection.py` + `tn --setup`.
 
@@ -66,7 +66,7 @@ Full index: [reference/workflows-index.md](reference/workflows-index.md)
 
 ## Vendored toscactl command skills
 
-Synced from [tosca-cli/skills](https://github.com/Tricentis-Tosca/tosca-cli/tree/main/skills): `tosca-find`, `tosca-run`, `tosca-setup`, `toscactl-reference`, `tosca-agents`, `tosca-datasets`, etc. Run `python3 sync_toscactl_skills.py` to refresh.
+Command skills in this pack include `tosca-find`, `tosca-run`, `tosca-setup`, `toscactl-reference`, `tosca-agents`, `tosca-datasets`, and others (sibling folders in this IDE tree).
 
 ## Journey skills
 
@@ -76,5 +76,5 @@ See [journeys-index.md](journeys-index.md). Consumer packs include `AGENTS.md.fr
 
 | Capability | Use instead |
 |------------|-------------|
-| On-prem Commander | **Tosca.Commander.IDE.integration** |
-| Direct IDE MCP (no CLI) | **Tosca.Cloud.MCP.integration** |
+| On-prem Commander | [Commander CLI](../../../../../Commander/CLI/README.md) |
+| Direct IDE MCP (no CLI) | [Tosca Cloud MCP](../../../../MCP/README.md) |

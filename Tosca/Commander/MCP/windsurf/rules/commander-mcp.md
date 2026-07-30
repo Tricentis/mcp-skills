@@ -5,7 +5,7 @@ description: >-
   direct tool mode. Load commander-mcp on /commander-mcp, tosca-commander, Tosca
   automation, or when Commander MCP tools connect. Does NOT cover headless
   TCShell, TCAPI, Remote Control, or CI when Commander is closed (use
-  IDE.integration).
+  Commander CLI pack).
 globs:
 alwaysApply: false
 ---
@@ -20,4 +20,4 @@ When MCP tools such as `get_workspace_info`, `execute_task`, or `di_connection` 
 4. **Data Integrity** — read [di-orchestration.md](di-orchestration.md) and one `reference/di/` file before DI tools.
 5. Persist: `save_workspace` / `check_in_all`; pass explicit `objectIds`.
 
-Requires Commander open (port **46248**). Headless: Tosca.Commander.IDE.integration.
+Requires Commander open (MCP on localhost; default port **46248** — use Commander MCP settings). Headless: [Commander CLI](../../CLI/README.md).

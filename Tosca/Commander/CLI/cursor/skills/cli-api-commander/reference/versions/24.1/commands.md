@@ -1,8 +1,7 @@
 # TCShell Command Reference
 
-> Generated from Tricentis.ToscaCommander `commander/TCCore/TCShell/TCShell_Readme.txt`
+> Generated from Tosca Commander TCShell documentation (`TCShell_Readme.txt`)
 > Commander version: 24.1 (Tosca Commander 24.1)
-> Generated at: 2026-06-25T21:10:13Z
 
 
 > **Agent navigation:** Do **not** load this entire file (~400 lines). Use [cli-from-source.md](cli-from-source.md) for CLI flags, or search for one command keyword only.

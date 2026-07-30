@@ -1,11 +1,13 @@
 # Maintainers
 
-Team assignments are **TBD** while this repository is private. Populate before public launch.
+This project is maintained by **[Tricentis](https://www.tricentis.com/)** ([`@Tricentis`](https://github.com/Tricentis) on GitHub).
 
-| Team | Scope | Status |
-|------|-------|--------|
-| `@Tricentis/tosca-commander-mcp-approvers` | `Tosca/Commander/MCP/**` | TBD |
-| `@Tricentis/open-source-approvers` | Root LICENSE, README, NOTICE | TBD |
-| `@Tricentis/devops-approvers` | `.github/**` workflows | TBD |
+For questions, use [GitHub Issues](https://github.com/Tricentis/mcp-skills/issues).
 
-Escalation: contact the Commander MCP engineering lead or open-source program office (assign when teams are created).
+| Area | Contact |
+|------|---------|
+| Skill content (`Tosca/**`) | Open an issue with the product path (Commander MCP, Commander CLI, Cloud MCP, Cloud CLI) |
+| Repository / licensing | Open an issue tagged for maintainers |
+| Security | See [SECURITY.md](SECURITY.md) — use private Security Advisories for vulnerabilities |
+
+Community contributions welcome per [CONTRIBUTING.md](CONTRIBUTING.md).

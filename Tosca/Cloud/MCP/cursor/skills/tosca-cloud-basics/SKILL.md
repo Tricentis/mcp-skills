@@ -6,10 +6,10 @@ description: >-
   searching inventory, running playlists, and using Builder. Use as the foundation before any other
   Tosca Cloud skill, or when unsure which MCP tool to call or how to resolve an artifact. Does NOT
   cover detailed tool orchestration or Data Integrity workflows (use tosca-cloud-mcp).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "0.1.0"
+  version: "1.0.0"
 ---
 
 # Tosca Cloud basics

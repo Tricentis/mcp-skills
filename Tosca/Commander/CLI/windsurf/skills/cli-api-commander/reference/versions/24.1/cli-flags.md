@@ -3,7 +3,7 @@
 > Commander version: 24.1 (Tosca Commander 24.1)
 
 
-> **Agent navigation:** Do **not** load this entire file (~400 lines). Use [cli-from-source.md](cli-from-source.md) for CLI flags from TCShellInterpreter source.
+> **Agent navigation:** Do **not** load this entire file (~400 lines). Use [cli-from-source.md](cli-from-source.md) for CLI flags from TCShell source.
 ## Startup samples
 
 

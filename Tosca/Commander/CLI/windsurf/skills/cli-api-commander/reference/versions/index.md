@@ -17,7 +17,7 @@ Default bundled reference (skill root): **26.1** — see `../commands.md`.
 | File | Purpose |
 |------|---------|
 | `commands.md` | Full TCShell_Readme.txt — search one command; use `cli-from-source.md` for flags |
-| `cli-from-source.md` | CLI flags from TCShellInterpreter (incl. `-auth`, `-healthCheck`) |
+| `cli-from-source.md` | CLI flags from TCShell (incl. `-auth`, `-healthCheck`) |
 | `examples-catalog.md` | Sample folder topic index |
 | `scenarios-index.md` | Verified test → scenario map |
 | `examples-index.md` | Full sample script contents — one `##` section via `examples-catalog.md` |

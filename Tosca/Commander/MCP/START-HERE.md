@@ -13,7 +13,7 @@ Pick **one** install method. Do not combine plugin + zip on the same profile.
 
 **Prerequisite:** Tosca Commander **26.1+** open with a workspace.
 
-For **TCShell / TCAPI / Remote Control** when Commander is closed, use [Tosca.Commander.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration).
+For **TCShell / TCAPI / Remote Control** when Commander is closed, use [Commander CLI & API](../CLI/README.md).
 
 ## 2. Pick your tier
 
@@ -34,7 +34,7 @@ This pack **does not** write `mcp.json`. In Cursor:
 
 1. **Settings → MCP → Add server**
 2. Name: `tosca-commander`
-3. URL: `http://127.0.0.1:46248/mcp` (DEBUG builds: port **8080**)
+3. URL: `http://127.0.0.1:<port>/mcp` — use the port from **Commander MCP configuration** (default **46248**; DEBUG builds often **8080**)
 4. Reload; confirm Commander has a workspace open
 
 ## 4. Verify connection

@@ -34,6 +34,6 @@ See vendored skills `tosca-agents`, `tosca-datasets`.
 
 ## Builder / DI / mobile (gap — use tn)
 
-Not available in toscactl today. See [mcp-building-blocks.md](mcp-building-blocks.md) and [runtime-routing.md](../../packages/core/skills/tosca-cloud/runtime-routing.md).
+Not available in toscactl today. See [mcp-building-blocks.md](mcp-building-blocks.md) and [runtime-routing.md](../../tosca-cloud/runtime-routing.md).
 
-Reference: [tosca-cli README](https://github.com/Tricentis-Tosca/tosca-cli#commands)
+Command details: vendored **`toscactl-reference`** skill in this pack.

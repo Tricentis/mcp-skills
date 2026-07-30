@@ -31,11 +31,11 @@ def _load_json(relative: str) -> dict[str, Any]:
 
 
 def load_commander_versions_manifest() -> dict[str, Any]:
-    return _load_json("packages/core/reference/commander-versions.json")
+    return _load_json("commander-versions.json")
 
 
 def load_tcapi_compatibility_manifest() -> dict[str, Any]:
-    return _load_json("packages/core/reference/tcapi-compatibility.json")
+    return _load_json("tcapi-compatibility.json")
 
 
 def read_commander_version_from_ide_env() -> str | None:
@@ -75,7 +75,7 @@ def resolve_commander_version_key(
             for token in _VERSION_PATH_TOKENS[key]:
                 if token in normalized:
                     return key
-        # Dev / unversioned clone output: .../Tricentis.ToscaCommander or ToscaCommander/
+        # Dev / unversioned install folder: .../ToscaCommander/ (no version token in path)
         if re.search(r"toscacommander/?$", normalized) and not re.search(
             r"24\.|25\.|26\.|241|242|251|261", normalized
         ):

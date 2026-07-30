@@ -11,6 +11,6 @@
 
 Install via **Customize** (Cursor 3.8+) or your org team marketplace. Do not also install the user-scope zip to the same profile — pick one method.
 
-For path detectors: download `cli-api-commander-IDE-{version}-user.zip` from [Releases](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration/releases) and copy scripts to a tools folder, or use Tier 3 installer.
+For path detectors: download `cli-api-commander-IDE-{version}-user.zip` from [GitHub Releases](https://github.com/Tricentis/mcp-skills/releases) tag `tosca/commander/cli/{version}`, or use Tier 3 installer from this folder.
 
 Security: [SECURITY.md](../../SECURITY.md)

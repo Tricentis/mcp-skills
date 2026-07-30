@@ -5,10 +5,10 @@ description: >-
   and pass-rate changes. Use when the user asks about trends, flaky tests, historical failures, or
   whether a failure is new or recurring across runs. Read-only. Does NOT cover single-run diagnosis
   (use tosca-analyzing-execution-results).
-license: LicenseRef-Tricentis-Internal
+license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "0.1.0"
+  version: "1.0.0"
 ---
 
 # Analyze Tosca Cloud execution history

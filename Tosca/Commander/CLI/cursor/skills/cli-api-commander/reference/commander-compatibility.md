@@ -37,7 +37,7 @@ Path detection resolves `CommanderVersion` from (in order):
 
 1. Explicit `--commander-version` / `-CommanderVersion`
 2. `COMMANDER_VERSION` env var or `%USERPROFILE%\.tricentis\tcshell-ide.env`
-3. Install path tokens (e.g. `...\Tosca Commander 25.1\`, `...241`, unversioned `Tricentis.ToscaCommander` → `master`)
+3. Install path tokens (e.g. `...\Tosca Commander 25.1\`, `...241`, unversioned Commander dev install folder → `master`)
 4. Default: `26.1`
 
 Use **whichever detector executes**, or read [commander-versions.json](commander-versions.json) directly when neither runs.

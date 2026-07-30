@@ -2,7 +2,7 @@
 
 Install **24 skills** for automating Tosca Cloud via **toscactl** (default) and **tn** (CLI gaps).
 
-Install toscactl: [tosca-cli README](https://github.com/Tricentis-Tosca/tosca-cli#installation)
+Install **toscactl** per your Tricentis distribution (must be on PATH).
 
 ## 1. Pick install tier
 
@@ -53,4 +53,4 @@ python3 Get-TnCloudPaths.py
 
 Load **`tosca-cloud-basics`** then the journey skill for your task. See `AGENTS.md.fragment` in the install root.
 
-Gap table: [cli-gaps.md](cli-gaps.md)
+Gap routing: [`runtime-routing.md`](cursor/skills/tosca-cloud/runtime-routing.md) in the `tosca-cloud` skill (also under `claude/` and `windsurf/` for your IDE).

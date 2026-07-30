@@ -6,10 +6,5 @@
   "supportedIdes": [
     "Cursor"
   ],
-  "license": "Apache-2.0",
-  "sourceRepo": "Tricentis-Tosca/Tosca.Cloud.MCP.integration",
-  "sourceBranch": "cloud-mcp-1.0.0",
-  "sourceSha": "bfc001a1b590b81fa9debf3d1c29f123b02f030f",
-  "syncedAt": "2026-07-30T18:26:21.101354+00:00",
-  "generatedAt": "2026-07-30T18:26:21.101354+00:00"
+  "license": "Apache-2.0"
 }
