@@ -51,10 +51,5 @@ jobs:
             echo "No changes to commit"
             exit 0
           fi
-          git commit -m "$(cat <<'EOF'
-Sign consumer installers and refresh SHA256SUMS.
-
-Authenticode-sign product .ps1 installers via SignPath and regenerate SHA256SUMS for validate-export.
-EOF
-)"
+          git commit -m "Sign consumer installers and refresh SHA256SUMS."
           git push
