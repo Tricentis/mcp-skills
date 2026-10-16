@@ -1,141 +1,122 @@
 # DI workflow — row-by-row comparison
 
-## Creating a Row-by-Row Comparison (Interactive Workflow)
+Create a Complete Row by Row Comparison test case between two database connections.
 
-When the user asks to create a row-by-row comparison test case, follow these steps:
+Load **di-orchestration.md**, then this file. Schema steps are the canonical recipe in [conventions.md](../conventions.md) — copy them; do not invent a schema tool.
 
-### Step 1 — List available connections
-```
-Call tosca_dataintegrity_listConnections
-→ Present the list to the user.
-→ Ask: "Which connection should be the **source** and which should be the **target**?"
-```
-
-### Step 2 — Fetch schema for both connections
-Run the two-step schema retrieval for each connection. Both can be started in parallel, but each pair (getConnectionSchema → checkSchemaResult) must be sequential.
-
-**EXECUTION (no plan mode, no user confirmation needed for the launcher steps):**
-For EACH connection:
-```
-a. Call tosca_dataintegrity_getConnectionSchema(connectionId="<id>")
-   → Returns { launcherLink, notificationId, executorCommandId }
-b. Open the launcherLink on the user's machine: Start-Process "<launcherLink>"
-c. Call tosca_dataintegrity_checkSchemaResult(notificationId="<notificationId>")
-   → Returns { connectionId, count, columns: [{ schemaName, tableName, columnName, dataType, isNullable }] }
+```text
+Row-by-row comparison:
+- [ ] tosca_diconnection List → user picks source and target
+- [ ] Five-step schema per connection (Get, allowAiQueries, DBMS, runSql catalog)
+- [ ] Propose SQL + RowKey + remaps; confirm
+- [ ] tosca_dataintegrity_createRowByRowComparison (include columnRenames when names differ; expectedResult only when differences are expected)
+- [ ] tosca_testcase Get
 ```
 
-> **If schema retrieval fails:** The connection may be a "Custom" ODBC type with no stored schema SQL.
-> In that case, ask the user to describe the relevant tables and columns manually so you can write the SQL.
+## Step 1 — List connections
 
-### Step 3 — Analyze both schemas and propose SQL + RowKey
-Using the column metadata returned:
-- Identify matching tables and columns between source and target.
-- Propose a `SELECT` statement for each side listing only the relevant columns (avoid `SELECT *`).
-- Suggest a `RowKey`: the primary key or a unique business key column.
-  - Schema results do NOT include primary key info. If the primary key is not obvious from the column names, ask the user: "Which column(s) uniquely identify a row — for example, an Id or OrderNumber column?"
-  - Composite key: join with semicolons, e.g. `"OrderId;LineItemId"`.
-  - If no unique key exists: use `"All Source Columns"` — every source column becomes the key.
+```
+Call tosca_diconnection List
+→ Present connectionName, dataSourceType, allowAiQueries, id.id
+→ Ask: "Which connection is the **source** and which is the **target**?"
+```
 
-### Step 4 — Confirm with the user
-Present the proposed parameters before creating:
+If none exist, or the user asked to create/test a connection, follow `reference/workflows/di-connection.md`, then resume at List.
+
+## Step 2 — Schema for each connection
+
+For **each** picked connection, run the five-step recipe from [conventions.md](../conventions.md):
+
+1. `tosca_diconnection` Get (`connectionId` = inner Ulid)
+2. If `allowAiQueries` is false → **stop**; enable Allow AI queries in Connection Manager
+3. Infer DBMS from `dataSourceType`, name, description, `metadata.databaseCategory`
+4. If unclear → ask
+5. Catalog `SELECT` via `tosca_dataintegrity_runSql` → open `launcherLink` → poll `checkSqlResult`
+
+Both connections can start in parallel; each `runSql` → `checkSqlResult` pair is sequential. Do not narrate pending polls.
+
+If catalog retrieval fails (Custom ODBC with no usable catalog SQL), ask the user to describe tables and columns.
+
+## Step 3 — Propose SQL + RowKey + remaps
+
+Using catalog columns:
+
+- Match tables/columns between source and target.
+- Propose a `SELECT` per side (explicit columns, not `SELECT *`).
+- Suggest `rowKey` (PK/business key, composite with `;`, or `"All Source Columns"`). Catalog rows do not include PK metadata — ask if unclear.
+- If names differ (e.g. `ORDER_ID` vs `OrderId`), plan `sourceOptions.columnRenames` / `targetOptions.columnRenames`. After remaps, RowKey names must match.
+
+## Step 4 — Confirm
+
 ```
 Source connection: <name>
 Source SQL: SELECT ...
 Target connection: <name>
 Target SQL: SELECT ...
 RowKey: <column(s)>
+Remaps: <from → to, or none>
 ```
+
 Ask: "Does this look correct, or would you like to adjust anything?"
 
-### Step 5 — Create the test case
-```
-Call tosca_dataintegrity_createRowByRowComparison with the confirmed parameters.
-→ Returns { success, testCaseId, testCasePath }
-```
+## Step 5 — Create, then verify
+
+Default write: `tosca_dataintegrity_createRowByRowComparison`. Fill remaps and optional tolerances on that request — do not rebuild the module with `tosca_teststep_edit`.
+
+`expectedResult` is what the step verifies after the comparison has run. Omit it when source and target are meant to match: it falls back to the module default `OK*`, whose trailing wildcard absorbs the row counts and report path the executor appends to the message. Set it only when differences are the expected outcome — a known defect, or a migration still in flight. In that case run the comparison once, take the message off the failing step, and pass that text with a trailing `*`; do not hand-write an expected error from memory, because the wording and counts come from the executor. Setting `OK*` on a comparison that is supposed to find differences turns a meaningful check into a permanently red test.
+
+Then `tosca_testcase` Get on the returned `testCaseId`.
+
+Do **not** start `tosca_testrun_edit` Create unless the user asked to run.
 
 ---
 
-## Example — Two database connections
+## Example — names differ; remap on create
 
 ```
-► tosca_dataintegrity_listConnections
-◄ { connections: [{ id: "01J...", name: "SourceDB", ... }, { id: "01K...", name: "TargetDB", ... }] }
-  → User picks SourceDB as source and TargetDB as target.
+► tosca_diconnection List
+◄ [{ connectionName: "SourceDB", dataSourceType: "ODBC", allowAiQueries: true,
+     id: { spaceId: "...", id: "01J..." } },
+   { connectionName: "TargetDB", ... id: { spaceId: "...", id: "01K..." } }]
 
-► tosca_dataintegrity_getConnectionSchema(connectionId="01J...")
-◄ { launcherLink: "tricentistosca://di?...", notificationId: "abc-123", executorCommandId: "..." }
-► Start-Process "tricentistosca://di?..."
-► tosca_dataintegrity_checkSchemaResult(notificationId="abc-123")
-◄ { count: 4, columns: [
-      { schemaName: "dbo", tableName: "Orders", columnName: "OrderId",    dataType: "int",      isNullable: false },
-      { schemaName: "dbo", tableName: "Orders", columnName: "CustomerId", dataType: "int",      isNullable: true  },
-      { schemaName: "dbo", tableName: "Orders", columnName: "OrderDate",  dataType: "datetime", isNullable: true  },
-      { schemaName: "dbo", tableName: "Orders", columnName: "Total",      dataType: "decimal",  isNullable: true  }
-    ]}
+► tosca_diconnection Get  connectionId="01J..."
+◄ { connectionId: "01J...", connectionName: "SourceDB", dataSourceType: "ODBC",
+    allowAiQueries: true, metadata: { databaseCategory: "MSSQL" } }
 
-► tosca_dataintegrity_getConnectionSchema(connectionId="01K...")
-◄ { launcherLink: "tricentistosca://di?...", notificationId: "def-456", executorCommandId: "..." }
-► Start-Process "tricentistosca://di?..."
-► tosca_dataintegrity_checkSchemaResult(notificationId="def-456")
-◄ { count: 4, columns: [
-      { schemaName: "dbo", tableName: "Orders", columnName: "OrderId",    dataType: "int",  isNullable: false },
-      { schemaName: "dbo", tableName: "Orders", columnName: "CustomerId", dataType: "int",  isNullable: true  },
-      { schemaName: "dbo", tableName: "Orders", columnName: "OrderDate",  dataType: "date", isNullable: true  },
-      { schemaName: "dbo", tableName: "Orders", columnName: "Total",      dataType: "money",isNullable: true  }
-    ]}
-  → Both sides have an Orders table with matching column names.
-  → OrderId is NOT NULL on both sides — good candidate for RowKey. Confirm with user.
+► tosca_dataintegrity_runSql  connectionId="01J..."
+    sql="SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Orders'"
+◄ { launcherLink: "tricentistosca://di?...", notificationId: "abc-123" }
+► open launcherLink
+► tosca_dataintegrity_checkSqlResult  notificationId="abc-123"  (poll until completed)
+◄ columns include dbo.Orders.ORDER_ID, CUSTOMER_ID, ORDER_DATE, TOTAL
+
+(same Get + runSql catalog on 01K... → dbo.Orders.OrderId, CustomerId, OrderDate, Total)
 
 ► tosca_dataintegrity_createRowByRowComparison({
-    Name: "Orders: SourceDB vs TargetDB",
-    Source: { Type: "Database", ConnectionName: "SourceDB", SqlStatement: "SELECT OrderId, CustomerId, OrderDate, Total FROM dbo.Orders" },
-    Target: { Type: "Database", ConnectionName: "TargetDB", SqlStatement: "SELECT OrderId, CustomerId, OrderDate, Total FROM dbo.Orders" },
-    RowKey: "OrderId"
+    name: "Orders: SourceDB vs TargetDB",
+    source: {
+      type: "Database",
+      connectionName: "SourceDB",
+      sqlStatement: "SELECT ORDER_ID, CUSTOMER_ID, ORDER_DATE, TOTAL FROM dbo.Orders"
+    },
+    target: {
+      type: "Database",
+      connectionName: "TargetDB",
+      sqlStatement: "SELECT OrderId, CustomerId, OrderDate, Total FROM dbo.Orders"
+    },
+    rowKey: "OrderId",
+    sourceOptions: {
+      columnRenames: [
+        { from: "ORDER_ID", to: "OrderId" },
+        { from: "CUSTOMER_ID", to: "CustomerId" },
+        { from: "ORDER_DATE", to: "OrderDate" },
+        { from: "TOTAL", to: "Total" }
+      ]
+    }
   })
 ◄ { success: true, testCaseId: "...", testCasePath: "/TestCases/Orders: SourceDB vs TargetDB" }
+
+► tosca_testcase Get  testCaseId="..."
 ```
 
----
-
-## Example — Two database connections
-
-```
-► tosca_dataintegrity_listConnections
-◄ { connections: [{ id: "01J...", name: "SourceDB", ... }, { id: "01K...", name: "TargetDB", ... }] }
-  → User picks SourceDB as source and TargetDB as target.
-
-► tosca_dataintegrity_getConnectionSchema(connectionId="01J...")
-◄ { launcherLink: "tricentistosca://di?...", notificationId: "abc-123", executorCommandId: "..." }
-► Start-Process "tricentistosca://di?..."
-► tosca_dataintegrity_checkSchemaResult(notificationId="abc-123")
-◄ { count: 4, columns: [
-      { schemaName: "dbo", tableName: "Orders", columnName: "OrderId",    dataType: "int",      isNullable: false },
-      { schemaName: "dbo", tableName: "Orders", columnName: "CustomerId", dataType: "int",      isNullable: true  },
-      { schemaName: "dbo", tableName: "Orders", columnName: "OrderDate",  dataType: "datetime", isNullable: true  },
-      { schemaName: "dbo", tableName: "Orders", columnName: "Total",      dataType: "decimal",  isNullable: true  }
-    ]}
-
-► tosca_dataintegrity_getConnectionSchema(connectionId="01K...")
-◄ { launcherLink: "tricentistosca://di?...", notificationId: "def-456", executorCommandId: "..." }
-► Start-Process "tricentistosca://di?..."
-► tosca_dataintegrity_checkSchemaResult(notificationId="def-456")
-◄ { count: 4, columns: [
-      { schemaName: "dbo", tableName: "Orders", columnName: "OrderId",    dataType: "int",  isNullable: false },
-      { schemaName: "dbo", tableName: "Orders", columnName: "CustomerId", dataType: "int",  isNullable: true  },
-      { schemaName: "dbo", tableName: "Orders", columnName: "OrderDate",  dataType: "date", isNullable: true  },
-      { schemaName: "dbo", tableName: "Orders", columnName: "Total",      dataType: "money",isNullable: true  }
-    ]}
-  → Both sides have an Orders table with matching column names.
-  → OrderId is NOT NULL on both sides — good candidate for RowKey. Confirm with user.
-
-► tosca_dataintegrity_createRowByRowComparison({
-    Name: "Orders: SourceDB vs TargetDB",
-    Source: { Type: "Database", ConnectionName: "SourceDB", SqlStatement: "SELECT OrderId, CustomerId, OrderDate, Total FROM dbo.Orders" },
-    Target: { Type: "Database", ConnectionName: "TargetDB", SqlStatement: "SELECT OrderId, CustomerId, OrderDate, Total FROM dbo.Orders" },
-    RowKey: "OrderId"
-  })
-◄ { success: true, testCaseId: "...", testCasePath: "/TestCases/Orders: SourceDB vs TargetDB" }
-```
-
----
-
+Optional tolerances on the same create call, e.g. `tolerances.numericByColumn: [{ column: "Total", tolerance: "0.01" }]`.

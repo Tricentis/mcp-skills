@@ -24,4 +24,4 @@ Reload Cursor → sign in when prompted → `/tosca-cloud-connect`.
 
 MCP connection is configured by the user in IDE settings (same as marketplace plugin).
 
-See [README.md](../../README.md) and [START-HERE.md](../../START-HERE.md).
+See [docs/installation.md](../../docs/installation.md).

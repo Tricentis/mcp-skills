@@ -1,12 +1,18 @@
+#requires -Version 5.1
 <#
 .SYNOPSIS
-    Installs Tosca Cloud MCP skills and rules for Cursor (consumer layout).
-    Does not configure MCP servers — users add their tenant in IDE Settings -> MCP.
+    Installs Tosca Cloud MCP skills (and Cursor rules) for Cursor, Claude Code, or GitHub Copilot.
+    Does not configure MCP servers - users add their tenant in IDE Settings -> MCP
+    (Copilot CLI: copilot mcp add).
+
+.EXITCODES
+    0  Install succeeded.
+    1  Could not install (missing host/project, missing pack files, copy failure, or invalid args).
 #>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("Cursor")]
+    [ValidateSet("Cursor", "Claude", "Copilot")]
     [string]$Ide,
 
     [ValidateSet("User", "Project")]
@@ -20,55 +26,128 @@ param(
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "lib/IntegrationCommon.ps1")
 
-$packMap = Get-IdePackMap
-$config = $packMap[$Ide]
-$skillIds = Get-CloudSkillIds
+function Install-SkillsOnly {
+    param(
+        [string]$TargetSkillsRoot,
+        [string]$SrcSkillsRoot,
+        [string[]]$SkillIds
+    )
 
-if ($VerifyManifest) {
-    Test-PackManifest -PackRoot $PSScriptRoot
-}
-
-if ($skillIds.Count -eq 0) {
-    throw "No tosca-* skills found under $(Join-Path $config.PackPath 'skills')"
-}
-
-$srcSkillsRoot = Join-Path $config.PackPath "skills"
-$srcRules = Join-Path $config.PackPath "rules/tosca-cloud-mcp.mdc"
-
-function Install-CursorPack {
-    param([string]$TargetSkillsRoot, [string]$TargetRules)
-
-    foreach ($skillId in $skillIds) {
-        $src = Join-Path $srcSkillsRoot $skillId
+    foreach ($skillId in $SkillIds) {
+        $src = Join-Path $SrcSkillsRoot $skillId
         Copy-DirectoryContents -Source $src -Destination (Join-Path $TargetSkillsRoot $skillId)
     }
-
-    New-Item -ItemType Directory -Force -Path $TargetRules | Out-Null
-    Copy-Item -Path $srcRules -Destination (Join-Path $TargetRules "tosca-cloud-mcp.mdc") -Force
 }
 
-if ($Scope -eq "User") {
-    Install-CursorPack -TargetSkillsRoot $config.UserSkills -TargetRules $config.UserRules
-    Write-Host "Installed Cursor Cloud MCP skills to user profile."
-} else {
-    Install-CursorPack -TargetSkillsRoot (Join-Path $ProjectPath $config.ProjectSkills) `
-        -TargetRules (Join-Path $ProjectPath $config.ProjectRules)
-    Write-Host "Installed Cursor Cloud MCP skills to project: $ProjectPath"
+function Install-CursorPack {
+    param(
+        [string]$TargetSkillsRoot,
+        [string]$TargetRules,
+        [string]$PackPath,
+        [string]$SrcSkillsRoot,
+        [string[]]$SkillIds
+    )
+
+    Install-SkillsOnly -TargetSkillsRoot $TargetSkillsRoot -SrcSkillsRoot $SrcSkillsRoot -SkillIds $SkillIds
+
+    $srcRules = Join-Path $PackPath "rules/tosca-cloud-mcp.mdc"
+    if (-not (Test-Path -LiteralPath $srcRules -PathType Leaf)) {
+        throw "Cursor rules not found: $srcRules"
+    }
+    New-InstallDirectory -LiteralPath $TargetRules
+    Copy-Item -LiteralPath $srcRules -Destination (Join-Path $TargetRules "tosca-cloud-mcp.mdc") -Force
 }
 
-Write-Host ""
-Write-Host "Next steps:"
-Write-Host "  1. Cursor -> Settings -> MCP -> add your Tosca Cloud tenant server"
-Write-Host "  2. Use URL: https://{tenant}.my.tricentis.com/{space}/_mcp/api/mcp"
-Write-Host "  3. Reload Cursor; complete sign-in when the IDE prompts"
-Write-Host "  4. Verify: tosca_organization_listWorkspaces"
-Write-Host "  5. Skills: /tosca-cloud-connect then /tosca-cloud-basics"
+try {
+    $packMap = Get-IdePackMap
+    $config = $packMap[$Ide]
+    if ($null -eq $config) {
+        throw "Unknown IDE '$Ide'. Use Cursor, Claude, or Copilot."
+    }
+
+    $skillIds = Get-CloudSkillIds -PackPath $config.PackPath
+    if ($skillIds.Count -eq 0) {
+        throw "No tosca-* skills found under $(Join-Path $config.PackPath 'skills')"
+    }
+
+    if ($VerifyManifest) {
+        Test-PackManifest -PackRoot $PSScriptRoot
+    }
+
+    Assert-IdeInstallTarget -Ide $Ide -Config $config -Scope $Scope -ProjectPath $ProjectPath
+
+    $srcSkillsRoot = Join-Path $config.PackPath "skills"
+
+    if ($Scope -eq "User") {
+        if ($Ide -eq "Cursor") {
+            Install-CursorPack `
+                -TargetSkillsRoot $config.UserSkills `
+                -TargetRules $config.UserRules `
+                -PackPath $config.PackPath `
+                -SrcSkillsRoot $srcSkillsRoot `
+                -SkillIds $skillIds
+        } else {
+            Install-SkillsOnly -TargetSkillsRoot $config.UserSkills -SrcSkillsRoot $srcSkillsRoot -SkillIds $skillIds
+        }
+        Write-Host "Installed $Ide Cloud MCP skills to user profile."
+    } else {
+        $projectSkills = Join-Path $ProjectPath $config.ProjectSkills
+        if ($Ide -eq "Cursor") {
+            Install-CursorPack `
+                -TargetSkillsRoot $projectSkills `
+                -TargetRules (Join-Path $ProjectPath $config.ProjectRules) `
+                -PackPath $config.PackPath `
+                -SrcSkillsRoot $srcSkillsRoot `
+                -SkillIds $skillIds
+        } else {
+            Install-SkillsOnly -TargetSkillsRoot $projectSkills -SrcSkillsRoot $srcSkillsRoot -SkillIds $skillIds
+        }
+        Write-Host "Installed $Ide Cloud MCP skills to project: $ProjectPath"
+    }
+
+    $tenantUrl = "https://{tenant}.my.tricentis.com/{space}/_mcp/api/mcp"
+
+    Write-Host ""
+    Write-Host "Next steps:"
+    switch ($Ide) {
+        "Cursor" {
+            Write-Host "  1. Cursor -> Settings -> MCP -> add your Tosca Cloud tenant server"
+            Write-Host "  2. Use URL: $tenantUrl"
+            Write-Host "  3. Reload Cursor; complete sign-in when the IDE prompts"
+        }
+        "Claude" {
+            Write-Host "  1. Configure Tosca Cloud MCP in Claude Code settings"
+            Write-Host "  2. Use URL: $tenantUrl"
+            Write-Host "  3. Reload Claude Code; complete sign-in when prompted"
+        }
+        "Copilot" {
+            Write-Host "  Copilot CLI:"
+            Write-Host "    1. copilot mcp add --transport http tosca-cloud `"$tenantUrl`""
+            Write-Host "    2. Start copilot; if status is needs-auth run /mcp auth tosca-cloud"
+            Write-Host "    3. copilot skill list  (or /skills reload then /skills info tosca-cloud-connect)"
+            Write-Host "  VS Code Copilot Chat:"
+            Write-Host "    1. Command Palette -> MCP: Add Server (HTTP) with the same tenant URL"
+            Write-Host "    2. Reload the window; complete Okta sign-in when prompted"
+            Write-Host "  This installer does not write mcp-config.json or .vscode/mcp.json."
+        }
+    }
+    Write-Host "  Verify: tosca_module Search"
+    Write-Host "  Skills: /tosca-cloud-connect then /tosca-cloud-basics"
+    exit 0
+} catch {
+    $message = $_.Exception.Message
+    if ([string]::IsNullOrWhiteSpace($message)) {
+        $message = $_.ToString()
+    }
+    Write-Host "Install failed: $message" -ForegroundColor Red
+    exit 1
+}
 
 # SIG # Begin signature block
 # MIIqGAYJKoZIhvcNAQcCoIIqCTCCKgUCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCArbgaQ5vT+NWPH
-# xfdJXpq/Eb31D0fkttzpO6uvco3Hz6CCDt8wggboMIIE0KADAgECAhB3vQ4Ft1kL
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCBexwCLjTqGreZ0
+# 512FpRQAY0HDtYnG4xToN4FNDGkVG6CCDt8wggboMIIE0KADAgECAhB3vQ4Ft1kL
 # th1HYVMeP3XtMA0GCSqGSIb3DQEBCwUAMFMxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
 # ExBHbG9iYWxTaWduIG52LXNhMSkwJwYDVQQDEyBHbG9iYWxTaWduIENvZGUgU2ln
 # bmluZyBSb290IFI0NTAeFw0yMDA3MjgwMDAwMDBaFw0zMDA3MjgwMDAwMDBaMFwx
@@ -152,41 +231,41 @@ Write-Host "  5. Skills: /tosca-cloud-connect then /tosca-cloud-basics"
 # MTIwMAYDVQQDEylHbG9iYWxTaWduIEdDQyBSNDUgRVYgQ29kZVNpZ25pbmcgQ0Eg
 # MjAyMAIMDYkOSCK3QR2bFmhSMA0GCWCGSAFlAwQCAQUAoHwwEAYKKwYBBAGCNwIB
 # DDECMAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEO
-# MAwGCisGAQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIKUr+MfCEOjsTBYyHYfDpjgL
-# AsZH9VKVFtxNE629bMDTMA0GCSqGSIb3DQEBAQUABIICAGDUEgnuF3ldUmyO5Ix5
-# aKYu7qvYgCYXotrmZCw1UBmdqut2SN2XROhkERDyzlNfYiYmhctuOCcwuEQbv1Ue
-# 0MPp5iIvSTO8pBzml89tchsOaBf6GeR4+ZVZ17ElFFRDa8SyX/TBIMqkAx0Up3L0
-# Lj6iSZlLCv0YOnWXKkTNQPEZ39PTeYRqNYxhUj0U2lRBjDkVSArmEfMGM/2YD4TN
-# vil1Mk70l4LfwPgB4p2AWjVBM6Oc1rTFOeeeMgzhWaXDrYVvYWb8MwprZlV7V3j3
-# mrjMRf27yDzSGgVw+dCdB81KRzxZJCmbdnkzmmD/9X6JwESK6FTaDmqCGNZPDepj
-# zOnBhUb+eFz3pF9ij1dIDN9wtAk6VrPP98iE2cMfow97y/QiZXFTz9pRqoBoCiNT
-# DjrZ0ESqoHvb4SGgsIumEqQ0H3TFNrwIEkiF5vFc9e7Fz3YiGyWAPVEhnpfagdtK
-# YJ1pyQ2pT9agpiQCzEYp4qlxIHvqucxOFrMtzraYDn6w5sNVhnerR6uIv/PAvg0K
-# auhbkl5Itam3qiI3YFuZ3UFezt2J/YWXEuyD0EQ3lvQVz2bHIeXAXEstUBbHqn5/
-# AduNCsuajqerG0bJmYGPig3VfMbXXMEPXzFHm4stahAusu3NsPsoiMzGiLgzRBKM
-# /ipps30u0VWSd4koXxe3FCP1oYIXdjCCF3IGCisGAQQBgjcDAwExghdiMIIXXgYJ
+# MAwGCisGAQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIEH13cXiEJSlEcgh+otFuFxK
+# 0SbgM0CkyG6klZE2lu/0MA0GCSqGSIb3DQEBAQUABIICAAgQRdaDq/sab+MZansv
+# Rcbdeo0lgx7yr3GeoL7Thfplwd6imTjuXu2iIKgsyrrY9MNHXThF4jogWSuwd9MI
+# xyJYQdDolrVZLSsnS6/FVG0s38Go8oXL4suDbGU0uurnfXHBAYUENiQt+ZR1jSTC
+# B8WI+VUaukELykcbdgzXiS7pPYakjHaM8HAJbcDyBI15Bj+QgDo5ca/prTflpC0r
+# zhhcL9mDDHCTso8Xg9UL5fJCW71JN9hmywDYZhOfVmB8i0Nfinz91mKDRjOqVEPc
+# TsXtskDDUZK1NI7/r2pviqIJgepKy5nIGXyKK8FC+WI2b7JlPsBcWjtEkS25Upnc
+# tpoN/sFxu3dO/0hoWAwTA2eX7IaSWETlGCtMdHRUxtyaTT/VUrgRSgSgJK3qx4bv
+# kL3r5RJ40ovLNdSdjZ3brQOdN9dwhXIon7vQRfQDh9utc+hWvccvHxldNUFUovv4
+# g7xWDdAaqkHYK8HLm01ysthorBxw4RIE7ezzbBG3zJn9Y6wwcvn6iiT0r3Fae1dv
+# N1zMKrLgK1AD03BCd36HN7seWfVc8swTIimb8ze1MUOGeEsLdY4PqFOCQqveoG+f
+# cZifQL1GeMjcUzsc9apVgfwbKdlnJ0mgOVHIwqCc2Xn6paE2WJbc93vzF7KSdUVS
+# ViuVHu1hLJiKVdl5qEi8gW3MoYIXdjCCF3IGCisGAQQBgjcDAwExghdiMIIXXgYJ
 # KoZIhvcNAQcCoIIXTzCCF0sCAQMxDzANBglghkgBZQMEAgEFADB3BgsqhkiG9w0B
-# CRABBKBoBGYwZAIBAQYJYIZIAYb9bAcBMDEwDQYJYIZIAWUDBAIBBQAEIDHqsINp
-# q1G7W8JtOdPdQ/Nk+SrTEqWsQcUOSn9JqXFkAhB4dF7hAKyhlu3bsIpFOjhAGA8y
-# MDI2MDczMDE4MjY1NFqgghM6MIIG7TCCBNWgAwIBAgIQCoDvGEuN8QWC0cR2p5V0
-# aDANBgkqhkiG9w0BAQsFADBpMQswCQYDVQQGEwJVUzEXMBUGA1UEChMORGlnaUNl
+# CRABBKBoBGYwZAIBAQYJYIZIAYb9bAcBMDEwDQYJYIZIAWUDBAIBBQAEIMXSHlGw
+# ZQGvgatzc12+4Sk8VrkWqcfqoVhOFxLU5CjBAhAd/p/xAC9+fPYVgIVxoA4nGA8y
+# MDI2MTAxNTIyMTgwMlqgghM6MIIG7TCCBNWgAwIBAgIQCE/cM09+RU7bww+P+ZIY
+# NTANBgkqhkiG9w0BAQsFADBpMQswCQYDVQQGEwJVUzEXMBUGA1UEChMORGlnaUNl
 # cnQsIEluYy4xQTA/BgNVBAMTOERpZ2lDZXJ0IFRydXN0ZWQgRzQgVGltZVN0YW1w
-# aW5nIFJTQTQwOTYgU0hBMjU2IDIwMjUgQ0ExMB4XDTI1MDYwNDAwMDAwMFoXDTM2
-# MDkwMzIzNTk1OVowYzELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRpZ2lDZXJ0LCBJ
+# aW5nIFJTQTQwOTYgU0hBMjU2IDIwMjUgQ0ExMB4XDTI2MDgwNTAwMDAwMFoXDTM3
+# MTEwNDIzNTk1OVowYzELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRpZ2lDZXJ0LCBJ
 # bmMuMTswOQYDVQQDEzJEaWdpQ2VydCBTSEEyNTYgUlNBNDA5NiBUaW1lc3RhbXAg
-# UmVzcG9uZGVyIDIwMjUgMTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIB
-# ANBGrC0Sxp7Q6q5gVrMrV7pvUf+GcAoB38o3zBlCMGMyqJnfFNZx+wvA69HFTBdw
-# bHwBSOeLpvPnZ8ZN+vo8dE2/pPvOx/Vj8TchTySA2R4QKpVD7dvNZh6wW2R6kSu9
-# RJt/4QhguSssp3qome7MrxVyfQO9sMx6ZAWjFDYOzDi8SOhPUWlLnh00Cll8pjrU
-# cCV3K3E0zz09ldQ//nBZZREr4h/GI6Dxb2UoyrN0ijtUDVHRXdmncOOMA3CoB/iU
-# SROUINDT98oksouTMYFOnHoRh6+86Ltc5zjPKHW5KqCvpSduSwhwUmotuQhcg9tw
-# 2YD3w6ySSSu+3qU8DD+nigNJFmt6LAHvH3KSuNLoZLc1Hf2JNMVL4Q1OpbybpMe4
-# 6YceNA0LfNsnqcnpJeItK/DhKbPxTTuGoX7wJNdoRORVbPR1VVnDuSeHVZlc4seA
-# O+6d2sC26/PQPdP51ho1zBp+xUIZkpSFA8vWdoUoHLWnqWU3dCCyFG1roSrgHjSH
-# lq8xymLnjCbSLZ49kPmk8iyyizNDIXj//cOgrY7rlRyTlaCCfw7aSUROwnu7zER6
-# EaJ+AliL7ojTdS5PWPsWeupWs7NpChUk555K096V1hE0yZIXe+giAwW00aHzrDch
-# Ic2bQhpp0IoKRR7YufAkprxMiXAJQ1XCmnCfgPf8+3mnAgMBAAGjggGVMIIBkTAM
-# BgNVHRMBAf8EAjAAMB0GA1UdDgQWBBTkO/zyMe39/dfzkXFjGVBDz2GM6DAfBgNV
+# UmVzcG9uZGVyIDIwMjYgMTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIB
+# ALZ7pvLJ/s1K+NSbTGWz/TjGMPh8CQ6RucZCLv5anHzWJjF/NWJrFIhy24fcpKXl
+# gRiky4WAawDfU3YP0BMxt9l3Dm5oCG5Z69AqEN1kgHg2epx+l+lZBcmJCcN0ASUR
+# ML5uFIS80sZsDwO3BSkUxDjLJhBI+qiZP3aixAC/qEGLjsBNlLol9VZ7pfGEXiMl
+# neJIC5/YKuizVzNFKZZEeoy/0B8Zm+nzKBgSWG52lCO1w+nCg6XpCtklTJXeIg28
+# 3hw7TmmsZXR+SMbjbrEOvZ3fP2VxIgeR28Y90ZStd3F9VuA5RVynb/whITPAo9b7
+# 5Zr4Ta6Mj3URm26QZYMn/FnbuTegcoRcFEZ9FOqM5T6MTdtr/n74lIT/ug0eeOzm
+# Z6QTFg33otX+bFRsIolvykE1jive4PuESaT8zzVeFWDAMDtozNgLctkGD1ZjkEyZ
+# tJrLl5ya0m5doH/ScpaZCZVl6pNUOCybMc/kxC6EAmSJY24L0yYKD1Nkddsnb/It
+# VKi/2nXpQNMu1PT5prW83vV8d67WowuUs0HdY4H8AMLGvdL/WHEj3ZnqMqAQQP9u
+# 3Ai9t+5eQ02GDwy0ODjdzi0xlp70W+ow63/0++YDEX1M0iwgUHwbrJvfpklkZQvw
+# 3+kv3vUPItdwroczk9icflf55W1zOEKAcJVAIXpcMCU9AgMBAAGjggGVMIIBkTAM
+# BgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQUyWOKMC7USvtulPPm40B+9ezN4jAfBgNV
 # HSMEGDAWgBTvb1NK6eQGfHrK4pBW9i/USezLTjAOBgNVHQ8BAf8EBAMCB4AwFgYD
 # VR0lAQH/BAwwCgYIKwYBBQUHAwgwgZUGCCsGAQUFBwEBBIGIMIGFMCQGCCsGAQUF
 # BzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wXQYIKwYBBQUHMAKGUWh0dHA6
@@ -194,18 +273,18 @@ Write-Host "  5. Skills: /tosca-cloud-connect then /tosca-cloud-basics"
 # cGluZ1JTQTQwOTZTSEEyNTYyMDI1Q0ExLmNydDBfBgNVHR8EWDBWMFSgUqBQhk5o
 # dHRwOi8vY3JsMy5kaWdpY2VydC5jb20vRGlnaUNlcnRUcnVzdGVkRzRUaW1lU3Rh
 # bXBpbmdSU0E0MDk2U0hBMjU2MjAyNUNBMS5jcmwwIAYDVR0gBBkwFzAIBgZngQwB
-# BAIwCwYJYIZIAYb9bAcBMA0GCSqGSIb3DQEBCwUAA4ICAQBlKq3xHCcEua5gQezR
-# CESeY0ByIfjk9iJP2zWLpQq1b4URGnwWBdEZD9gBq9fNaNmFj6Eh8/YmRDfxT7C0
-# k8FUFqNh+tshgb4O6Lgjg8K8elC4+oWCqnU/ML9lFfim8/9yJmZSe2F8AQ/UdKFO
-# tj7YMTmqPO9mzskgiC3QYIUP2S3HQvHG1FDu+WUqW4daIqToXFE/JQ/EABgfZXLW
-# U0ziTN6R3ygQBHMUBaB5bdrPbF6MRYs03h4obEMnxYOX8VBRKe1uNnzQVTeLni2n
-# HkX/QqvXnNb+YkDFkxUGtMTaiLR9wjxUxu2hECZpqyU1d0IbX6Wq8/gVutDojBIF
-# eRlqAcuEVT0cKsb+zJNEsuEB7O7/cuvTQasnM9AWcIQfVjnzrvwiCZ85EE8LUkqR
-# hoS3Y50OHgaY7T/lwd6UArb+BOVAkg2oOvol/DJgddJ35XTxfUlQ+8Hggt8l2Yv7
-# roancJIFcbojBcxlRcGG0LIhp6GvReQGgMgYxQbV1S3CrWqZzBt1R9xJgKf47Cdx
-# VRd/ndUlQ05oxYy2zRWVFjF7mcr4C34Mj3ocCVccAvlKV9jEnstrniLvUxxVZE/r
-# ptb7IRE2lskKPIJgbaP5t2nGj/ULLi49xTcBZU8atufk+EMF/cWuiC7POGT75qaL
-# 6vdCvHlshtjdNXOCIUjsarfNZzCCBrQwggScoAMCAQICEA3HrFcF/yGZLkBDIgw6
+# BAIwCwYJYIZIAYb9bAcBMA0GCSqGSIb3DQEBCwUAA4ICAQCNxTphHp1SCt+ZrAmA
+# fn0oQLFr0mLywSLaDXQIENoyKqxrFbJblzCVP/pkXmwXOdrOpWygLzlT12os5ipD
+# Cy35RBCg2UMeApEtrfGhz45F4Wt4WGdNdIbRWt3YTYJmpR+b7lr4d7Uwn+H600u4
+# D7RnOGf8Wj4UNgAdZkfHhHv1mx9EVh71SJelcEN/oORSjXzdjfw1iZH9d8Nh/thn
+# 6hH23d+VsPAr6GAYyzSA02nXD1nYLI7Ijmiv+xLCiYC41DSFYL3GhTiy0PxpawPt
+# GRyaBVGzq+UiTfM8pD7KVyF5aQyWP4KhVGUUTnmm/RlYJoW3TiXA/+t0YcT2oRVB
+# m3JETjajHug2AL+v5jhtKVnd3D0rbHXEu27o+Q8p4sEWPMqKDB+qbceb6T/6WcwT
+# wXmQ9lOCLLYcsQeSWmvKqzpAec9etE14jOQAzLKWdE3w/TCaKtLRaRT7LCkRYVnh
+# A2D73FLje1O5b3HR5eHs0NzU/+xX7NbEdcofy0W3Wdwd1XOqtlpg/JgwtKfZM5dq
+# O94lbUveOiJBI+xZEbGRsMNbXmMREUTgu+Oca7Y73MPWcslIx2VhkSKSXjDbD6rg
+# g39H5Mh7QfieAIjWagkJNt68Yfim6cjEzVSiLSeZfdkr5dtFPTW6jATlWJdYeeDR
+# GCyatf8R1hSjzSvdN8yWQPT9gzCCBrQwggScoAMCAQICEA3HrFcF/yGZLkBDIgw6
 # SYYwDQYJKoZIhvcNAQELBQAwYjELMAkGA1UEBhMCVVMxFTATBgNVBAoTDERpZ2lD
 # ZXJ0IEluYzEZMBcGA1UECxMQd3d3LmRpZ2ljZXJ0LmNvbTEhMB8GA1UEAxMYRGln
 # aUNlcnQgVHJ1c3RlZCBSb290IEc0MB4XDTI1MDUwNzAwMDAwMFoXDTM4MDExNDIz
@@ -273,21 +352,21 @@ Write-Host "  5. Skills: /tosca-cloud-connect then /tosca-cloud-basics"
 # Iy30fnFqI2si/xK4VC0nftg62fC2h5b9W9FcrBjDTZ9ztwGpn1eqXijiuZQxggN8
 # MIIDeAIBATB9MGkxCzAJBgNVBAYTAlVTMRcwFQYDVQQKEw5EaWdpQ2VydCwgSW5j
 # LjFBMD8GA1UEAxM4RGlnaUNlcnQgVHJ1c3RlZCBHNCBUaW1lU3RhbXBpbmcgUlNB
-# NDA5NiBTSEEyNTYgMjAyNSBDQTECEAqA7xhLjfEFgtHEdqeVdGgwDQYJYIZIAWUD
+# NDA5NiBTSEEyNTYgMjAyNSBDQTECEAhP3DNPfkVO28MPj/mSGDUwDQYJYIZIAWUD
 # BAIBBQCggdEwGgYJKoZIhvcNAQkDMQ0GCyqGSIb3DQEJEAEEMBwGCSqGSIb3DQEJ
-# BTEPFw0yNjA3MzAxODI2NTRaMCsGCyqGSIb3DQEJEAIMMRwwGjAYMBYEFN1iMKyG
-# Ci0wa9o4sWh5UjAH+0F+MC8GCSqGSIb3DQEJBDEiBCBR4T5mbFWPQpqU/SQSwfNk
-# FpPOuR53PL+xMgJqCUmrdDA3BgsqhkiG9w0BCRACLzEoMCYwJDAiBCBKoD+iLNdc
-# hMVck4+CjmdrnK7Ksz/jbSaaozTxRhEKMzANBgkqhkiG9w0BAQEFAASCAgBrZYSA
-# cr7RQU7oomAkpeCybFVNURSf5dimh18knHXr+d9yihMczmkGMoZZ4qq/Ik2h4IyM
-# HANqUM+iBOwpSDnsDhHPq2TNt7jXAU09JqODKX7tpJQvwg4bHHP1KlW47J3IvZL7
-# 4WzPk7El5oPjb/JOB3Lp9J1sjbOFqfvYSbiFgKgTQem8Nt7dH62kHtDtOLj8y1uU
-# Lodycy7xgPygvwOuGJQpUAtlNeB1u1NdeSdAO5XiZB18bTUdbXC0AeovfRFzKtm0
-# gytkHZx0jj0dxxFWJgS5MKHmmPMmk+dsB4EaoqyNCFVOr/DZSIFbhjb8fgK1DAhA
-# brtXg1qHp6fnm/t+gnQXGUPriluCypOAlju0DSRWPFUgrfsrwa50rFZXBovdP/Y4
-# 1zfHRzpXTMiUeWwrkGFx+5zENi5vG6Qvs22FSRrzmgxg3+axA1v9BfrZ6q6h7ckN
-# cJZUiacKTPVF7POuaJvVzaQ808E9GEvh+Puhk6OXGpBxAdOHI5PCZy+8ANmHUf4Z
-# ciMcwIVXn7jJ3/XMOOaZ6DW6NCDA1kUfynrEO9AVjtbYrX6LffN6haKeydVkfRyx
-# bdLQOYpW8eFpfqYrC6QGdjd0byG92IsXQvjzPHFLA3ANBxbfWg1y28IgSbwTkkQy
-# KrWtu6+qDb3bGHNy74K1cjKrIo7sq+N90oNloQ==
+# BTEPFw0yNjEwMTUyMjE4MDJaMCsGCyqGSIb3DQEJEAIMMRwwGjAYMBYEFFHZq9oD
+# SXPYT0JmrKSCSOazacQ5MC8GCSqGSIb3DQEJBDEiBCARNr1Vvx+URWW6aEIE6Of6
+# siq6g2JnQvArMd/DiC0c3DA3BgsqhkiG9w0BCRACLzEoMCYwJDAiBCAtoJ2n9BMf
+# n+cttsXm6cllZ1WvBD8ep0LMDSEg4UHr/DANBgkqhkiG9w0BAQEFAASCAgCkdnZj
+# 0bkfSNNlRtZCe2qHBcZStkVh61jKg9A0m5KQNvJyPEDllkBtrEIJw6Roxsoi6En8
+# 9iaUOhPAc9Cy/5JEOye+87mCIDCDAEFLH+XKWzmWC+L/RT7R0O2/n+DhYENs/KbH
+# S1VnvqiyE2w51A0DN4xE/fOuJz19SlwMpdfeZfaZAvhCsstqAYWNXblhUGfIBjTq
+# QK1VGfG0RtIKKVN+yxkxxa0MciCl802OT/ekPLn2p11deLrjKKsnpUTSDne15zYD
+# Cqx7HEvhCamgCKJ+0e36/lLpg3XV55hKMrsA6jwSeARHbJY9kKxnUtXwdxcX82gU
+# YDeoV+ZtEBHSR7CsDT2pIq85UNP2mHrsa+HOqGD7E9Jqq3dBduFTJufQdfUbCUAR
+# yFnTtco9NOjpQ+3m5qqGrxjXzKp7d//wT2stfJvdgV9O5zOj4NR8eYoaJ03i4m3b
+# 6DNMWnNI8TpiE0dgZHyMLF/u+nkPxHBloZ2vnmDbHFXW87X7Jbz3T5aCMM0MEVYt
+# szTsoQxsRLVmCjrciyN+I0n/TAaLYKx4q5h/bruKrYeTTR/awl0nIKp5YgM3rng5
+# 1p2tzbgXP2Kzt8iLO7kotlmOlRJVG02EvVTdARePOGDRXPa86aHCguLOnTfisGN8
+# s4S1H+GRqxcKcAoJtc2G2wSl15J7AgL9k99emA==
 # SIG # End signature block

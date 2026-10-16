@@ -1,16 +1,25 @@
 # Run result schema — Tosca Cloud
 
-## Run states
+## Playlist run Get
 
-Runs from `tosca_playlist_getRecentRuns` include execution state (e.g. Passed, Failed, Running).
+`tosca_playlistrun` Get (by `playlistRunId` | latest `playlistId` | exact `playlistName`) returns:
 
-## Failed test steps
+- Playlist run state and portal `url`
+- `playlistTestCaseRuns[]` (progress / terminal states)
+- When Failed: `failedStepsByTestCaseRunId` (inline)
+- When Failed/Succeeded: `testStepsUriByTestCaseRunId` (URI only — not full trees)
+- `attachments[]` / `logsUrl` when available
 
-`tosca_playlist_getFailedTestSteps` returns per-run:
+While Pending/Running/Canceling, keep polling — do not invent success.
 
-- Failed test case units
-- Test step attachments with step name, action, expected/actual where available
+## Playlist run Search
 
-## Comparison across runs
+Summaries only (id, playlist, state, timestamps) — **no** portal `url`. Use for multi-run history; Get selected ids for detail.
 
-`tosca_execution_getRecentRunLogs` — compare log patterns across recent executions for the same playlist.
+## Trial run Get
+
+`tosca_testrun` Get returns state, `portalUrl`, `testSteps` (messages/details), and `attachments[]` for personal Builder runs. Use List (`name` / `state`) when the user has no `testRunId`.
+
+## Identity rule
+
+`playlistTestCaseRuns[].id` ≠ `tosca_testrun` id.

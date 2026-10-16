@@ -2,18 +2,23 @@
 
 ## Immediate persistence
 
-All Builder and inventory mutations commit via Cloud API. There is no draft/checkout model.
+All mutations commit via Cloud API. There is no draft/checkout model.
 
 ## Editability
 
-- Confirm artifact exists via search before update
-- `tosca_builder_updateApiMessage` is flagged destructive — review payload
-- Playlist renames use analyze-then-apply pattern for semantic naming
+- Confirm artifact exists via Search/Get before update
+- `tosca_apimessage_edit` Upsert with `messageId` is full replacement — review payload and confirm
+- Step renames/value fixes use `tosca_teststep_edit` Upsert
+- Password/secret values cannot be set via MCP
 
 ## Re-validation
 
-After fixes, run the playlist and compare run state:
+After fixes:
 
 ```
-tosca_playlist_run → tosca_playlist_getRecentRuns → tosca_playlist_getFailedTestSteps (if failed)
+# Trial
+tosca_testrun_edit Create → tosca_testrun Get until terminal
+
+# Playlist
+tosca_playlistrun_edit Create → tosca_playlistrun Get until terminal
 ```

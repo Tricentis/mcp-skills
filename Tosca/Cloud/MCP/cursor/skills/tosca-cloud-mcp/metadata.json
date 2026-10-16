@@ -1,12 +1,13 @@
 {
   "name": "tosca-cloud-mcp",
-  "version": "1.0.0",
+  "version": "1.16.0",
+  "author": "Henry Fieglein | Fractal",
   "organization": "Tricentis",
   "technology": "Tosca Cloud MCP",
-  "abstract": "Agent skill for orchestrating Tosca Cloud MCP tools — inventory, playlists, execution, Builder, and Data Integrity workflows via Code Mode or direct tool mode.",
+  "abstract": "Agent skill for orchestrating Tosca Cloud MCP noun tools \u2014 modules, test cases, test steps, trial runs, playlists, playlist runs, inventory, test sheets (TDM), API messages, API simulation, and Data Integrity via Code Mode or direct tool mode.",
   "mcpServer": "tosca-cloud",
-  "mcpEndpoint": "https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp",
-  "toolCount": 51,
+  "mcpEndpoint": "http://127.0.0.1:3000/mcp",
+  "toolCount": 42,
   "slashCommand": "/tosca-cloud-mcp",
-  "namingConvention": "tosca_{domain}_{action}"
+  "namingConvention": "tosca_<entity> / tosca_<entity>_edit"
 }

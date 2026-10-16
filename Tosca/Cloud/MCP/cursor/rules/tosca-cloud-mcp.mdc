@@ -1,7 +1,7 @@
 ---
 description: >-
   Route Tosca Cloud MCP work: connect tenant first, then engineering vs journey skills.
-  Use tosca_{domain}_{action} wire names. Does NOT cover Commander or TAIS chatbot paths.
+  Tool names are tosca_<entity> (read) and tosca_<entity>_edit (mutate). Does NOT cover Commander or TAIS chatbot paths.
 globs:
 alwaysApply: false
 ---
@@ -14,7 +14,7 @@ When automating **Tosca Cloud** via MCP:
 2. Read `AGENTS.md` for journey routing.
 3. Use **tosca-cloud-mcp** for tool orchestration and Code Mode.
 4. Use journey skills for user-story workflows.
-5. Wire names: `tosca_{domain}_{action}`; prefix `tosca-cloud:` when multiple MCP servers are active.
-6. Search before mutate — resolve `entityId` via inventory search.
+5. Tool names: `tosca_<entity>` (read: Get/Search/List) and `tosca_<entity>_edit` (mutate); operation is a parameter. Prefix `tosca-cloud:` when multiple MCP servers are active.
+6. Search before mutate — resolve `id` via `tosca_asset` Search.
 
 Requires hosted Cloud MCP with valid Okta session (not local Commander).
