@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - "Tosca/**"
+      - ".github/workflows/verify-signatures.yml"
   push:
     branches: [main]
     paths:
       - "Tosca/**"
+      - ".github/workflows/verify-signatures.yml"
 
 permissions:
   contents: read
@@ -19,53 +21,47 @@ jobs:
     runs-on: windows-stepsecurity-x64
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
 
-      - name: Verify Authenticode on product installers
+      - name: Require Authenticode on user PowerShell scripts
         shell: pwsh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           $ErrorActionPreference = "Stop"
-          $products = @(
-            "Tosca/Cloud/CLI",
-            "Tosca/Cloud/MCP",
-            "Tosca/Commander/CLI",
-            "Tosca/Commander/MCP"
-          )
-          $failures = @()
-          foreach ($product in $products) {
-            if (-not (Test-Path $product)) { continue }
+          $failures = [System.Collections.Generic.List[string]]::new()
+          $targets = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 
-            # -Include without a path wildcard is a no-op; use -Filter. .bat is not Authenticode-capable.
-            $files = @(Get-ChildItem -Path $product -File -Filter *.ps1 -ErrorAction SilentlyContinue)
-            $lib = Join-Path $product "lib"
-            if (Test-Path $lib) {
-              $files += @(Get-ChildItem -Path $lib -File -Filter *.ps1 -ErrorAction SilentlyContinue)
-            }
-            if ($files.Count -eq 0) {
-              Write-Host "SKIP $product (no .ps1 installers)"
-              continue
-            }
+          # Installers and helpers must stay signed. Skill examples are snippets until a PR changes them.
+          Get-ChildItem -Path Tosca -Recurse -File -Filter *.ps1 |
+            Where-Object { $_.FullName -notmatch '[\\/]examples[\\/]' } |
+            ForEach-Object { [void]$targets.Add($_.FullName) }
 
-            $statuses = foreach ($file in $files) {
-              [pscustomobject]@{
-                Path = $file.FullName
-                Status = (Get-AuthenticodeSignature -FilePath $file.FullName).Status
-                Subject = (Get-AuthenticodeSignature -FilePath $file.FullName).SignerCertificate.Subject
+          if ($env:EVENT_NAME -eq "pull_request" -and $env:BASE_SHA) {
+            git diff --name-only --diff-filter=AM "$env:BASE_SHA" HEAD |
+              Where-Object { $_ -like "*.ps1" -or $_ -like "*.psm1" } |
+              ForEach-Object {
+                if (Test-Path -LiteralPath $_) {
+                  [void]$targets.Add((Resolve-Path -LiteralPath $_).Path)
+                }
               }
-            }
-            $valid = @($statuses | Where-Object { $_.Status -eq "Valid" })
-            if ($valid.Count -eq 0) {
-              Write-Host "SKIP $product (no Authenticode-signed .ps1 in this checkout yet)"
-              continue
-            }
+          }
 
-            foreach ($row in $statuses) {
-              if ($row.Status -ne "Valid") {
-                $failures += "$($row.Path): $($row.Status)"
-              } else {
-                Write-Host "OK $($row.Path) -> $($row.Subject)"
-              }
+          if ($targets.Count -eq 0) {
+            Write-Error "No user PowerShell scripts found to verify."
+          }
+
+          foreach ($path in $targets) {
+            $sig = Get-AuthenticodeSignature -FilePath $path
+            if ($sig.Status -ne "Valid") {
+              $failures.Add("${path}: $($sig.Status)")
+            } else {
+              Write-Host "OK $path -> $($sig.SignerCertificate.Subject)"
             }
           }
+
           if ($failures.Count -gt 0) {
-            Write-Error ("Unsigned or invalid installer scripts:`n" + ($failures -join "`n") + "`n`nEnsure release .ps1 files are Authenticode-signed before merge.")
+            Write-Error ("PowerShell scripts must be Authenticode-signed before merge:`n" + ($failures -join "`n"))
           }
