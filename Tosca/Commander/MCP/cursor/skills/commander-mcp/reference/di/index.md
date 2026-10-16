@@ -31,4 +31,4 @@ Read **one** workflow file that matches the user's scenario:
 | 6 | [workflows/06-lineage-csv.md](workflows/06-lineage-csv.md) |
 | 7 | [workflows/07-db-expert-data-quality.md](workflows/07-db-expert-data-quality.md) |
 
-Source: `Tricentis.ToscaCommander` → `DIWorkflowTool.cs` (regenerate with `scripts/extract_di_reference_docs.py`).
+Source: `Tricentis.ToscaCommander` → `DIWorkflowTool.cs`; maintainers regenerate it in the source repository.
