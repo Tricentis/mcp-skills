@@ -24,10 +24,12 @@ def get_repo_root() -> Path:
 
 
 def _load_json(relative: str) -> dict[str, Any]:
-    path = get_repo_root() / relative
-    if not path.is_file():
-        raise FileNotFoundError(f"Missing manifest: {path}")
-    return json.loads(path.read_text(encoding="utf-8"))
+    source_path = get_repo_root() / relative
+    consumer_path = Path(__file__).resolve().parent.parent / Path(relative).name
+    for path in (source_path, consumer_path):
+        if path.is_file():
+            return json.loads(path.read_text(encoding="utf-8"))
+    raise FileNotFoundError(f"Missing manifest: {source_path} or {consumer_path}")
 
 
 def load_commander_versions_manifest() -> dict[str, Any]:

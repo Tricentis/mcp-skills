@@ -9,6 +9,7 @@ on:
       - "README.md"
       - "SECURITY.md"
       - ".trufflehog-exclude"
+      - ".github/workflows/validate-export.yml"
 
 permissions:
   contents: read
@@ -102,3 +103,33 @@ jobs:
           done
 
           echo "validate-export: OK"
+
+      - name: User script smoke tests
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          while IFS= read -r file; do
+            python3 -m py_compile "$file"
+          done < <(find Tosca -type f -name '*.py' | sort)
+
+          while IFS= read -r file; do
+            FILE="$PWD/$file" pwsh -NoProfile -Command \
+              '$errors=$null; [System.Management.Automation.Language.Parser]::ParseFile($env:FILE,[ref]$null,[ref]$errors) > $null; if($errors){$errors | ForEach-Object { Write-Error $_ }; exit 1}'
+          done < <(find Tosca -type f -name '*.ps1' | sort)
+
+          tmp=$(mktemp -d)
+          python3 Tosca/Cloud/CLI/configure_tn_connection.py \
+            --tenant example --space default --dry-run > "$tmp/tn-config.txt"
+          python3 Tosca/Commander/CLI/Get-CommanderAutomationPaths.py \
+            > "$tmp/commander-paths.json" || test "$?" -eq 2
+          python3 -m json.tool "$tmp/commander-paths.json" > /dev/null
+
+          pwsh -NoProfile -File Tosca/Cloud/CLI/install.ps1 \
+            -Ide Cursor -Scope Project -ProjectPath "$tmp/cloud-cli" -SkipTnConfig -VerifyManifest
+          pwsh -NoProfile -File Tosca/Cloud/MCP/install.ps1 \
+            -Ide Cursor -Scope Project -ProjectPath "$tmp/cloud-mcp" -VerifyManifest
+          pwsh -NoProfile -File Tosca/Commander/CLI/install.ps1 \
+            -Ide Cursor -Scope Project -ProjectPath "$tmp/commander-cli"
+          pwsh -NoProfile -File Tosca/Commander/MCP/install.ps1 \
+            -Ide Cursor -Scope Project -ProjectPath "$tmp/commander-mcp" -VerifyManifest

@@ -29,10 +29,5 @@ UTF-8 BOM is applied at export/sign time. That does not make non-ASCII safe in s
 
 ## Before commit
 
-```powershell
-pwsh -File scripts/validate_powershell.ps1
-```
-
-Or `pwsh -File scripts/dev.ps1 -Task Validate`.
-
-The validator fails on any non-ASCII character with file, line, column, and code point.
+Run the source pack's validation workflow. Consumer installs intentionally omit
+maintainer-only validation scripts; locally, reject any non-ASCII script character.
