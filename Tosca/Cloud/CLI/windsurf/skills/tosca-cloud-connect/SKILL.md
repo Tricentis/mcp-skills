@@ -4,17 +4,17 @@ description: >-
   Connects toscactl to Tosca Cloud — login, workspace selection, and connectivity check. Use when
   setting up toscactl, fixing auth errors, or before any other Tosca Cloud skill. For tn gap
   workflows only, also run configure_tn_connection.py. Does NOT cover direct IDE MCP.
-license: Apache-2.0
+license: LicenseRef-Tricentis-Internal
 metadata:
   author: Tricentis
-  version: "1.0.0"
+  version: "1.2.0"
 ---
 
 # Connect toscactl to Tosca Cloud
 
 Configure **`toscactl`** for the user's tenant. Primary runtime for all non-gap journeys.
 
-Install **toscactl** per your Tricentis distribution (must be on PATH).
+Install: [tosca-cli README — Installation](https://github.com/Tricentis-Tosca/tosca-cli#installation)
 
 ## Setup checklist
 
@@ -45,11 +45,11 @@ Headless / CI: set `TOSCA_CLIENT_ID` and `TOSCA_CLIENT_SECRET`, or `toscactl log
 |--------|--------|
 | Workspace list in config | Proceed — load `tosca-cloud-basics` or task skill |
 | Auth error | Re-run login; check tenant URL format |
-| toscactl not found | Install toscactl per your Tricentis distribution; ensure it is on PATH |
+| toscactl not found | Install from [tosca-cli releases](https://github.com/Tricentis-Tosca/tosca-cli/releases) |
 
 ## tn (gap workflows only)
 
-Required before invoking gap skills (author, remediate, explain step tree, DI). See [runtime-routing.md](../tosca-cloud/runtime-routing.md).
+Required before invoking gap skills (author, remediate, explain step tree, DI). See [runtime-routing.md](../packages/core/skills/tosca-cloud/runtime-routing.md).
 
 ```bash
 python3 configure_tn_connection.py --tenant acme --space default --output ~/.tn/mcp.json

@@ -9,10 +9,12 @@ import sys
 from pathlib import Path
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
-_lib = _SCRIPT_DIR / "lib"
-if not (_lib / "tenant_url.py").is_file():
-    raise SystemExit("tenant_url.py not found (expected lib/tenant_url.py beside installer)")
-sys.path.insert(0, str(_lib))
+for _lib in (_SCRIPT_DIR / "lib", _SCRIPT_DIR.parent / "scripts" / "lib"):
+    if (_lib / "tenant_url.py").is_file():
+        sys.path.insert(0, str(_lib))
+        break
+else:
+    raise SystemExit("tenant_url.py not found (expected lib/ or scripts/lib/)")
 
 from tenant_url import (  # noqa: E402
     DEFAULT_ENV,

@@ -53,4 +53,4 @@ python3 Get-TnCloudPaths.py
 
 Load **`tosca-cloud-basics`** then the journey skill for your task. See `AGENTS.md.fragment` in the install root.
 
-Gap routing: [`runtime-routing.md`](cursor/skills/tosca-cloud/runtime-routing.md) in the `tosca-cloud` skill (also under `claude/` and `windsurf/` for your IDE).
+Gap routing: `runtime-routing.md` inside the `tosca-cloud` skill (synced to each IDE pack on export).

@@ -4,10 +4,10 @@ description: >-
   Analyzes the latest Tosca Cloud playlist run via toscactl, diagnoses failures, and proposes
   confidence-rated remediations. Use when the user asks what went wrong or why tests failed.
   Read-only via toscactl. Does NOT apply fixes (hand off to tosca-remediating-from-results).
-license: Apache-2.0
+license: LicenseRef-Tricentis-Internal
 metadata:
   author: Tricentis
-  version: "1.0.0"
+  version: "1.2.0"
 ---
 
 # Analyze Tosca Cloud execution results

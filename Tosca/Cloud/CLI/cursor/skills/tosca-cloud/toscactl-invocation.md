@@ -4,7 +4,7 @@ IDE agents drive Tosca Cloud via **`toscactl`** in the workspace terminal. Alway
 
 **Prerequisite:** `toscactl` on PATH; run `toscactl login --url <tenant>.my.tricentis.com` and `toscactl workspaces set`. Verify with `python3 verify_toscactl.py`.
 
-Full command reference: [toscactl-reference](../toscactl-reference/SKILL.md) skill in this pack.
+Full command reference: [toscactl-reference](../tosca-commands/toscactl-reference/SKILL.md) and [tosca-cli README](https://github.com/Tricentis-Tosca/tosca-cli#commands).
 
 ## Connect and workspace
 
@@ -39,7 +39,7 @@ toscactl playlists history --page-size 1 --json --silent "My Playlist" \
   | toscactl playlists run view --json --silent
 ```
 
-Pipe JSON between commands with `jq` when chaining (see example above).
+See [JSON Piping](https://github.com/Tricentis-Tosca/tosca-cli#json-piping).
 
 ## CI flags
 
