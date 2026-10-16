@@ -1,4 +1,4 @@
-# Inline TCAPI — paste in terminal after setting paths below.
+# Inline TCAPI - paste in terminal after setting paths below.
 
 $env:COMMANDER_HOME = 'C:\Program Files\Tricentis\Tosca\Commander'
 $tws = 'C:\Projects\Demo.tws'

@@ -5,6 +5,24 @@ description: >-
   Remote Control. Use for /cli-api-commander, JumpToNode, checkout/checkinall,
   workspace locked, batch mode, .tws workspaces, execution lists, or GUI RC.
   Detects runtimes first. Does NOT cover Data Integrity or in-process Commander automation.
+version: "1.1.0"
+primary-axis: product
+status: distributed
+tier: 2
+owner: "@hfieglein-tricentis"
+license: Apache-2.0
+applicability:
+  ide:
+    - claude-code
+    - cursor
+    - vscode
+    - windsurf
+  product:
+    - tosca
+created: "2026-07-14"
+updated: "2026-10-13"
+metadata:
+  version: "1.1.0"
 ---
 
 # CLI & API Commander

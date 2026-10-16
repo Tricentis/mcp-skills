@@ -108,7 +108,7 @@ TCShell.exe -workspace "path.tws" -auth "token" script.tcs
 
 See [path-selection.md](path-selection.md).
 
-## Implementation references
+## Source references (Tricentis.ToscaCommander)
 
 - `commander/TCAddIns/RemoteControlAddIn/Remoting/RemoteControl.cs`
 - `commander/TCAddIns/RemoteControlAddIn/CommandHandling/RemoteCommandInterpreter.cs`
