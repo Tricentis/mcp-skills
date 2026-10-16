@@ -18,55 +18,28 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 2
 
-      - name: Create tags and GitHub releases for changed products
+      - name: Publish mcp-skills release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            mapfile -t manifests < <(find Tosca -mindepth 2 -maxdepth 2 -name manifest.json | sort)
-            echo "Manual run; checking all product manifests for missing releases"
-          else
-            mapfile -t manifests < <(git diff --name-only HEAD~1 HEAD | grep -E '^Tosca/[^/]+/[^/]+/manifest\.json$' || true)
-            if [ "${#manifests[@]}" -eq 0 ]; then
-              mapfile -t manifests < <(find Tosca -mindepth 2 -maxdepth 2 -name manifest.json | sort)
-              echo "No manifest changes in push; checking all product manifests for missing releases"
-            fi
+          VERSION=1.1.0
+          TAG="v${VERSION}"
+          TITLE="mcp-skills ${VERSION}"
+          NOTES="mcp-skills release ${VERSION}. Install any product from its directory under Tosca/ — see that directory README and SHA256SUMS."
+
+          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+            git tag -a "$TAG" -m "$TITLE"
           fi
-
-          for manifest in "${manifests[@]}"; do
-            dir=$(dirname "$manifest")
-            version=$(python3 -c "import json; d=json.load(open('$manifest')); print(d['version'])")
-            package=$(python3 -c "import json; d=json.load(open('$manifest')); print(d.get('packageName', 'pack'))")
-            rel="${dir#Tosca/}"
-            tag="tosca/$(echo "$rel" | tr '[:upper:]' '[:lower:]')/${version}"
-            title="$(echo "$rel" | tr '/' ' ') ${version}"
-            notes="Tricentis MCP Skills release: ${package} ${version}. Install from ${dir}/ — see README and SHA256SUMS for integrity verification."
-
-            if ! git rev-parse "$tag" >/dev/null 2>&1; then
-              git tag -a "$tag" -m "${title}"
-            else
-              echo "Tag ${tag} already exists locally"
-            fi
-
-            if ! git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
-              git push origin "$tag"
-              echo "Pushed tag ${tag}"
-            else
-              echo "Tag ${tag} already on origin"
-            fi
-
-            if gh release view "$tag" >/dev/null 2>&1; then
-              echo "Release ${tag} already exists"
-            else
-              gh release create "$tag" --title "$title" --notes "$notes"
-              echo "Created GitHub release ${tag}"
-            fi
-          done
+          if ! git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            git push origin "$TAG"
+          fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release ${TAG} already exists"
+          else
+            gh release create "$TAG" --title "$TITLE" --notes "$NOTES"
+          fi

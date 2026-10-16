@@ -56,7 +56,7 @@ Tier details, path tables, and security notes live in **each product README** �
 | [Tosca Cloud MCP](Tosca/Cloud/MCP/) | `Install-ToscaCloudMcpPack.ps1` | **Cursor** (primary export) | User scope | `-Tenant`, `-Space`, `-Env`; MCP config helper; [START-HERE.md](Tosca/Cloud/MCP/START-HERE.md) |
 | [Tosca Cloud CLI](Tosca/Cloud/CLI/) | `Install-TnCloudPack.ps1` | Cursor, Claude, Windsurf | User scope; VS Code fragment | `-Tenant`, `-Space`; tn + `configure_tn_connection.py`; [START-HERE.md](Tosca/Cloud/CLI/START-HERE.md) |
 
-**Releases:** [GitHub Releases](https://github.com/Tricentis/mcp-skills/releases) — tags like `tosca/commander/mcp/{version}`, `tosca/commander/cli/{version}`, `tosca/cloud/mcp/{version}`, `tosca/cloud/cli/{version}`.
+**Releases:** [GitHub Releases](https://github.com/Tricentis/mcp-skills/releases) — one catalog release, currently `mcp-skills 1.1.0` (`v1.1.0`).
 
 ---
 
