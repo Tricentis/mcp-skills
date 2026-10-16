@@ -7,17 +7,25 @@ For when/how per tool, load **tool-orchestration.md** from the skill root. For c
 | Workflow | File | Use when |
 |----------|------|----------|
 | Inspect workspace | [inspect-workspace.md](workflows/inspect-workspace.md) | User asks what is open, project structure |
-| Create test case | [create-test-case.md](workflows/create-test-case.md) | New test case with optional steps |
-| Add step to existing test case | [add-step-to-existing-test-case.md](workflows/add-step-to-existing-test-case.md) | Appending a step after creation (not supported by `create_test_case`) |
+| Create test case | [create-test-case.md](workflows/create-test-case.md) | Create or fully replace test cases and steps |
+| Add step to existing test case | [add-step-to-existing-test-case.md](workflows/add-step-to-existing-test-case.md) | Append without full-replacing steps through `create_test_cases` |
+| Configure Test Configuration Parameters | [configure-test-configuration-parameters.md](workflows/configure-test-configuration-parameters.md) | Read and full-replace local TCPs without UI tasks |
 | Author manual test case | [author-manual-test-case.md](workflows/author-manual-test-case.md) | Written manual definition → Tosca manual test case |
 | Author automated test case | [author-automated-test-case.md](workflows/author-automated-test-case.md) | Build an automated test from a description; module sourcing, buffering, validation |
 | Explain a test case | [explain-test-case.md](workflows/explain-test-case.md) | Summarize what a test case does (steps, values, target apps) |
+| Run and monitor an execution | [run-and-monitor-execution.md](workflows/run-and-monitor-execution.md) | Start a validation run or an execution list, poll to completion |
+| Locate execution results | [locate-execution-results.md](workflows/locate-execution-results.md) | Find the right run/list with no search tool |
 | Analyze execution results | [analyze-execution-results.md](workflows/analyze-execution-results.md) | Diagnose why the latest run failed; ranked remediations + confidence |
+| Diagnose an incomplete run | [diagnose-incomplete-run.md](workflows/diagnose-incomplete-run.md) | Aborted / NotExecuted / cancelled / unknown-state runs |
 | Analyze execution history | [analyze-execution-history.md](workflows/analyze-execution-history.md) | Trends, flakiness, recurring errors across many runs |
+| Compare two runs | [compare-two-runs.md](workflows/compare-two-runs.md) | Diff exactly two runs into regressions, fixes, and flake |
 | Remediate from results | [remediate-from-results.md](workflows/remediate-from-results.md) | Apply a non-UI fix to a test / data / module and validate |
-| Run Commander task | [execute-task.md](workflows/execute-task.md) | Context menu task on selection |
+| Run Commander task | [execute-task.md](workflows/execute-task.md) | Context-menu task with explicit object IDs |
 | Persist changes | [save-and-checkin.md](workflows/save-and-checkin.md) | After mutations in multi-user workspace |
 | Data Integrity intro | [di-getting-started.md](workflows/di-getting-started.md) | DI connections, schema, comparison |
+| Refresh DEX agents | [configure-dex-agent.md](workflows/configure-dex-agent.md) | List connected agents on the Configurations root |
+
+**Execution object model, cost rules, and hard gaps**: [execution-object-model.md](execution-object-model.md) — read once before the first execution workflow of a session.
 
 **Data Integrity reference** (read one file at a time): [di/index.md](di/index.md)
 

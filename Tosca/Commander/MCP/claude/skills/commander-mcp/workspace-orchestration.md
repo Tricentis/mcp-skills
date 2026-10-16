@@ -4,14 +4,14 @@ MCP shares the **same workspace** as the Commander GUI. Multi-user checkout rule
 
 **Progressive disclosure:** read when planning workspace mutations; pair with [tool-orchestration.md](tool-orchestration.md) for tool order.
 
-Analog in Commander CLI skill: [workspace-checkout.md](../../../../CLI/claude/skills/cli-api-commander/workspace-checkout.md) (TCShell `checkouttree` / `checkinall`).
+Analog in IDE.integration: [workspace-checkout.md](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration/blob/main/packages/core/skills/tcshell-commander/workspace-checkout.md) (TCShell `checkouttree` / `checkinall`).
 
 ## Contents
 
 - [Single-user vs multi-user](#single-user-vs-multi-user)
 - [Checkout orchestration](#checkout-orchestration)
 - [Save vs check-in vs update](#save-vs-check-in-vs-update)
-- [create_test_case persistence](#create_test_case-persistence)
+- [Dedicated writer persistence](#dedicated-writer-persistence)
 - [Selection vs explicit IDs](#selection-vs-explicit-ids)
 - [Decision tree](#decision-tree)
 
@@ -78,6 +78,9 @@ project practice, not a documented Tricentis recommendation:
      `Checkout Tree`.
   3. If `parent` is `null` (workspace root) before the task appears, stop and ask the user — don't
      call `get_object_info` on a null parent.
+  4. If the walk-up exhausts without the task appearing, **`Checkout Tree` via MCP is currently
+     unreliable** (hands-on testing reports it unsupported on some folders) — stop and ask the user
+     to check out the tree in the Commander UI instead of calling the task.
 
 ### Detect checkout need
 
@@ -129,7 +132,7 @@ examples (classes `CheckOutTask` / `CheckOutTreeTask`), but always read the **ex
 1. get_workspace_info
 2. update_all                    # optional — reduce conflicts
 3. checkout (via execute_task)
-4. mutate (set_attribute, execute_task, create_test_case, …)
+4. mutate (set_attribute, execute_task, create_test_cases, …)
 5. save_workspace
 6. check_in_all                  # when publishing; not after every tiny edit
 ```
@@ -145,14 +148,14 @@ Large check-ins may:
 
 Pass optional `comment` for audit trail.
 
-## `create_test_case` persistence
+## Dedicated writer persistence
 
-`create_test_case` handles persistence internally:
+`create_test_cases`, `create_test_configuration_parameters`, and `delete_objects` handle checkout and persistence internally:
 
-- **Multi-user:** checks in created folders/test case (and checked-out requirements) on success.
-- **Single-user:** saves workspace on success.
+- **Multi-user:** check in successful changes.
+- **Single-user:** save successful changes.
 
-Still verify with `get_object_info` after creation. On failure mid-way, the tool rolls back partial test case — no extra save needed.
+Still verify writes with the corresponding read tool. Do not add an immediate `save_workspace` unless later plan steps make additional in-memory edits.
 
 ## Selection vs explicit IDs
 
@@ -163,6 +166,8 @@ MCP calls are stateless from the agent's perspective — **UI selection may chan
 | `objectIds=[surrogateId]` on tasks | User may click elsewhere in Commander |
 | `identifiers=[path or id]` on attributes | Same |
 | `set_object_selection` only when driving UI for user visibility | Not a substitute for passing IDs |
+
+`get_current_selection` is only for a user request about their current selection. Empty `identifiers` and omitted `objectIds` are interactive fallbacks, not agent planning inputs.
 
 ## Decision tree
 
@@ -188,7 +193,7 @@ Mutation planned?
 | Workspace file lock blocks second process | Same GUI workspace — no lock conflict |
 | Must close Commander for headless | Commander must stay open |
 
-When the user cannot keep Commander open, switch to the [Commander CLI pack](../../../../CLI/README.md) headless path — MCP cannot run.
+When the user cannot keep Commander open, switch to IDE.integration headless path — MCP cannot run.
 
 ## Related
 

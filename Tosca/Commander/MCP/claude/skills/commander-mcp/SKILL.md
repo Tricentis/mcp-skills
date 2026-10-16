@@ -1,11 +1,13 @@
 ---
 name: commander-mcp
 description: >-
-  Automates Tosca Commander via in-process MCP when Commander is open with a
-  workspace — checkout, tasks, test cases, and Data Integrity. Use for Tosca
-  automation, /commander-mcp, tosca-commander, McpServerAddIn, or when Commander
-  MCP tools connect. Does NOT cover headless TCShell, TCAPI, Remote Control, or
-  CI when Commander is closed (use Commander CLI pack).
+  Automates Tosca Commander via MCP when Commander is open with a workspace —
+  checkout, tasks, execution results, test cases, and Data Integrity. Use for
+  /commander-mcp, tosca-commander, McpServerAddIn, Distribution Agent, or failed
+  runs. Does NOT cover agent install, unattended RDP, headless TCShell, TCAPI,
+  Remote Control, or CI when Commander is closed (use Tosca.Commander.IDE.integration).
+metadata:
+  version: "1.2.1"
 ---
 
 # Commander MCP — workspace automation
@@ -25,6 +27,7 @@ Commander MCP session:
 - [ ] Intent doc — tool / workspace / task / di orchestration (one only)
 - [ ] Plan — script or numbered tool table before first mutation
 - [ ] Execute — discover before mutate; explicit objectIds
+- [ ] GUI avoidance — selection tools only for explicit user-visible requests
 - [ ] Persist — save_workspace / check_in_all at end
 ```
 
@@ -36,6 +39,11 @@ Commander MCP session:
 | Read-only / audit | [tool-orchestration.md](tool-orchestration.md) | `get_workspace_info` → navigate |
 | Edit attributes / checkout | [workspace-orchestration.md](workspace-orchestration.md) | Checkout → mutate → save |
 | Context-menu task | [task-orchestration.md](task-orchestration.md) | `list_available_tasks` → `execute_task` |
+| Execution / result analysis | [reference/execution-object-model.md](reference/execution-object-model.md) | Object tree, cost rules, then one workflow below |
+| Test Configuration Parameters | [reference/workflows/configure-test-configuration-parameters.md](reference/workflows/configure-test-configuration-parameters.md) | List then full-replace local TCPs |
+| Test case authoring | [reference/workflows-index.md](reference/workflows-index.md) | `create_test_cases` or matching workflow |
+| API assets / deletion / asset search | [tool-orchestration.md](tool-orchestration.md) | Prefer dedicated identifier-first tools |
+| DEX agents | [reference/workflows/configure-dex-agent.md](reference/workflows/configure-dex-agent.md) | Refresh agents on Configurations (multi-user) |
 | Data Integrity | [di-orchestration.md](di-orchestration.md) | One DI reference file below |
 
 ## Execution modes
@@ -73,9 +81,9 @@ Do **not** open the catalog at session start.
 |-------------|-------|
 | Commander 26.1+ | MCP add-in |
 | Workspace open | Active workspace |
-| MCP connected | Port from Commander MCP settings (default **46248**; DEBUG often **8080**) |
+| MCP connected | Port **46248** (8080 DEBUG) |
 | DI license | For Data Integrity tools |
 
 ## When MCP is unavailable
 
-Use the **[Commander CLI pack](../../../../CLI/README.md)** skill (TCShell / TCAPI / Remote Control).
+Use **Tosca.Commander.IDE.integration** (TCShell / TCAPI / Remote Control).

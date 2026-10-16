@@ -13,12 +13,13 @@ Task workflow:
 - [ ] save_workspace — if task mutated workspace
 ```
 
-TCShell analog: `Task "Create Template Instance"`, `TaskOnEach` — see [reference/commands.md](../../../../CLI/windsurf/skills/cli-api-commander/reference/commands.md).
+TCShell analog: `Task "Create Template Instance"`, `TaskOnEach` — see IDE.integration `reference/commands.md`.
 
 ## Contents
 
 - [When to use tasks vs other tools](#when-to-use-tasks-vs-other-tools)
 - [Standard task orchestration](#standard-task-orchestration)
+- [Tasks that must not be run via MCP](#tasks-that-must-not-be-run-via-mcp)
 - [Checkout tasks (multi-user)](#checkout-tasks-multi-user)
 - [Multi-object tasks](#multi-object-tasks)
 - [Drop task orchestration](#drop-task-orchestration)
@@ -29,11 +30,16 @@ TCShell analog: `Task "Create Template Instance"`, `TaskOnEach` — see [referen
 
 | Goal | Use | Not |
 |------|-----|-----|
-| Context-menu action (Create, Import, Checkout, …) | `execute_task` | Guessing CLI/TCShell |
+| Checkout, Manual XTestStep, IF/DO/WHILE, used Modules, Import Subset | `execute_task` with explicit `objectIds` | UI selection |
 | Simple property change | `set_attribute` | Task if attribute API suffices |
-| New test case with steps | `create_test_case` | Manual task chain unless tool insufficient |
+| Create/update test cases | `create_test_cases` | Generic create/edit tasks |
+| Test Configuration Parameters | `list_test_configuration_parameters` + `create_test_configuration_parameters` | Create TCP task |
+| Delete objects | `delete_objects` after confirmation | Delete task |
+| Create/update API assets | `create_api_*` / `update_api_module` | API context-menu tasks |
 | Drag module onto test case | `execute_drop_task` | `execute_task` |
 | Check in all checked-out | `check_in_all` | Checkout task on each object |
+
+Do not run Scan or Rescan tasks for automation. They require a live application and scanner UI; use dedicated module tools where available or report the module gap.
 
 ## Standard task orchestration
 
@@ -55,6 +61,7 @@ Step D  save_workspace                          → unless task auto-saves
 - Pass `objectIds` — never rely on stale UI selection.
 - Read returned task **names exactly** (case-sensitive).
 - Read **parameter schema** — map user intent to parameter keys for step C.
+- Do not call `set_object_selection` first; selection never substitutes for `objectIds`.
 
 **Signals:**
 
@@ -63,6 +70,7 @@ Step D  save_workspace                          → unless task auto-saves
 | Edit/create/delete tasks absent | Owning checkout unit not checked out — see [Checkout granularity](workspace-orchestration.md#checkout-orchestration) for which object to check out |
 | Empty list | Wrong object type or no tasks for context — verify `get_object_info` |
 | Task with parameters | Supply `parameters` dict in `execute_task` |
+| Task reports `parameters: []` | **Not a safety signal** — some no-parameter tasks open a native dialog MCP cannot fill in. Check [Tasks that must not be run via MCP](#tasks-that-must-not-be-run-via-mcp) before calling |
 
 ### Step C — `execute_task`
 
@@ -92,6 +100,27 @@ Step D  save_workspace                          → unless task auto-saves
 - `execute_task` with an unrecognized name returns `"Unknown task {name}. Available tasks: ..."`.
   This is also the signal for a checkout-gated task that hasn't appeared yet — it is not a distinct
   "not checked out" error. Re-run step B after checking out the correct object (see below).
+
+## Tasks that must not be run via MCP
+
+A small set of attribute-editing tasks open a **native Commander dialog** that MCP has no way to
+fill in or dismiss: `Name`, `Description`, `SynchronizationPolicy`, `OwningGroupName`,
+`ViewingGroupName`, `Pausable`, `TestCaseWorkState`. All of them report `parameters: []` in
+`list_available_tasks`, identical to a normal safe task — the empty parameter list is not a
+warning.
+
+**Failure chain if called anyway:** the dialog opens → the MCP request times out → **the whole
+Commander UI is blocked** until a human manually closes the dialog → every later MCP call fails
+until then.
+
+**Instead:**
+
+- `Name` / `Description` → `set_attribute` (both are writable attributes; use this, never the task).
+- The other five → `get_attributes` first; if `is_readonly=false`, `set_attribute`; if read-only,
+  **ask the user** to change it in the Commander UI. Do not fall back to the task.
+
+**Exception:** Rename (`Umbenennen`) also reports `parameters: []` but is safe — it accepts a
+`NewName` parameter under the hood and does not open a dialog.
 
 ## Checkout tasks (multi-user)
 
@@ -159,10 +188,13 @@ MCP exposes task **names and schemas** via `list_available_tasks` — use that i
 |-------|-----|
 | Hard-coded task names from memory | Names vary by object type and checkout state |
 | `execute_task` without step B | Failures and wrong task |
+| `execute_task` when a dedicated tool exists | Dedicated tools are identifier-first and return structured outcomes |
+| Scan / Rescan tasks | Scanner UI and live application required |
 | Skip re-list after checkout | Edit tasks appear only after checking out the correct owning object |
 | Assume "checkout the parent" always | Checkout unit varies by operation — see [workspace-orchestration.md](workspace-orchestration.md#checkout-orchestration) |
 | Reach for `Checkout Tree` as the default escalation | Locks every descendant, not just the object needed — try plain `Checkout` at the correct owner first |
 | Same task name across different object types | Always list per target |
+| Treat an empty parameter list as "safe to call" | Some tasks open a native modal dialog and hang the whole Commander UI — see [Tasks that must not be run via MCP](#tasks-that-must-not-be-run-via-mcp) |
 
 ## Related
 

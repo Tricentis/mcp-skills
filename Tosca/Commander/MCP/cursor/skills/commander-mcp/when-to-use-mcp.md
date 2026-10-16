@@ -27,7 +27,7 @@ MCP readiness:
 - [When to prompt the user](#when-to-prompt-the-user)
 - [Agent workflow (mandatory)](#agent-workflow-mandatory)
 
-For Commander **closed**, batch/CI, or workspace file locked by a headless process, use the **[Commander CLI pack](../../../../CLI/README.md)** (TCShell / TCAPI / Remote Control) instead.
+For Commander **closed**, batch/CI, or workspace file locked by a headless process, use **[Tosca.Commander.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Commander.IDE.integration)** (TCShell / TCAPI / Remote Control) instead.
 
 ## Step 1 — Is MCP the right path?
 
@@ -37,7 +37,7 @@ For Commander **closed**, batch/CI, or workspace file locked by a headless proce
 | Commander **closed** | **No** | Headless TCShell or TCAPI |
 | User wants CI/unattended with no GUI | **No** | Headless TCShell |
 | Commander open but MCP not configured | **No** | Close Commander → TCShell, or configure MCP |
-| "Automate what I see" without MCP | **No** | Remote Control (last resort — [Commander CLI](../../../../CLI/cursor/skills/cli-api-commander/remote-control.md)) |
+| "Automate what I see" without MCP | **No** | Remote Control (last resort, IDE.integration) |
 | Data Integrity comparison/validation | **Yes** (if licensed) | No TCShell equivalent — MCP-only |
 
 MCP runs **in-process** in the open Commander GUI. It shares the workspace with the user — no second workspace lock, no separate `TCShell.exe` process.
@@ -53,28 +53,34 @@ get_workspace_info
 | Field / signal | Agent action |
 |----------------|--------------|
 | Workspace path returned | Proceed — workspace is active |
-| Error / connection refused | Stop — ask user to open Commander, load workspace, check MCP port in Commander settings (default **46248**; DEBUG often **8080**) |
+| Error / connection refused | Stop — ask user to open Commander, load workspace, check MCP port (**46248**, **8080** in DEBUG) |
 | `IsMultiUser` (or equivalent) | Read [workspace-orchestration.md](workspace-orchestration.md) — checkout/check-in rules apply |
 
-Optional context read:
+Interactive context read only:
 
 ```
 get_current_selection
 ```
 
-Use when the user refers to "what I have selected" — but still pass explicit `objectIds` in later steps.
+Call only when the user refers to "what I have selected" or "what I have open." Still pass explicit IDs in every later call.
 
 ## Step 3 — Classify user intent
 
 | Intent | Tool category | Code Mode? | Start with |
 |--------|---------------|------------|------------|
 | "What's open?" / audit | Read-only workspace | Optional | `get_workspace_info` → navigate |
+| Find objects by type | Read-only workspace | Optional | `list_assets` with optional subtree root |
 | Read properties | Attributes | Yes | `get_object_info` → `get_attributes` |
 | Edit property | Mutation | Yes | checkout? → `get_attributes` → `set_attribute` → save |
 | Context-menu action | Tasks | Yes | `list_available_tasks` → `execute_task` |
 | Drag-and-drop | Drop task | Yes | resolve IDs → `execute_drop_task` |
-| New test case | Create | Yes | `create_test_case` (handles save/check-in internally) |
+| Create/update test cases | Create | Yes | `create_test_cases` (handles save/check-in internally) |
+| Configure TCPs | Configuration | Yes | list then `create_test_configuration_parameters` |
+| Delete objects | Delete | Yes | confirm then `delete_objects` |
+| Create/update API assets | API | Yes | `list_api_connections` / `create_api_*` / `update_api_module` |
 | Sync with repository | Multi-user | Yes | `update_all` before edit; `check_in_all` after |
+| Run / validate a test | Execution | Yes | `execute_test_suite` (`is_validation_run=true` scratchbook, `false` plus `execution_list_id` for a list or test event), then poll — [reference/execution-object-model.md](reference/execution-object-model.md) |
+| Why did a run fail / what's flaky | Execution results | Optional | [reference/execution-object-model.md](reference/execution-object-model.md) → pick one workflow |
 | Data Integrity | DI | **Required** | [di-orchestration.md](di-orchestration.md) + one [reference/di/](reference/di/index.md) file |
 
 ## Step 4 — Pick execution mode
@@ -95,12 +101,14 @@ Both modes use the same tool ordering from [tool-orchestration.md](tool-orchestr
 ## Step 6 — Selection rules
 
 1. **Always plan multi-step work** before the first mutation tool.
-2. **Pass explicit `objectIds` / `identifiers`** — do not assume UI selection persists between MCP calls.
-3. **Discover before mutate** — `get_object_info`, `get_attributes`, `list_available_tasks` before writes/tasks.
-4. **Checkout before edit** in multi-user workspaces — see [workspace-orchestration.md](workspace-orchestration.md).
-5. **Persist last** — `save_workspace` / `check_in_all` after all mutations in the plan.
-6. **DI gate** — read [di-orchestration.md](di-orchestration.md) before any DI tool.
-7. **One `execute_test_suite` at a time** — poll `execute_test_suite_status` until complete.
+2. **Pass explicit `objectIds` / `identifiers` / `targetId` / `sourceIds`** — do not assume UI selection persists between MCP calls.
+3. **Avoid GUI coupling** — `get_current_selection` only for an explicit selected-object request; `set_object_selection` only when the user must see the object.
+4. **Discover before mutate** — `get_object_info`, `get_attributes`, `list_available_tasks` before writes/tasks.
+5. **Prefer dedicated tools** — use TCP, test-case, API, delete, attribute, import, persistence, and sync tools instead of matching context-menu tasks.
+6. **Checkout before edit** in multi-user workspaces — see [workspace-orchestration.md](workspace-orchestration.md).
+7. **Persist last** — `save_workspace` / `check_in_all` after all mutations in the plan.
+8. **DI gate** — read [di-orchestration.md](di-orchestration.md) before any DI tool.
+9. **One `execute_test_suite` at a time** — poll `execute_test_suite_status` until complete.
 
 ## When to prompt the user
 
@@ -119,7 +127,7 @@ Both modes use the same tool ordering from [tool-orchestration.md](tool-orchestr
 ```
 1. get_workspace_info          → MCP ready? multi-user?
 2. Classify intent             → read / mutate / task / DI
-3. If not MCP-appropriate      → point to Commander CLI pack (TCShell/TCAPI)
+3. If not MCP-appropriate      → point to IDE.integration (TCShell/TCAPI)
 4. Draft Code Mode script OR direct-tool plan  → code-mode.md / direct-tool-mode.md
 5. If UserPromptRequired       → ask user
 6. Execute plan step-by-step
@@ -144,4 +152,4 @@ If any of 1–3 fail, do not proceed with MCP automation — fix connectivity or
 | Per-tool when/how | [tool-orchestration.md](tool-orchestration.md) |
 | Checkout, save, check-in | [workspace-orchestration.md](workspace-orchestration.md) |
 | DI sequencing | [di-orchestration.md](di-orchestration.md) |
-| Headless automation | [Commander CLI](../../../../CLI/README.md): [path-selection.md](../../../../CLI/cursor/skills/cli-api-commander/path-selection.md) |
+| Headless automation | IDE.integration: `path-selection.md` |

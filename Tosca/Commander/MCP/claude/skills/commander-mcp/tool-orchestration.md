@@ -32,6 +32,15 @@ READINESS  →  PLAN  →  DISCOVER  →  ACT  →  PERSIST  →  VERIFY
 | **Persist** | `save_workspace`, `check_in_all` | After all mutations in plan |
 | **Verify** | `get_object_info`, `get_attributes` | When user needs confirmation |
 
+## GUI avoidance (agents)
+
+- Never rely on UI selection between MCP calls.
+- Always pass `identifiers`, `objectIds`, `targetId`, and `sourceIds` from `get_object_info`, `list_assets`, or prior tool results.
+- Call `get_current_selection` only when the user explicitly says "selected" or "what I have open."
+- Call `set_object_selection` only when the user must see an object in Commander; it never replaces explicit IDs.
+- Prefer dedicated write tools over `execute_task` when both exist.
+- Empty `identifiers` or omitted `objectIds` means implicit GUI coupling and is an anti-pattern unless the user requested their current selection.
+
 ---
 
 ## By intent — which tools to orchestrate
@@ -44,12 +53,13 @@ READINESS  →  PLAN  →  DISCOVER  →  ACT  →  PERSIST  →  VERIFY
 
 ```
 get_workspace_info
-get_current_selection                                        # optional — may be empty
 get_object_info([user-named path])                           # if specific object
 get_object_info([parent], include_parent_and_children=true)  # paginate with nextOffset
+list_assets(assetType, root?)                                # if type known but path unknown
 get_attributes(identifiers=[...])                             # if properties needed
 ```
 
+Add `get_current_selection` only when the user explicitly refers to their current selection.
 **Do not** call save/check-in. **Code Mode optional** for simple reads.
 
 ---
@@ -61,6 +71,7 @@ get_attributes(identifiers=[...])                             # if properties ne
 | Tool | When to call | How |
 |------|--------------|-----|
 | `get_object_info` | User gives name/path; need surrogateId | Pass node path or id; handle per-object errors |
+| `list_assets` | Target type is known but name/path is unknown | Pass `assetType`; restrict with `root`; paginate |
 | `get_object_info` (`include_parent_and_children=true`) | Explore tree, or need parent for checkout/context | Single identifier only; paginate children with `limit`/`offset` |
 | `set_object_selection` | User should **see** object in UI | Optional — still pass `objectIds` in later tools |
 
@@ -75,10 +86,10 @@ get_attributes(identifiers=[...])                             # if properties ne
 **When:** Inspect state before edit or report to user.
 
 ```
-get_attributes(identifiers=[target])   # prefer explicit ids
+get_attributes(identifiers=[target])
 ```
 
-If `identifiers` omitted, current UI selection is used — **risky** if selection empty. Always pass identifiers when target is known.
+For agent use, `identifiers` is required. An empty array uses UI selection only for an interactive request about already-selected objects.
 
 ---
 
@@ -104,7 +115,7 @@ Password/Secret attributes: `set_attribute` returns an encrypted `new_value` —
 
 ### Execute context-menu tasks
 
-**When:** User wants a Commander task (Create, Import, Checkout, module actions, etc.).
+**When:** User wants a context-menu action without a dedicated MCP tool, such as Checkout, Manual XTestStep, IF/DO/WHILE, used Modules, or Import Subset.
 
 **Full orchestration:** [task-orchestration.md](task-orchestration.md)
 
@@ -130,23 +141,40 @@ save_workspace
 
 Call when `list_available_tasks` does not expose the needed action but a drop task exists.
 
-**Append step to existing test case** (`create_test_case` only accepts steps at creation): apply this pattern twice — module→testcase (new step), then attribute→step (value). See [reference/workflows/add-step-to-existing-test-case.md](reference/workflows/add-step-to-existing-test-case.md).
+**Append step to existing test case:** `create_test_cases` updates fully replace all steps, so apply this drop pattern twice when appending — module→testcase (new step), then attribute→step (value). See [reference/workflows/add-step-to-existing-test-case.md](reference/workflows/add-step-to-existing-test-case.md).
 
 ---
 
-### Create test case
+### Create or update test cases
 
-**When:** New test case with optional steps and requirement links.
+**When:** Create test cases, or fully replace an existing test case's name/path, steps, and requirement links.
 
 ```
-get_workspace_info                     # multi-user affects auto check-in
-create_test_case(name, path, testSteps?, linkedRequirements?)
-get_object_info([new case path])       # verify
+get_workspace_info
+create_test_cases(test_cases=[...])
+get_object_info([created or updated case path])       # verify
 ```
 
-`create_test_case` saves/checks in on success — **do not** duplicate save immediately unless plan continues with more edits.
+`create_test_cases` saves/checks in successful changes. With an existing `id`, `test_steps` and `linked_requirements` are full replacements; do not use it to append one step.
 
 See [reference/workflows/create-test-case.md](reference/workflows/create-test-case.md).
+
+---
+
+### Configure Test Configuration Parameters
+
+**When:** Read or replace local Test Configuration Parameters (TCPs).
+
+```
+list_test_configuration_parameters(identifiers=[target], includeInherited=true)
+create_test_configuration_parameters(
+  targets=[{id: target, parameters: [...complete desired local set...]}]
+)
+```
+
+The create tool full-replaces each target's local set. List first to preserve existing local values. Never use the Create Test Configuration Parameter task.
+
+See [reference/workflows/configure-test-configuration-parameters.md](reference/workflows/configure-test-configuration-parameters.md).
 
 ---
 
@@ -181,6 +209,7 @@ See [workspace-orchestration.md](workspace-orchestration.md).
 | `get_workspace_info` | Session start, after workspace switch | No args | Branch single vs multi-user plan |
 | `get_current_selection` | User says "selected" / "what I have" | No args | Use ids in plan or resolve via `get_object_info` |
 | `get_object_info` | Need id from path or verify existence | `identifiers[]` | Use `surrogateId` in plan |
+| `list_assets` | Find objects by type when path is unknown | `assetType`, optional `root` | Paginate; use returned ids |
 | `set_object_selection` | Show object in UI for user | id or path | Still pass ids explicitly later |
 | `get_object_info` (`include_parent_and_children=true`) | Traverse tree, or checkout target is parent | single id, paginate | Loop until no `nextOffset`; use returned `parent` for checkout |
 | `get_attributes` | Before read report or `set_attribute` | `identifiers[]` | Check `is_readonly` |
@@ -188,15 +217,29 @@ See [workspace-orchestration.md](workspace-orchestration.md).
 | `list_available_tasks` | **Before every** `execute_task` | `objectIds[]` | Pick exact task name |
 | `execute_task` | Task name known from list | name, params, `objectIds[]` | Save; handle task messages |
 | `execute_drop_task` | DnD scenario | targetId, sourceIds | Save |
-| `create_test_case` | New TC in folder path | name, path, steps?, reqs? | Verify; tool may save/check-in |
+| `create_test_cases` | Create or fully replace test cases | `test_cases[]` | Verify; tool saves/checks in |
+| `list_test_configuration_parameters` | Read local/inherited TCPs | `identifiers[]` | Preserve local set before replacement |
+| `create_test_configuration_parameters` | Full-replace local TCPs | `targets[]` | Tool saves/checks in |
+| `delete_objects` | User confirmed object deletion | `object_ids[]`, recursive?, force? | Read blockers before force |
 | `create_api_module` | New API module | per tool schema | Verify; tool may save/check-in |
-| `execute_test_suite` | Run test case/step (validation only¹) | `testCaseId`, `isValidationRun=true` | Get JobId; poll with execute_test_suite_status |
-| `execute_test_suite_status` | After `execute_test_suite` | jobId | Call again immediately² until `IsRunning=false` |
+| `execute_test_suite` | Scratchbook (`is_validation_run=true`) or execution list / test event (`is_validation_run=false`)¹ | `test_case_id` or `execution_list_id` | `{ jobId, errorMessage }`. `errorMessage` set → not started, don't retry blindly. Poll with `execute_test_suite_status` |
+| `execute_test_suite_status` | After `execute_test_suite` | jobId | Call again immediately² until `isRunning=false`. `jobFound=false` → unknown/discarded id, **not** a failure |
 | `save_workspace` | After mutation group | No args | Required before close |
 | `update_all` | Multi-user, before edit | No args | Then checkout/mutate |
 | `check_in_all` | Multi-user, publish ready | comment?, forceLargeCheckin? | After save; confirm large check-ins |
 
-¹ `executionListId` runs not yet supported. ² Server paces the poll interval — no client-side backoff needed.
+¹ `is_validation_run=true` needs `test_case_id` (`TestCase` or `TestStep`, scratchbook).
+`is_validation_run=false` needs `execution_list_id` (`ExecutionList`, `ExecutionEntryFolder`,
+`ExecutionEntry`, or `TestEvent`). A `TestEvent` is only enqueued; per-entry rows are the last
+known logs. Read the durable log from `references.ActualExecutionLog`. See
+[reference/workflows/run-and-monitor-execution.md](reference/workflows/run-and-monitor-execution.md).
+² Server paces the poll interval — no client-side backoff needed; never interrupt the loop to ask
+the user something, keep polling silently until `isRunning=false`.
+
+`get_object_info` with `include_parent_and_children=true` also returns a `references` map (role →
+object, e.g. `testCase` for an `ExecutionEntry`) and `missingValues` — see
+[reference/execution-object-model.md](reference/execution-object-model.md) for execution-specific
+uses.
 
 ### Data Integrity tools
 
@@ -238,6 +281,7 @@ On error: **stop**, diagnose, revise the plan — do not blindly retry the same 
 | DI license | Stop — inform user |
 | Another `execute_test_suite` running | Poll until free |
 | `ExecutionCancelledException`, no step detail | Ask user to check live app/browser state before further config changes |
+| MCP timeout (`-32001`) right after `execute_task` | Suspect a native dialog opened (see [task-orchestration.md § Tasks that must not be run via MCP](task-orchestration.md#tasks-that-must-not-be-run-via-mcp)) — stop calling tools, ask the user to close it in Commander, do not retry |
 
 ---
 
@@ -247,11 +291,13 @@ On error: **stop**, diagnose, revise the plan — do not blindly retry the same 
 |-------|------------|
 | Jump straight to `execute_task` | `list_available_tasks` first |
 | Rely on UI selection across calls | Explicit `objectIds` |
+| Use `execute_task` for TCP, rename, or delete | Dedicated TCP tools, `set_attribute`, or `delete_objects` |
+| Scan or rescan UI modules | Report module gap; use dedicated non-UI module tools |
 | `set_attribute` without discovery | `get_attributes` first |
 | Save after every single attribute | One save at mutation group end |
 | Skip DI skill docs | Read [di-orchestration.md](di-orchestration.md) before DI tools |
 | Parallel `execute_test_suite` | Strictly sequential + poll |
-| MCP when Commander closed | [Commander CLI](../../../../CLI/README.md) TCShell/TCAPI |
+| MCP when Commander closed | IDE.integration TCShell/TCAPI |
 
 ---
 

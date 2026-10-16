@@ -12,7 +12,7 @@ Persist mutations:
 
 | Step | Tool | When |
 |------|------|------|
-| 1 | `save_workspace` | After any `set_attribute`, `execute_task`, `create_test_case`, etc. |
+| 1 | `save_workspace` | After in-memory writes such as `set_attribute` or `execute_task`; dedicated writers may persist internally |
 
 ## Multi-user workspace
 
