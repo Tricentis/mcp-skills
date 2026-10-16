@@ -1,14 +1,22 @@
-# Module sourcing — Tosca Cloud
+# Module sourcing — automated test authoring
 
-## Discovery
+## Resolve modules
 
-1. `tosca_builder_getModulesSummary` — summarized module list
-2. `tosca_inventory_search(artifactType: module, artifactName)` — find by name
+1. **`tosca_module` Search** — `name` substring; `scope` All \| StandardObjects \| UserAssets.
+2. **`tosca_module` Get** — full definition + attribute paths (required before setting step values).
+3. **`tosca_asset` Search (`artifactType: module`, …)** — when inventory filters (folder/tags) help narrow candidates.
 
-## Rules
+## Before creating steps
 
-- **No UI scanning** — agents cannot scan applications to create new UI modules
-- Present module candidates to user for selection
-- Prefer reusing existing modules over creating new ones
-- **Name collisions** — when multiple modules share a name, `tosca_builder_scaffoldTestCase` uses the first inventory match. Search with `tosca_inventory_search(artifactType: module)` and confirm with the user before scaffolding.
-- **Steps at creation only** — provide all module-backed steps in `testSteps` when calling `tosca_builder_scaffoldTestCase`. There is no MCP tool to append a step to an existing test case.
+- Confirm module choice with the user when Search returns multiple hits.
+- If no module matches, offer `tosca_module_edit` **Scan** (or **Rescan**): open the returned launcher/portal link, wait for the user to finish the Cloud scanner, then `tosca_module` Search `scope=UserAssets` `sort=Latest` → Get. Report a gap only if Scan is declined or unsupported (e.g. Salesforce still needs manual Cloud UI via the portal URL).
+- Optional: `tosca_module_edit` Upsert can create a **NonGui** empty shell (User assets only).
+
+## After creating the test case
+
+- **`tosca_teststep_edit` Upsert** — insert/update steps (`moduleId` + `values[]`) or folders.
+- **`tosca_testcase` Get** / **`tosca_teststep` Get|List** — verify structure.
+
+## Name collisions
+
+When multiple modules share a name, present Search hits and let the user choose before Upsert.

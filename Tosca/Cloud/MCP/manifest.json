@@ -1,10 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.16.0",
   "packageName": "tosca-cloud-mcp",
   "installScope": "User",
   "adminRequired": false,
   "supportedIdes": [
-    "Cursor"
+    "Cursor",
+    "Claude",
+    "Copilot"
   ],
   "license": "Apache-2.0"
 }

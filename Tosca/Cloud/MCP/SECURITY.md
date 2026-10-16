@@ -6,7 +6,7 @@ IT and security review checklist for the Tosca Cloud MCP integration (`tosca-clo
 
 | Property | Value |
 |----------|--------|
-| **Publisher** | Tricentis — [mcp-skills](https://github.com/Tricentis/mcp-skills) (Tosca Cloud MCP pack) |
+| **Publisher** | Tricentis — [Tricentis-Tosca/Tosca.Cloud.MCP.integration](https://github.com/Tricentis-Tosca/Tosca.Cloud.MCP.integration) |
 | **Install scope** | User profile (default) or project checkout — **no admin** for the IDE pack |
 | **Runtime network** | **Yes** — MCP client connects to `https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp` via OAuth (Okta) |
 | **Secrets** | OAuth tokens managed by the IDE MCP client; pack does not ship credentials or write `mcp.json` |
@@ -16,9 +16,9 @@ IT and security review checklist for the Tosca Cloud MCP integration (`tosca-clo
 
 | Artifact | Contents | Scripts? |
 |----------|----------|----------|
-| **Release zip** (`tosca-cloud-mcp-{version}-user.zip`) | Cursor skills, rules, skills installer | Yes (user-run) |
+| **Release zip** (`tosca-cloud-mcp-{version}-user.zip`) | Cursor / Claude / Copilot skills, Cursor rules, skills installer | Yes (user-run) |
 | **Cursor plugin** | Skills + rules + commands | **No** standalone scripts in plugin tree |
-| **Git clone / mcp-skills** | Same consumer tree under `Tosca/Cloud/MCP/` | Install script at pack root |
+| **mcp-skills export** | Same consumer tree under `Tosca/Cloud/MCP/cursor/` | Install script at export root |
 
 **Plugin vs zip:** Both install skills and rules. Zip/git adds `Install-ToscaCloudMcpPack.ps1`. MCP connection is always configured by the user in IDE settings.
 
@@ -29,7 +29,7 @@ https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp
 ```
 
 - Authentication: Okta bearer token via browser OAuth on first connect
-- No self-hosted MCP server required
+- No customer-hosted MCPServer required
 - Tenant and space are user-supplied install parameters
 
 ## Files the installer may write (user scope)
@@ -38,14 +38,17 @@ https://{tenant}.my.tricentis.com/{spaceId}/_mcp/api/mcp
 |------|---------|
 | `%USERPROFILE%\.cursor\skills\tosca-*\` | Cursor skills (9 bundled) |
 | `%USERPROFILE%\.cursor\rules\tosca-cloud-mcp.mdc` | Cursor rule (`alwaysApply: false`) |
+| `%USERPROFILE%\.claude\skills\tosca-*\` | Claude Code skills |
+| `%USERPROFILE%\.copilot\skills\tosca-*\` | GitHub Copilot CLI / VS Code personal skills (`COPILOT_HOME` overrides the `.copilot` root) |
 
-The installer **does not** modify `%ProgramFiles%`, registry, Windows services, or `mcp.json`.
+The installer **does not** modify `%ProgramFiles%`, registry, Windows services, or MCP config files. User-scope install requires the host profile folder already (`%USERPROFILE%\.cursor`, `.claude`, or `.copilot`); it exits with an error instead of creating those folders.
 
 ## Script behavior
 
 | Script | Reads | Writes | Network |
 |--------|-------|--------|---------|
 | `Install-ToscaCloudMcpPack.ps1` | Pack source | Profile skill/rule paths | No (local files only) |
+| `pack_release.py` | Repo sources | `dist/*.zip`, `SHA256SUMS` | No |
 
 MCP **runtime** network calls occur when the IDE connects to the hosted endpoint — governed by IDE MCP policy and customer firewall rules.
 
@@ -59,13 +62,13 @@ Get-FileHash -Path .\tosca-cloud-mcp-1.0.0-user.zip -Algorithm SHA256
 # Compare to SHA256SUMS
 ```
 
-3. Extract the zip only after hash verification succeeds.
+3. Mirror verified artifacts internally before wide distribution.
 
-Release `.ps1` installers are **Authenticode-signed** by Tricentis before export to this repository. Verify with `Get-AuthenticodeSignature` and compare file hashes to `SHA256SUMS`.
+**Code signing:** Release `.ps1` installers and `lib/*.ps1` helpers are **Authenticode-signed** by Tricentis before mcp-skills export. Verify with `Get-AuthenticodeSignature` and compare file hashes to `SHA256SUMS`.
 
 ## PowerShell execution policy
 
-Install scripts are **Authenticode-signed** by Tricentis. Default install does **not** use `-ExecutionPolicy Bypass`; scripts honor the machine policy (`AllSigned`, `RemoteSigned`, etc.) when the Tricentis publisher is trusted.
+Default install does **not** use `-ExecutionPolicy Bypass`; scripts honor the machine policy (`AllSigned`, `RemoteSigned`, etc.) when the Tricentis publisher is trusted.
 
 ```powershell
 .\Install-ToscaCloudMcpPack.ps1
@@ -87,5 +90,5 @@ Report security concerns via your Tricentis support channel or a private GitHub 
 
 ## Related docs
 
-- [START-HERE.md](START-HERE.md) — install decision tree
-- [README.md](README.md) — install overview
+- [docs/START-HERE.md](docs/START-HERE.md) — install decision tree
+- [docs/installation.md](docs/installation.md) — full install guide

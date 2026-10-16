@@ -3,74 +3,70 @@
 ## Discovery
 
 ```text
-tosca_organization_listWorkspaces
-tosca_inventory_search(artifactType, artifactName, ...)
-tosca_inventory_advancedSearch(...)   # complex filters
-tosca_playlist_searchByName(name)
+tosca_asset Search(...) / AdvancedSearch(...)
+tosca_module Search / Get
+tosca_playlist Search / Get
+tosca_testcase Get
+tosca_teststep Get / List
+```
+
+## Inventory
+
+```text
+tosca_asset Search / AdvancedSearch
+tosca_asset_folder Get                      # omit folderId = workspace root
+tosca_asset_folder_edit Upsert / Delete / Move
+```
+
+## Authoring
+
+```text
+tosca_module_edit Upsert / Delete / Scan / Rescan  # User assets; Scan/Rescan kick off scanner
+tosca_testcase_edit Upsert / Delete
+tosca_teststep_edit Upsert / Delete / Move
+tosca_apimessage Get                      # API messages
+tosca_apimessage_edit Upsert / Delete
+tosca_testsheet List / Get / ListInstances   # TDM test sheets, classes, rows
+tosca_testsheet_edit Upsert / Delete / AttributeUpsert / AttributeDelete / InstanceUpsert / InstanceDelete
+tosca_testsheet_edit ClassReferenceAdd / ClassReferenceDetach / ConvertToClass / AssignChildInstance / UnassignChildInstance
+tosca_testsheet_edit GenerateRows / RowUpsert / RowDelete
 ```
 
 ## Execution
 
 ```text
-tosca_playlist_run(playlistId)
-tosca_playlist_getRecentRuns(playlistId, limit)
-tosca_playlist_getFailedTestSteps(runIds)   # failed runs only
-tosca_execution_getRecentRunLogs(...)
-```
-
-## Builder
-
-```text
-tosca_builder_scaffoldTestCase(...)
-tosca_builder_getModulesSummary(...)
-tosca_builder_createApiMessage / get / update / delete
+tosca_testrun Get / List               # personal trial catalog + poll
+tosca_testrun_edit Create / Delete     # start / remove personal trial run
+tosca_playlist_edit Upsert / SetTestCases / SetSchedule / Delete
+tosca_playlistrun_edit Create / Cancel / Delete
+tosca_playlistrun Get / Search             # results + failed steps + URIs
 ```
 
 ## Data Integrity
 
-Always start with `tosca_dataintegrity_workflow`. Async tools need polling via `check*Result` companions.
-
-| Tool group | Purpose |
-|------------|---------|
-| `workflow`, `listConnections` | Gate + connection discovery |
-| `testConnection` / `checkTestConnectionResult` | Validate connectivity (async) |
-| `getConnectionSchema` / `checkSchemaResult` | Column metadata for SQL (async) |
-| `createRowByRowComparison` | Row-by-row or file comparison TC |
-| `createDiDbExpertTestcase` | DB Expert TC |
-
-Engineering detail: `tosca-cloud-mcp` → `di-orchestration.md`.
-
-## Mobile
-
-Connection and Appium capability management — no run-from-connection outcome tool.
+Async tools need polling via `check*Result` companions. See `tosca-cloud-mcp` → `di-orchestration.md`.
 
 ```text
-tosca_mobile_listConnections / getConnection / createConnection / updateConnection
-tosca_mobile_addCapabilitySet / setCapability / renameCapabilitySet
+tosca_diconnection List / Get
+tosca_diconnection_edit Create / Update / Delete
+tosca_dataintegrity_runSql / checkSqlResult          # schema = catalog SELECT
+tosca_dataintegrity_testConnection / checkTestConnectionResult
+tosca_dataintegrity_createRowByRowComparison
 ```
 
-Engineering detail: `mobile-orchestration.md`, `mobile-connection` workflow.
-
-## API execution
-
-HTTP/JMS/Kafka connection CRUD — configure endpoints for API tests.
+## Mobile / API execution / Simulation
 
 ```text
-tosca_apiexecution_listConnections / getConnection / createConnection / updateConnection
+tosca_mobileconnection Get / List
+tosca_mobileconnection_edit Upsert / Delete
+tosca_mobilecapabilityset Get / List                # always by connectionId
+tosca_mobilecapabilityset_edit Upsert / Delete / SetCapability / DeleteCapability
+tosca_apiconnection Get / List
+tosca_apiconnection_edit Create / Update / Delete
+tosca_simulator List
+tosca_simulator_edit Upsert / Deploy
 ```
-
-Engineering detail: `apiexecution-orchestration.md`, `api-execution-connection` workflow.
-
-## Simulation
-
-Deploy API simulations to agents.
-
-```text
-tosca_simulation_listAgents / create / deploy
-```
-
-Engineering detail: `simulation-orchestration.md`, `deploy-simulation` workflow.
 
 ## Response handling
 
-Most tools return JSON strings. Parse in Code Mode; summarize for the user in direct tool mode.
+Most tools return JSON strings. Parse in Code Mode; summarize for the user in direct tool mode. Portal `url` appears on Get, not on Search summaries. Secrets: [safety-and-space.md](safety-and-space.md#secrets).

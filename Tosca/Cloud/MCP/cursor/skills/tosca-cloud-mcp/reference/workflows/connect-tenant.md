@@ -5,9 +5,9 @@ The user connects the IDE to their tenant's hosted MCP server. This pack does **
 ```text
 Connect tenant:
 - [ ] Skills installed
-- [ ] User added MCP server URL in IDE Settings
-- [ ] User signed in when IDE prompted
-- [ ] tosca_organization_listWorkspaces
+- [ ] User added MCP server URL in the host (IDE Settings, VS Code MCP: Add Server, or Copilot CLI `copilot mcp add`)
+- [ ] User signed in when prompted (`/mcp auth` in Copilot CLI if status is needs-auth)
+- [ ] tosca_module Search
 ```
 
 ## Plan
@@ -16,9 +16,9 @@ Connect tenant:
 |------|--------|----------|
 | 1 | Resolve `tenant` from portal URL (`acme` from `acme.my.tricentis.com`) | Lowercase tenant slug |
 | 2 | Confirm `spaceId` with user (default `default`) | Space segment in MCP URL |
-| 3 | User adds server in **Settings → MCP** with production URL below | IDE shows server entry |
-| 4 | User reloads IDE; completes sign-in on first MCP session | Green MCP status |
-| 5 | `tosca_organization_listWorkspaces` | Workspace list |
+| 3 | User adds HTTP MCP server with production URL below (Cursor/Claude/VS Code settings, or `copilot mcp add --transport http tosca-cloud <url>`) | Host shows server entry |
+| 4 | User reloads / completes sign-in (`/mcp auth tosca-cloud` in Copilot CLI if needed) | Authenticated MCP session |
+| 5 | `tosca_module` Search | Modules in the URL space |
 
 ## Production URL
 

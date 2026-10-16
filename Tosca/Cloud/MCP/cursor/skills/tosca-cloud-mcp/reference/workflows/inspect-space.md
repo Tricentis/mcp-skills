@@ -1,23 +1,18 @@
 # Inspect space
 
-Read-only Code Mode sequence to understand artifacts in the current Tosca Cloud space.
+Browse inventory in the current space.
 
 ```text
 Inspect space:
-- [ ] tosca_organization_listWorkspaces
-- [ ] tosca_inventory_search (artifactType=* or specific type)
-- [ ] optional: tosca_inventory_advancedSearch
+- [ ] tosca_asset Search
+- [ ] Optional: tosca_asset_folder Get (omit folderId = root)
+- [ ] Optional: tosca_playlist Search / tosca_module Search
 ```
 
-## Plan
+## Steps
 
 | Step | Tool | Args | Expected |
 |------|------|------|----------|
-| 1 | `tosca_organization_listWorkspaces` | — | Workspace list |
-| 2 | `tosca_inventory_search` | `artifactType`, optional filters | Matching artifacts with EntityId, Name, Type |
-| 3 | `tosca_inventory_search` | `folderEntityId` from step 2 | Children in folder |
-
-## Notes
-
-- Summarize for the user in human terms (names, types) — not raw JSON unless debugging.
-- Use `tosca_inventory_advancedSearch` when simple search filters are insufficient.
+| 1 | `tosca_asset` Search | `artifactType`, optional filters | Matching artifacts (`id`, `type`) |
+| 2 | `tosca_asset_folder` Get | omit `folderId` (root) or folder UUID | Folder metadata + direct children |
+| 3 | `tosca_playlist` Search | optional name | Playlist summaries |

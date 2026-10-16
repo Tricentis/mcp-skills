@@ -4,15 +4,15 @@ description: >-
   Creates a manual test case in Tosca Cloud from a written specification or user story. Use when the
   user provides manual test steps in prose and wants a Cloud test case created. Does NOT cover
   automated module-based authoring (use tosca-authoring-automated-testcase).
-license: Apache-2.0
+license: LicenseRef-Tricentis-Internal
 metadata:
-  author: Tricentis
-  version: "1.0.0"
+  author: Henry Fieglein | Fractal
+  version: "1.16.0"
 ---
 
 # Author manual test case — Tosca Cloud
 
-Convert written manual steps into a Cloud test case.
+Convert written manual steps into a Cloud test case shell (name, description, structured folders/steps).
 
 **Prerequisite:** `tosca-cloud-basics` + MCP connected.
 
@@ -21,23 +21,26 @@ Convert written manual steps into a Cloud test case.
 ```text
 Author manual Cloud test:
 - [ ] Parse spec → name, steps, expected results
-- [ ] Find target folder (inventory search)
-- [ ] scaffoldTestCase with manual step structure
-- [ ] Verify via inventory search
-- [ ] Report entityId and step summary
+- [ ] inventory search — avoid duplicate names
+- [ ] Find target folder (optional)
+- [ ] tosca_testcase_edit Upsert (name + description; empty or folder structure)
+- [ ] Optional: tosca_teststep_edit folders for sectioning
+- [ ] tosca_testcase Get / inventory search to verify
+- [ ] Report id and step summary
 ```
 
 ## Fast path
 
 1. **Parse spec** — extract test name, steps, expected results from user input.
-2. **Find target folder** — `tosca_inventory_search(artifactType: folder)`.
-3. **Scaffold** — `tosca_builder_scaffoldTestCase` with manual step structure.
-4. **Verify** — `tosca_inventory_search(artifactType: testCase, artifactName)`.
-5. **Report** — entityId, portal link if returned, step summary.
+2. **Check for duplicates** — `tosca_asset` Search (`artifactType: testCase`, `name`); if a match exists, confirm with user before creating another.
+3. **Find target folder** — `tosca_asset` Search (`artifactType: folder`) (optional).
+4. **Create** — `tosca_testcase_edit` Upsert with `name` + `description` capturing the manual intent (empty `steps` shell OK). Use `tosca_teststep_edit` Upsert `kind=testStepFolder` to section the case if helpful.
+5. **Verify** — `tosca_testcase` Get.
+6. **Report** — id, portal `url`, step/folder summary.
 
 ## Model notes
 
-Manual tests use descriptive steps rather than module references. See [references/manual-model.md](references/manual-model.md).
+Fully automated steps require modules — see [references/manual-model.md](references/manual-model.md). When the user wants executable automation, hand off to `tosca-authoring-automated-testcase`.
 
 ## Hand off
 

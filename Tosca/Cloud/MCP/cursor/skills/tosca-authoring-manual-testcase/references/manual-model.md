@@ -1,11 +1,8 @@
 # Manual test model — Tosca Cloud
 
-Manual test cases in Cloud Builder contain human-readable step descriptions rather than XModule references.
+Manual specs map to a **test case container** (`name` + `description` + optional folder items) via:
 
-## Scaffolding
+- `tosca_testcase_edit` Upsert
+- `tosca_teststep_edit` Upsert with `kind=testStepFolder` for sections
 
-`tosca_builder_scaffoldTestCase` accepts test case metadata and step definitions per API schema.
-
-## Folder placement
-
-Always resolve parent folder `entityId` via inventory search before scaffold.
+Executable automated steps still need modules (`tosca_module` Search/Get + step `moduleId` + `values`). Prefer `tosca-authoring-automated-testcase` when modules exist.

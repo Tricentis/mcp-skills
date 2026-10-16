@@ -11,7 +11,7 @@ Help the user connect Cursor to their **hosted** Tosca Cloud MCP server (not TAI
    `https://{tenant}.my.tricentis.com/{space}/_mcp/api/mcp`
 
 4. User **reloads Cursor** and completes **sign-in** when the IDE opens the browser.
-5. Verify: call `tosca_organization_listWorkspaces`.
+5. Verify: call `tosca_module` Search.
 6. Load skill **tosca-cloud-basics**, then the task skill from `AGENTS.md`.
 
 ## Do not

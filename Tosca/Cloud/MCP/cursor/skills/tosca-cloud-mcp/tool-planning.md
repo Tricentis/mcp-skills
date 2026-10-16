@@ -6,10 +6,11 @@ Use with [code-mode.md](code-mode.md), [tool-orchestration.md](tool-orchestratio
 
 ```text
 Plan checklist:
-- [ ] Goal stated in Cloud terms (tenant, space, artifact, playlist)
-- [ ] Readiness: tosca_organization_listWorkspaces
-- [ ] Discover before every mutation
-- [ ] Async poll steps identified (DI schema, playlist runs)
+- [ ] Goal stated in Cloud terms (tenant, space, artifact, playlist, run)
+- [ ] Readiness: tosca_module Search
+- [ ] Discover before every mutation (Search/Get; module Get for paths)
+- [ ] Async poll steps identified (testrun / playlistrun / DI)
+- [ ] Personal-agent gate planned (agentLink / needsAgent)
 - [ ] Destructive steps flagged for user confirmation
 - [ ] Verify step at end
 ```
@@ -18,109 +19,52 @@ Plan checklist:
 
 ### Resolve identity
 
-Cloud artifacts use **EntityId** from inventory search.
-
 ```
-tosca_inventory_search(artifactType, artifactName, folderEntityId?)
-  → EntityId for downstream tools
-```
-
-Prefer `tosca_inventory_advancedSearch` when filters are complex or results paginate.
-
-### Playlist resolution
-
-```
-tosca_playlist_searchByName(name)
-  → playlistId
-
-tosca_execution_getPlaylistIdsByName(name)   # id-only, read-only
+tosca_asset Search(artifactType, name, folderId?)
+tosca_asset AdvancedSearch(...)       # searchTerm / sort / filters / includeAncestors; paginated
+tosca_module Search / Get             # modules + attribute paths
+tosca_playlist Search / Get           # playlists
+tosca_testcase Get                    # TC structure
 ```
 
-### Run polling
+### Authoring chain
 
 ```
-tosca_playlist_run(playlistId) → runId
-tosca_playlist_getRecentRuns(playlistId, limit)
-  → repeat until state ∉ {Running, ...}
+tosca_module Search → Get
+tosca_testcase_edit Upsert(name, steps?)
+tosca_teststep_edit Upsert|Move|Delete
+tosca_testcase Get / tosca_teststep List|Get
 ```
 
-Only then `tosca_playlist_getFailedTestSteps` for failed runs.
+### Trial run polling
+
+```
+tosca_testrun_edit Create(testCaseId)
+  → testRunId | needsAgent + agentLink
+tosca_testrun Get(testRunId) until terminal
+# optional: tosca_testrun List(name?, state?, pageSize?, pageToken?)
+```
+
+### Playlist run polling
+
+```
+tosca_playlist_edit Upsert|SetTestCases|SetSchedule
+tosca_playlistrun_edit Create(playlistId, runOnAPersonalAgent?)
+  → playlistRunId | needsAgent
+tosca_playlistrun Get(playlistRunId) until Succeeded|Failed|Canceled
+```
 
 ### DI async chain
 
 ```
-tosca_dataintegrity_getConnectionSchema(connectionId) → notificationId
-tosca_dataintegrity_checkSchemaResult(notificationId) → poll until complete
+tosca_diconnection List / Get
+tosca_dataintegrity_runSql → launcher / notification   # schema = dialect catalog SELECT
+tosca_dataintegrity_checkSqlResult → poll until complete
+tosca_dataintegrity_createRowByRowComparison
+# optional: tosca_diconnection_edit; testConnection → checkTestConnectionResult
+# optional run: tosca_testrun_edit Create → tosca_testrun Get — only if the user asked
 ```
 
-Same pattern for `testConnection` / `checkTestConnectionResult`.
+## Output shape for plans
 
-### Builder scaffold chain
-
-```
-tosca_builder_getModulesSummary
-tosca_inventory_search(artifactType: module)   # if moduleName ambiguous
-tosca_builder_scaffoldTestCase(name, testSteps?)
-tosca_inventory_move(artifactIds, folderEntityId)
-```
-
-## Category-specific plans
-
-### Space audit (read-only)
-
-See [reference/workflows/inspect-space.md](reference/workflows/inspect-space.md).
-
-### Connect tenant
-
-See [reference/workflows/connect-tenant.md](reference/workflows/connect-tenant.md) and journey skill `tosca-cloud-connect`.
-
-### Search artifacts
-
-See [reference/workflows/search-artifacts.md](reference/workflows/search-artifacts.md).
-
-### Run and analyze playlist
-
-```
-run-playlist.md → analyze-run-failures.md
-```
-
-Or journey skill `tosca-analyzing-execution-results`.
-
-### Manage folders
-
-See [reference/workflows/manage-folder.md](reference/workflows/manage-folder.md).
-
-### Data Integrity
-
-```
-di-orchestration.md + one reference/di/workflows/*.md
-tosca_dataintegrity_workflow
-listConnections → schema (async) → createRowByRowComparison
-```
-
-**Never** call DI mutate tools before reading `tosca_dataintegrity_workflow` output.
-
-### Mobile / API / simulation
-
-| Scenario | Workflow |
-|----------|----------|
-| Mobile connection | [mobile-connection.md](reference/workflows/mobile-connection.md) |
-| API execution connection | [api-execution-connection.md](reference/workflows/api-execution-connection.md) |
-| Simulation deploy | [deploy-simulation.md](reference/workflows/deploy-simulation.md) |
-
-## Error recovery
-
-| Signal | Plan adjustment |
-|--------|-------------------|
-| 401 | Re-auth via IDE MCP settings |
-| Entitlement error | Stop; inform user |
-| Empty search | Broaden filters or ask user |
-| DI async incomplete | Continue polling check*Result |
-| Wrong entityId | Re-search inventory |
-
-## Journey vs engineering
-
-| Need | Use |
-|------|-----|
-| Tool order, polling, parameters | `tosca-cloud-mcp` (this skill) |
-| User-story diagnose/author/explain | Journey skills — `AGENTS.md` |
+Numbered rows: tool + operation + required args + expected id/field captured for the next row.

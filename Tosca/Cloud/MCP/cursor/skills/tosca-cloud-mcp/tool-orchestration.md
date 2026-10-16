@@ -1,19 +1,10 @@
 # Tool orchestration — when and how to call each MCP tool
 
-Use with [code-mode.md](code-mode.md) or [direct-tool-mode.md](direct-tool-mode.md). Wire names follow `tosca_{domain}_{action}`.
+Use with [code-mode.md](code-mode.md) or [direct-tool-mode.md](direct-tool-mode.md).
 
 **Progressive disclosure:** load domain orchestration companions for detail — do not read the full catalog at session start.
 
 Catalog (parameters): [reference/tools-catalog.md](reference/tools-catalog.md) — open only for tools in your plan.
-
-## Contents
-
-- [Mandatory orchestration loop](#mandatory-orchestration-loop)
-- [By intent](#by-intent--which-tools-to-orchestrate)
-- [Pagination and search](#pagination-and-search)
-- [By domain summary](#by-domain-summary)
-- [Error recovery](#error-recovery)
-- [Anti-patterns](#anti-patterns)
 
 ## Mandatory orchestration loop
 
@@ -23,142 +14,111 @@ READINESS  →  PLAN  →  DISCOVER  →  ACT  →  VERIFY
 
 | Phase | Tools | Rule |
 |-------|-------|------|
-| **Readiness** | `tosca_organization_listWorkspaces` | Once per session or after token refresh |
+| **Readiness** | `tosca_module` Search | Once per session or after token refresh (bounded; not a full inventory dump) |
 | **Plan** | *(no tools)* | Code Mode table before mutations |
-| **Discover** | `tosca_inventory_search`, `tosca_inventory_advancedSearch`, `tosca_playlist_searchByName` | Before every write |
-| **Act** | Domain mutate tools | One plan row at a time |
-| **Verify** | Re-search or run-status reads | When user needs confirmation |
+| **Discover** | `tosca_asset` Search, `tosca_module` Search, `tosca_playlist` Search | Before every write; Get modules for attribute paths |
+| **Act** | `*_edit` / Create ops | One plan row at a time |
+| **Verify** | Get / Search / poll run Get | When user needs confirmation |
 
-Cloud mutations persist immediately — no `save_workspace` / check-in step.
+Cloud mutations persist immediately — no save / check-in step.
 
 ---
 
-## By intent — which tools to orchestrate
+## By intent
 
 ### Read-only: understand space
 
-**When:** User asks what exists, audit inventory, list playlists.
-
 ```
-tosca_organization_listWorkspaces
-tosca_inventory_search(artifactType, artifactName, folderEntityId, tags)
-tosca_inventory_advancedSearch          # complex filters only
-tosca_playlist_searchByName             # playlists by name
+tosca_asset Search / AdvancedSearch
+tosca_playlist Search
+tosca_module Search
 ```
-
-**Do not** mutate. Code Mode optional for simple reads.
-
----
 
 ### Navigate and resolve identity
 
-**When:** Later steps need `entityId`.
+| Need | Tool |
+|------|------|
+| Artifact / folder id | `tosca_asset` Search / AdvancedSearch |
+| Module id + attribute paths | `tosca_module` Search → Get |
+| Playlist id | `tosca_playlist` Search → Get |
+| Test case structure | `tosca_testcase` Get; items via `tosca_teststep` List/Get |
 
-| Tool | When | How |
-|------|------|-----|
-| `tosca_inventory_search` | User names artifact or folder | Capture `EntityId` from results |
-| `tosca_inventory_advancedSearch` | Multi-criteria or pagination | Prefer when simple search insufficient |
-| `tosca_playlist_searchByName` | Playlist by name fragment | Returns playlist id |
-| `tosca_execution_getPlaylistIdsByName` | Id-only resolution | Read-only; max 50 matches |
-
-**Rule:** Resolve IDs **once**, reuse in subsequent plan rows. Prefer names in conversation; pass `entityId` in tools.
-
-**Name collisions:** multiple artifacts may share a name — disambiguate with folder, type, or ask the user.
-
----
+**Rule:** Resolve IDs once, reuse. Prefer names in conversation; pass ids in tools. Disambiguate collisions with the user.
 
 ### Inventory mutations
 
-**Full orchestration:** [inventory-orchestration.md](inventory-orchestration.md)
+[inventory-orchestration.md](inventory-orchestration.md)
 
 ```
-tosca_inventory_search → entityId
-tosca_inventory_createFolder | modifyFolder | move | deleteFolder
-tosca_inventory_search → verify
+tosca_asset Search → id
+tosca_asset_folder Get (omit folderId = root)
+tosca_asset_folder_edit Upsert | Delete | Move
 ```
 
-`deleteFolder`: call without `ChildBehavior` first to learn allowed behaviors, then call again with user-confirmed behavior.
+### Authoring (modules / test cases / steps)
 
----
-
-### Playlist and execution
-
-**Full orchestration:** [playlist-orchestration.md](playlist-orchestration.md), [execution-orchestration.md](execution-orchestration.md)
+[builder-orchestration.md](builder-orchestration.md)
 
 ```
-tosca_playlist_searchByName
-tosca_playlist_run → runId
-tosca_playlist_getRecentRuns → poll until terminal state
-tosca_playlist_getFailedTestSteps(runIds)   # Failed runs only
+tosca_module Search/Get
+tosca_testcase_edit Upsert
+tosca_teststep_edit Upsert|Move|Delete
+tosca_testcase Get / tosca_teststep Get|List
 ```
 
-**Cheap signal first:** run state before expensive failure step attachments.
+### Trial run (personal agent)
 
----
-
-### Builder / test cases
-
-**Full orchestration:** [builder-orchestration.md](builder-orchestration.md)
+[execution-orchestration.md](execution-orchestration.md)
 
 ```
-tosca_builder_getModulesSummary
-tosca_inventory_search(artifactType: module)   # disambiguate moduleName
-tosca_builder_scaffoldTestCase(name, testSteps?)
-tosca_inventory_move → target folder
+tosca_testrun_edit Create → (agentLink?) → Create again → tosca_testrun Get until terminal
 ```
 
-**Gap:** no append-step tool — include all `testSteps` at scaffold time or use Builder UI.
+### Playlist + batch run
 
----
-
-### Data Integrity
-
-**Gate:** [di-orchestration.md](di-orchestration.md) + **one** `reference/di/workflows/*.md`
+[playlist-orchestration.md](playlist-orchestration.md)
 
 ```
-tosca_dataintegrity_workflow          # mandatory first
-tosca_dataintegrity_listConnections
-async: getConnectionSchema → checkSchemaResult
-tosca_dataintegrity_createRowByRowComparison | createDiDbExpertTestcase
+tosca_playlist_edit Upsert|SetTestCases|SetSchedule
+tosca_playlistrun_edit Create → tosca_playlistrun Get (poll)
 ```
 
-Connections are **UI-managed** — MCP lists/gets/deletes only.
+### Data Integrity / Mobile / API / Simulation
 
----
-
-### Mobile / API execution / simulation
-
-| Domain | Orchestration doc |
-|--------|-------------------|
+| Domain | Doc |
+|--------|-----|
+| DI | [di-orchestration.md](di-orchestration.md) |
 | Mobile | [mobile-orchestration.md](mobile-orchestration.md) |
-| API execution | [apiexecution-orchestration.md](apiexecution-orchestration.md) |
+| API connection | [apiexecution-orchestration.md](apiexecution-orchestration.md) |
+| API message | [builder-orchestration.md](builder-orchestration.md) |
 | Simulation | [simulation-orchestration.md](simulation-orchestration.md) |
-
-List-before-mutate; confirm destructive deletes.
 
 ---
 
 ## Pagination and search
 
-`tosca_inventory_advancedSearch` supports pagination and rich filters — use when `tosca_inventory_search` returns too many or too few results.
-
-Loop with page tokens/offsets per tool schema until the target artifact is found or the user narrows criteria.
+`tosca_asset` Search / AdvancedSearch, playlist/playlistrun Search, and `tosca_testrun` List support `pageToken` / `pageSize`. Loop until the target is found or the user narrows criteria.
 
 ---
 
-## By domain summary
+## By entity summary
 
-| Domain | Primary tools | Destructive examples |
-|--------|---------------|----------------------|
-| organization | `listWorkspaces` | — |
-| inventory | `search`, `advancedSearch`, `createFolder`, `move` | `deleteFolder` |
-| playlist | `searchByName`, `run`, `getRecentRuns`, `getFailedTestSteps` | `deleteById` |
-| execution | `getPlaylistIdsByName`, `getRecentRunLogs` | read-only |
-| builder | `scaffoldTestCase`, `*ApiMessage` | `deleteApiMessage` |
-| dataintegrity | `workflow`, `createRowByRowComparison` | `connection` delete |
-| mobile | `listConnections`, `createConnection` | `deleteConnection` |
-| apiexecution | `listConnections`, `createConnection` | `deleteConnection` |
-| simulation | `listAgents`, `create`, `deploy` | — |
+| Entity | Read tool | Edit / run tool |
+|--------|-----------|-----------------|
+| module | `tosca_module` Get/Search | `tosca_module_edit` Upsert/Delete |
+| testcase | `tosca_testcase` Get | `tosca_testcase_edit` Upsert/Delete |
+| teststep | `tosca_teststep` Get/List | `tosca_teststep_edit` Upsert/Delete/Move |
+| testrun | `tosca_testrun` Get/List | `tosca_testrun_edit` Create/Delete |
+| testsheet | `tosca_testsheet` List/Get/ListInstances | `tosca_testsheet_edit` Upsert/Delete/Attribute*/Instance*/ClassReference*/ConvertToClass/*ChildInstance/GenerateRows/Row* |
+| playlist | `tosca_playlist` Get/Search | `tosca_playlist_edit` |
+| playlistrun | `tosca_playlistrun` Get/Search | `tosca_playlistrun_edit` |
+| diconnection | `tosca_diconnection` List/Get | `tosca_diconnection_edit` Create/Update/Delete |
+| apiconnection | `tosca_apiconnection` Get/List | `tosca_apiconnection_edit` Create/Update/Delete |
+| apimessage | `tosca_apimessage` Get | `tosca_apimessage_edit` Upsert/Delete |
+| simulator | `tosca_simulator` List | `tosca_simulator_edit` Upsert/Deploy |
+| mobileconnection | `tosca_mobileconnection` Get/List | `tosca_mobileconnection_edit` Upsert/Delete |
+| asset | `tosca_asset` Search/AdvancedSearch | — |
+| asset folder | `tosca_asset_folder` Get | `tosca_asset_folder_edit` Upsert/Delete/Move |
 
 ---
 
@@ -167,10 +127,11 @@ Loop with page tokens/offsets per tool schema until the target artifact is found
 | Error | Action |
 |-------|--------|
 | 401 Unauthorized | Re-auth — see `tosca-cloud-connect` |
-| Entitlement missing | Report to user; do not retry |
-| `McpException` | Parse message; replan with corrected entityIds |
+| Entitlement missing | Report; do not retry |
+| `McpException` / validation | Parse message; replan with corrected ids |
 | Empty search | Broaden criteria or ask user |
-| Async DI job pending | Poll `check*Result` — do not skip |
+| `needsAgent` / `agentLink` | Open link; wait; Create again |
+| Async DI pending | Poll `check*Result` |
 
 ---
 
@@ -178,9 +139,10 @@ Loop with page tokens/offsets per tool schema until the target artifact is found
 
 | Avoid | Why |
 |-------|-----|
-| Mutate without prior search | Entity IDs are opaque |
-| Entity IDs vs paths | Cloud uses entity IDs from inventory search |
-| Skip `tosca_dataintegrity_workflow` | DI tools expect workflow context |
-| `getFailedTestSteps` on passed runs | Wasted call — no failed steps |
-| Load full tools catalog at start | Use progressive disclosure |
+| Mutate without Get/Search | Ids and attribute paths are opaque |
+| Invent module attribute paths | Always Get the module first |
+| Cross-wire testrun ↔ playlistTestCaseRun ids | Different run systems |
+| Ask for or echo secrets / pass Password TCP values | Denied; use portal url. Scoped exception: [safety-and-space.md](../tosca-cloud-basics/references/safety-and-space.md#secrets) |
+| Stop polling while Running | Keep Get until terminal |
+| Load full tools catalog at start | Progressive disclosure |
 | Parallel destructive deletes | Confirm each target |

@@ -4,10 +4,10 @@
 
 | Metric | Source |
 |--------|--------|
-| Pass rate | Count Passed vs Failed in `getRecentRuns` window |
-| Failure recurrence | Same step signature across multiple runIds |
+| Pass rate | Count Succeeded vs Failed in `tosca_playlistrun` Search window |
+| Failure recurrence | Same step signature across multiple `playlistRunId`s (Get detail) |
 | New failure | Signature appears in latest run but not in prior N runs |
-| Recovery | Failed → Passed without artifact change (flaky) |
+| Recovery | Failed → Succeeded without artifact change (flaky) |
 
 ## Anomaly report template
 

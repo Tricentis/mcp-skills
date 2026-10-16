@@ -17,17 +17,19 @@ Direct tool mode:
 
 | Step | Tool | Args (summary) | Expected |
 |------|------|----------------|----------|
-| 1 | `tosca_organization_listWorkspaces` | — | Workspace list |
-| 2 | `tosca_inventory_search` | `artifactType`, `artifactName` | Matching artifacts |
-| 3 | … | … | … |
+| 1 | `tosca_asset` Search | `artifactType`, `name` | Matching artifacts (`id`, `type`) |
+| 2 | … | … | … |
 
 ## Rules
 
-1. **Discover before mutate** — always search before create/update/delete.
-2. **One domain focus per plan** — inventory, playlist, builder, or DI; avoid mixing without reason.
-3. **Poll async tools** — DI schema/test-connection and some execution reads need follow-up check tools.
-4. **Destructive tools** — confirm with user when `Destructive=true` in catalog.
-5. **Cloud persistence model** — mutations persist via API immediately; no checkout or save step.
+1. **Discover before mutate** — always Search/Get before create/update/delete.
+2. **One domain focus per plan** — authoring, playlist, inventory, or DI; avoid mixing without reason.
+3. **Poll async tools** — `tosca_testrun` / `tosca_playlistrun` Get until terminal; DI `check*Result` companions.
+4. **Personal agent** — if Create returns `agentLink` / `needsAgent`, open the link and Create again.
+5. **Destructive tools** — confirm with user before Delete / hardCancel.
+6. **Cloud persistence model** — mutations persist via API immediately; no checkout or save step.
+7. **Never invent module attribute paths** — Get the module first.
+8. **Never ask for or echo secrets** — see [safety-and-space.md](../tosca-cloud-basics/references/safety-and-space.md#secrets) for the scoped exception.
 
 ## Related
 
