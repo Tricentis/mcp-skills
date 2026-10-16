@@ -9,8 +9,8 @@ Build an automated test from a description, reusing existing modules. Extends
 |------|------|------|----------|
 | 1 | (intent) | description or an existing manual test | Break into ordered actions + verifications |
 | 2 | (ask user) | which module locations to source from | Allowed folders/subprojects under `Modules` — do NOT scan/create UI modules |
-| 3 | `get_object_info` | recurse the allowed module folders | Match modules + `ModuleAttribute`s to steps; flag steps with no module (report the gap, don't scan) |
-| 4 | `create_test_case` | `name`, `folderPath`, `steps=[{moduleId, action, values}]` | Resolve module ids first; unknown attrs/actions are skipped & reported |
+| 3 | `list_assets` + `get_object_info` | `assetType="XModule"`, `root=allowedFolder`; paginate, then inspect candidates | Match modules + `ModuleAttribute`s to steps; flag steps with no module |
+| 4 | `create_test_cases` | `test_cases=[{name, path, test_steps=[...]}]` | Resolve module ids first; unknown attrs/actions are skipped & reported |
 | 5 | `set_attribute` | per value: `Value`, `ActionMode` (Input / Verify+`Operator` / WaitOn / Buffer), `DataType`, `Condition` | Refine; buffer where the scenario says reuse |
 | 6 | `execute_task` / `create_api_module` | IF/DO/WHILE on the test case; API module for missing non-UI interactions | Control flow / non-UI steps |
 | 7 | `execute_test_suite` (`isValidationRun=true`) + `execute_test_suite_status` | `testCaseId` | Validate in the ScratchBook; fix until green |
@@ -18,5 +18,5 @@ Build an automated test from a description, reusing existing modules. Extends
 
 ## Notes
 
-- Reuse existing modules only; **never scan or rescan UI automation modules** — report missing-module gaps instead.
+- Reuse existing modules only; **never scan or rescan UI automation modules** and never call `set_object_selection` to find modules. Paginate `list_assets` under user-approved folders, inspect matches with `get_object_info`, and report missing-module gaps.
 - Buffer/reuse: set the source value `ActionMode=Buffer`, then reference `{B[name]}` on consumer values.

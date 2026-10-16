@@ -94,7 +94,7 @@ span two connections, so completeness needs a count from each side. Pick the pat
   - **Two-step buffer test case** (single self-contained check): step 1 runs `SELECT COUNT(*)` on the
     source and **buffers** the result; step 2 runs `SELECT COUNT(*)` on the target and asserts it
     **equals the buffered value**. The DI-specific MCP tools create only single-step test cases, so
-    assemble this in Commander (or via the generic `create_test_case` + drop-task/step tools) — it is
+    assemble this in Commander (or via `create_test_cases` + drop-task/step tools) — it is
     not produced by a single `create_di_*` call.
   - **Two DB Expert checks + external compare**: create one `create_di_db_expert_module` per side
     (`SELECT COUNT(*)`), or read each count with `run_di_sql_statement`, and compare the two numbers.

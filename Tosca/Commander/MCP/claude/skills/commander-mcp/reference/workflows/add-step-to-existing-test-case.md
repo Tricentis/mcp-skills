@@ -1,6 +1,6 @@
 # Add a step to an existing test case
 
-`create_test_case` only accepts `testSteps` at creation time. To append a step afterward, use `execute_drop_task` twice — this mirrors the two drags a user would do in the Commander UI (drag the module onto the test case, then drag an attribute onto the new step).
+`create_test_cases` can update an existing test case, but its `test_steps` field fully replaces all steps. To append without rebuilding the complete step list, use `execute_drop_task` twice: module onto test case, then module attribute onto the new step.
 
 ## Plan
 

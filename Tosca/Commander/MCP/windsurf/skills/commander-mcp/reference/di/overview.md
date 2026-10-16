@@ -171,8 +171,8 @@ Data Integrity Testing subset into the workspace. The subset file is located at:
   C:\Tosca_Projects\ToscaCommander\Tosca Data Integrity Modules And Samples.tsu
 
 To import it programmatically:
-1. Select the project root: `set_object_selection(identifier="<project_root_id>")` — use `get_workspace_info` to get the Project Root ID.
-2. Execute the Import Subset task: `execute_task(taskName="Import Subset", parameters={"FilesToImport": "C:\\Tosca_Projects\\ToscaCommander\\Tosca Data Integrity Modules And Samples.tsu"})`
+1. Resolve the project root ID with `get_workspace_info`.
+2. List tasks with `list_available_tasks(objectIds=["<project_root_id>"])`, then execute `execute_task(taskName="Import Subset", objectIds=["<project_root_id>"], parameters={"FilesToImport": "C:\\Tosca_Projects\\ToscaCommander\\Tosca Data Integrity Modules And Samples.tsu"})`.
 3. If prompted with ConfirmUseLargeSubsetImport, accept with "OK".
 
 After import, the DI modules will be available under "/Data Integrity Testing_import.../Modules/".

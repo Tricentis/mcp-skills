@@ -23,15 +23,15 @@ get_object_info(identifiers=[path or id])
 
 Prefer node paths when the user names folders; prefer surrogate IDs after first resolution (stable for the session).
 
-### Selection vs explicit IDs
+### Explicit IDs vs interactive selection
 
-| Tool | Selection default | Explicit override |
-|------|-------------------|-------------------|
-| `get_attributes` | Current UI selection | `identifiers` array |
-| `list_available_tasks` | Current selection | `objectIds` |
-| `execute_task` | Current selection | `objectIds` |
+| Tool | Agent input | Interactive-only fallback |
+|------|-------------|---------------------------|
+| `get_attributes` | `identifiers` array | Empty array uses current UI selection |
+| `list_available_tasks` | `objectIds` | Omitted value uses current selection |
+| `execute_task` | `objectIds` | Omitted value uses current selection |
 
-When the plan targets specific objects, **always pass `objectIds` / `identifiers`** — do not rely on UI selection surviving between calls.
+Agents always pass `objectIds` / `identifiers`. Use a selection fallback only when the user explicitly refers to objects already selected in Commander.
 
 ### Pagination
 
@@ -75,16 +75,17 @@ Use when the UI equivalent is drag-and-drop with a drop task.
 
 ```
 get_workspace_info
-get_current_selection
 get_object_info(identifiers=[parent], include_parent_and_children=true, limit=200, offset=0)  # paginate
+list_assets(assetType, root=parent, limit=200, offset=0)  # when type known but path unknown
 get_attributes(identifiers=[...])
 ```
+
+Add `get_current_selection` only when the user says "selected" or "what I have open."
 
 ### Create test case
 
 ```
-create_test_case(folderPath, name, steps?, requirements?)
-save_workspace
+create_test_cases(test_cases=[{path, name, test_steps?, linked_requirements?}])
 get_object_info(node path)  # verify
 ```
 
@@ -95,11 +96,23 @@ See [reference/workflows/create-test-case.md](reference/workflows/create-test-ca
 ```
 get_workspace_info                    # confirm multi-user
 update_all                            # optional: sync latest
-execute_task(Checkout) on parent
+list_available_tasks(objectIds=[checkoutUnit])
+execute_task("Checkout", objectIds=[checkoutUnit])
 set_attribute / execute_task(edit)
 save_workspace
 check_in_all
 ```
+
+### Test Configuration Parameters
+
+```
+list_test_configuration_parameters(identifiers=[target], includeInherited=true)
+create_test_configuration_parameters(
+  targets=[{id: target, parameters: [...complete desired local set...]}]
+)
+```
+
+The write full-replaces local parameters. Preserve wanted local entries from the list response; never use the Create Test Configuration Parameter task.
 
 See [reference/workflows/save-and-checkin.md](reference/workflows/save-and-checkin.md).
 
