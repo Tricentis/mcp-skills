@@ -27,6 +27,8 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             mapfile -t manifests < <(find Tosca -mindepth 2 -maxdepth 2 -name manifest.json | sort)
