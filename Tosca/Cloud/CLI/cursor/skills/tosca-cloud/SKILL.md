@@ -3,7 +3,9 @@ name: tosca-cloud
 description: >-
   Automates Tosca Cloud via toscactl (default) and tn for CLI gaps. Use for Tosca Cloud CLI,
   toscactl commands, or tn --loop for Builder/DI/mobile gaps. Does NOT cover on-prem Commander
-  (use Commander CLI pack in this repository — ../../../../../Commander/CLI/README.md).
+  (use Tosca.Commander.IDE.integration).
+metadata:
+  version: "1.2.0"
 ---
 
 # Tosca Cloud — hybrid CLI automation
@@ -76,5 +78,5 @@ See [journeys-index.md](journeys-index.md). Consumer packs include `AGENTS.md.fr
 
 | Capability | Use instead |
 |------------|-------------|
-| On-prem Commander | [Commander CLI](../../../../../Commander/CLI/README.md) |
-| Direct IDE MCP (no CLI) | [Tosca Cloud MCP](../../../../MCP/README.md) |
+| On-prem Commander | **Tosca.Commander.IDE.integration** |
+| Direct IDE MCP (no CLI) | **Tosca.Cloud.MCP.integration** |

@@ -7,7 +7,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: Tricentis
-  version: "1.0.0"
+  version: "1.2.0"
 ---
 
 # Explain Tosca Cloud test case

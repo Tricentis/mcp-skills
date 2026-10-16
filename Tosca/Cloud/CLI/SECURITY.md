@@ -1,12 +1,12 @@
-# Security — Tosca Cloud CLI pack
+# Security — Tosca Cloud CLI pack (maintainer)
 
-IT review checklist for the Tosca Cloud CLI pack (`tosca-cloud-IDE`). Adds agent skills and optional helper scripts — not a background service.
+IT review checklist for **Tosca.Cloud.IDE.integration** (`tosca-cloud-IDE`). Adds agent skills and optional helper scripts — not a background service.
 
 ## Summary
 
 | Property | Value |
 |----------|--------|
-| **Publisher** | Tricentis — [mcp-skills](https://github.com/Tricentis/mcp-skills) (Tosca Cloud CLI pack) |
+| **Publisher** | Tricentis — [Tosca.Cloud.IDE.integration](https://github.com/Tricentis-Tosca/Tosca.Cloud.IDE.integration) |
 | **Install scope** | User profile or project — **no admin** |
 | **Runtime network** | tn CLI contacts Tosca Cloud MCP + configured AI provider |
 | **Secrets** | OAuth tokens and API keys in `~/.tn/` — pack does not ship credentials |
@@ -27,7 +27,7 @@ IT review checklist for the Tosca Cloud CLI pack (`tosca-cloud-IDE`). Adds agent
 | `~/.tn/mcp.json` | Tosca MCP server config for tn |
 | `~/.claude/skills/tosca-*/` | Claude skills |
 
-Installer does **not** modify system directories or IDE-native MCP settings (see [Tosca Cloud MCP](../MCP/SECURITY.md) for direct IDE MCP).
+Installer does **not** modify system directories or IDE MCP config (unlike Tosca.Cloud.MCP.integration).
 
 ## Script behavior
 
@@ -53,7 +53,7 @@ Install scripts are **Authenticode-signed** by Tricentis. Default install does *
 powershell -NoProfile -ExecutionPolicy Bypass -File .\Install-ToscaCloudPack.ps1
 ```
 
-## tn runtime security
+## TN runtime security
 
 - Tool approvals in REPL for write/edit and non-auto-approved MCP
 - Loop mode uses auto-approved MCP only — document in skill
