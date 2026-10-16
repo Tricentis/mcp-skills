@@ -2,7 +2,7 @@
 
 $_libParent = Split-Path $PSScriptRoot -Parent
 if ((Split-Path $_libParent -Leaf) -eq "scripts") {
-    # Legacy layout: PSScriptRoot is scripts/lib — go up two levels to pack root
+    # Repository layout: PSScriptRoot is scripts/lib; go up two levels.
     $script:RepoRoot = Split-Path $_libParent -Parent
 } else {
     # Running from distribution zip: PSScriptRoot is <root>/lib, go up one level
@@ -18,6 +18,8 @@ function Get-CoreSkillPath {
         $path = Join-Path $script:RepoRoot "$ide/skills/$(Get-SkillId)"
         if (Test-Path $path) { return $path }
     }
+    $path = Join-Path $script:RepoRoot "packages/core/skills/$(Get-SkillId)"
+    if (Test-Path $path) { return $path }
     throw "Skill path not found under $($script:RepoRoot)"
 }
 
@@ -26,6 +28,8 @@ function Get-CoreRulesPath {
         $path = Join-Path $script:RepoRoot "$ide/rules"
         if (Test-Path $path) { return $path }
     }
+    $path = Join-Path $script:RepoRoot "packages/core/rules"
+    if (Test-Path $path) { return $path }
     throw "Rules path not found under $($script:RepoRoot)"
 }
 
@@ -48,15 +52,6 @@ function Get-SkillVersion {
     }
     $meta = Get-Content -Path $metaPath -Raw -Encoding UTF8 | ConvertFrom-Json
     return [string]$meta.version
-}
-
-function Remove-ConsumerSkillSections {
-    param([string]$SkillMdPath)
-    if (-not (Test-Path $SkillMdPath)) { return }
-    $content = Get-Content -Path $SkillMdPath -Raw -Encoding UTF8
-    $content = $content -replace '(?ms)\r?\n## Activation testing\r?\n\r?\n\[evaluations/activation\.md\][^\r\n]*\r?\n?', ''
-    Set-Content -Path $SkillMdPath -Value $content.TrimEnd() -Encoding UTF8 -NoNewline
-    Add-Content -Path $SkillMdPath -Value "`n" -Encoding UTF8
 }
 
 function Get-SkillId {
@@ -181,13 +176,21 @@ function Resolve-IdePackPath {
     if (Test-Path $short) {
         return $short
     }
-    throw "IDE pack not found: $FolderName/ under $($script:RepoRoot)"
+    $long = Join-Path $script:RepoRoot "packages/$FolderName-pack"
+    if (Test-Path $long) {
+        return $long
+    }
+    throw "IDE pack not found for '$FolderName' under $($script:RepoRoot)"
 }
 
 function Get-CommanderVersionsManifest {
-    $path = Join-Path $script:RepoRoot "commander-versions.json"
-    if (Test-Path $path) {
-        return Get-Content $path -Raw | ConvertFrom-Json
+    foreach ($path in @(
+        (Join-Path $script:RepoRoot "commander-versions.json"),
+        (Join-Path $script:RepoRoot "packages/core/reference/commander-versions.json")
+    )) {
+        if (Test-Path $path) {
+            return Get-Content $path -Raw | ConvertFrom-Json
+        }
     }
     throw "Commander versions manifest not found under $($script:RepoRoot)"
 }
@@ -204,10 +207,11 @@ function Resolve-CommanderVersionKey {
     }
 
     if (-not $CommanderHome) {
-        if ($env:USERPROFILE) {
+        $userHome = Get-UserProfileRoot
+        if ($userHome) {
             foreach ($file in @(
-                (Join-Path $env:USERPROFILE '.tricentis/tcshell-ide.env'),
-                (Join-Path $env:USERPROFILE '.tricentis\tcshell-ide.env')
+                (Join-Path $userHome '.tricentis/tcshell-ide.env'),
+                (Join-Path $userHome '.tricentis\tcshell-ide.env')
             )) {
                 if (-not (Test-Path $file)) { continue }
                 foreach ($line in Get-Content $file) {
@@ -245,7 +249,7 @@ function Resolve-CommanderVersionKey {
 
 function Get-UserProfileRoot {
     if ($env:USERPROFILE) { return $env:USERPROFILE }
-    if ($env:HOME) { return $env:HOME }
+    if ($HOME) { return $HOME }
     return $null
 }
 
@@ -287,8 +291,8 @@ function Get-IdePackMap {
 # SIG # Begin signature block
 # MIIqGQYJKoZIhvcNAQcCoIIqCjCCKgYCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCC1b3hC/aMDWWxK
-# PZ6v76OApROgELA7XRLvRZpGGL4F56CCDt8wggboMIIE0KADAgECAhB3vQ4Ft1kL
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCDGmpS4vhr4WYim
+# tDfQWwEiOPN+oWhH9CLMDdTMwfEPIKCCDt8wggboMIIE0KADAgECAhB3vQ4Ft1kL
 # th1HYVMeP3XtMA0GCSqGSIb3DQEBCwUAMFMxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
 # ExBHbG9iYWxTaWduIG52LXNhMSkwJwYDVQQDEyBHbG9iYWxTaWduIENvZGUgU2ln
 # bmluZyBSb290IFI0NTAeFw0yMDA3MjgwMDAwMDBaFw0zMDA3MjgwMDAwMDBaMFwx
@@ -372,41 +376,41 @@ function Get-IdePackMap {
 # MTIwMAYDVQQDEylHbG9iYWxTaWduIEdDQyBSNDUgRVYgQ29kZVNpZ25pbmcgQ0Eg
 # MjAyMAIMDYkOSCK3QR2bFmhSMA0GCWCGSAFlAwQCAQUAoHwwEAYKKwYBBAGCNwIB
 # DDECMAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEO
-# MAwGCisGAQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIPHGmstfpR8tB6gusUp6hGYp
-# aIEBtc9OoG6ixGC30p6QMA0GCSqGSIb3DQEBAQUABIICAHdgmg6dZt4/BST1+iVD
-# 7AoDTzvvnMItkvMhGGTW9AQlZWgOHb+/fvFiQmiONNSt2elRhsg2vClksvWEvxl6
-# cBRRKHkumkVJV90p0ygPeU323zsyJM6dyWulWaqBxdHFceQ4QBgh4gjkm5GaSQw5
-# r4q/ELtwIzWJMYTGabq11tHtNaRdsO6lOVNGuXBy1c8y592K/+yY8EkcaJgyfDsE
-# qzY+7Q1QhKxoaHGZzBcSAySBWhDck0ivKzWf5rjBCFpv1oRxiwQGIFOjKRG7e5rp
-# X+4DEzaBEFpf71VBzgEKPJGW6lBAn/0BbhR7I3s8gwWYvb/z/cUMziwl7c/ByiD7
-# gtGhc9dR569mtsIBDR26PfYpVbMscPKPNfW6g8Z20fgDQpU2bYTDVcifmYZN7XCi
-# ciSXUe2LkS1e4It1DIGLTSQiGAYbeRKtqIuJELttCuxMCOFNnkNuNu18qokDuK1Z
-# qZrK0KmEqzUyJqyf7zd+pR/mHyGNg5aIDILAB/VZOHwTcpHP1iRoNvwTbY2VOBs5
-# c6u+YrLEf0N26zcz3txisTEZ2COVhszYjFVcGlp7RM/5JYsW3qp8JR/eUNnF6cGS
-# gFC4turPu1zZfCj6rIP/VhTzeu4Pw57xnIWyihG56hvBYBydWV6wMhPELlTkxDdP
-# zIjTiAXEqfK0JJx2n2fRxjLwoYIXdzCCF3MGCisGAQQBgjcDAwExghdjMIIXXwYJ
+# MAwGCisGAQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIF+WDN6TEA+jlToZ956hkU48
+# koCD8mUuWHcMSTDLh6uDMA0GCSqGSIb3DQEBAQUABIICACopTLqZnYYx4BzDMlp8
+# zRtfGQmIPgLr3jTnpODllgH3J8m20rxgA+YRnx04b4Vusrre3+etUL+rEo8IE2oL
+# t8YwDVDbXMif/Kdzzk5qZ9+ntmOUxePXOCkMRH/A/P9HS7Ujd6qpMPrujXbjw/F7
+# CHFPg1lZl8S/zu44Kxp29oTSzWMseWno8f1Xu2TPpUlzhnAXB5HMaVrkshmHeG/l
+# Lb88vlI5SXgJxaNDoxLJsepfXHHemiQTJ1EMmOv4kgelDg6CtBJNKskXww8r+ZSQ
+# +Ol07+CVKySvnCKe3swkC0z9aO6TBPYvilF6VBlB4XX7jY/AqWKacIkBm/f5DzaC
+# kRixrE2XJMLhqZ9KpNQc63eIApmdxIyHhLLNruepRdlCATqaf8em4mJMYUM0KbOK
+# zEoFPAqeUraeqhOfiUw31+VjwN7M02pan22jBBR9N7Rm6EG1sembum4nRAfBKOz/
+# 93HiZZtuVof/L6uVhE+hWiJOMf/3KW2TfSfx3vxtV/ed600RA0zRRQKPfHrcYG85
+# gJqDTs18slEklRK/yc0RoFdQFtfXe6I+c8MqfrZapGGPLOBf9GDVcK5h5rHvAdX+
+# 2w+L787rHrtYeevCfyTxLatcs17ej9bIVD1RtrK6IVffly0o2bAvD72rnC/o4yX7
+# dA6foBFML3n6CHloQOmmsrjgoYIXdzCCF3MGCisGAQQBgjcDAwExghdjMIIXXwYJ
 # KoZIhvcNAQcCoIIXUDCCF0wCAQMxDzANBglghkgBZQMEAgEFADB4BgsqhkiG9w0B
-# CRABBKBpBGcwZQIBAQYJYIZIAYb9bAcBMDEwDQYJYIZIAWUDBAIBBQAEIGuDfpWh
-# YPS3DF3UXD1usvjvyfCeYJ2lMRZO7hbyDRufAhEA7A+mpvOw2CWy84fDfRFS2xgP
-# MjAyNjA3MzAyMTAyMTZaoIITOjCCBu0wggTVoAMCAQICEAqA7xhLjfEFgtHEdqeV
-# dGgwDQYJKoZIhvcNAQELBQAwaTELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRpZ2lD
+# CRABBKBpBGcwZQIBAQYJYIZIAYb9bAcBMDEwDQYJYIZIAWUDBAIBBQAEIBll/D57
+# VBPff2ZQIpqG8w3lFuFyi5oDLQPRA7CNOVkPAhEAuZ1f9OtNCFSuTWcF4AuKHBgP
+# MjAyNjEwMTUyMjE4MDBaoIITOjCCBu0wggTVoAMCAQICEAhP3DNPfkVO28MPj/mS
+# GDUwDQYJKoZIhvcNAQELBQAwaTELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRpZ2lD
 # ZXJ0LCBJbmMuMUEwPwYDVQQDEzhEaWdpQ2VydCBUcnVzdGVkIEc0IFRpbWVTdGFt
-# cGluZyBSU0E0MDk2IFNIQTI1NiAyMDI1IENBMTAeFw0yNTA2MDQwMDAwMDBaFw0z
-# NjA5MDMyMzU5NTlaMGMxCzAJBgNVBAYTAlVTMRcwFQYDVQQKEw5EaWdpQ2VydCwg
+# cGluZyBSU0E0MDk2IFNIQTI1NiAyMDI1IENBMTAeFw0yNjA4MDUwMDAwMDBaFw0z
+# NzExMDQyMzU5NTlaMGMxCzAJBgNVBAYTAlVTMRcwFQYDVQQKEw5EaWdpQ2VydCwg
 # SW5jLjE7MDkGA1UEAxMyRGlnaUNlcnQgU0hBMjU2IFJTQTQwOTYgVGltZXN0YW1w
-# IFJlc3BvbmRlciAyMDI1IDEwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoIC
-# AQDQRqwtEsae0OquYFazK1e6b1H/hnAKAd/KN8wZQjBjMqiZ3xTWcfsLwOvRxUwX
-# cGx8AUjni6bz52fGTfr6PHRNv6T7zsf1Y/E3IU8kgNkeECqVQ+3bzWYesFtkepEr
-# vUSbf+EIYLkrLKd6qJnuzK8Vcn0DvbDMemQFoxQ2Dsw4vEjoT1FpS54dNApZfKY6
-# 1HAldytxNM89PZXUP/5wWWURK+IfxiOg8W9lKMqzdIo7VA1R0V3Zp3DjjANwqAf4
-# lEkTlCDQ0/fKJLKLkzGBTpx6EYevvOi7XOc4zyh1uSqgr6UnbksIcFJqLbkIXIPb
-# cNmA98Oskkkrvt6lPAw/p4oDSRZreiwB7x9ykrjS6GS3NR39iTTFS+ENTqW8m6TH
-# uOmHHjQNC3zbJ6nJ6SXiLSvw4Smz8U07hqF+8CTXaETkVWz0dVVZw7knh1WZXOLH
-# gDvundrAtuvz0D3T+dYaNcwafsVCGZKUhQPL1naFKBy1p6llN3QgshRta6Eq4B40
-# h5avMcpi54wm0i2ePZD5pPIssoszQyF4//3DoK2O65Uck5Wggn8O2klETsJ7u8xE
-# ehGifgJYi+6I03UuT1j7FnrqVrOzaQoVJOeeStPeldYRNMmSF3voIgMFtNGh86w3
-# ISHNm0IaadCKCkUe2LnwJKa8TIlwCUNVwppwn4D3/Pt5pwIDAQABo4IBlTCCAZEw
-# DAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU5Dv88jHt/f3X85FxYxlQQ89hjOgwHwYD
+# IFJlc3BvbmRlciAyMDI2IDEwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoIC
+# AQC2e6byyf7NSvjUm0xls/04xjD4fAkOkbnGQi7+Wpx81iYxfzViaxSIctuH3KSl
+# 5YEYpMuFgGsA31N2D9ATMbfZdw5uaAhuWevQKhDdZIB4NnqcfpfpWQXJiQnDdAEl
+# ETC+bhSEvNLGbA8DtwUpFMQ4yyYQSPqomT92osQAv6hBi47ATZS6JfVWe6XxhF4j
+# JZ3iSAuf2Cros1czRSmWRHqMv9AfGZvp8ygYElhudpQjtcPpwoOl6QrZJUyV3iIN
+# vN4cO05prGV0fkjG426xDr2d3z9lcSIHkdvGPdGUrXdxfVbgOUVcp2/8ISEzwKPW
+# ++Wa+E2ujI91EZtukGWDJ/xZ27k3oHKEXBRGfRTqjOU+jE3ba/5++JSE/7oNHnjs
+# 5mekExYN96LV/mxUbCKJb8pBNY4r3uD7hEmk/M81XhVgwDA7aMzYC3LZBg9WY5BM
+# mbSay5ecmtJuXaB/0nKWmQmVZeqTVDgsmzHP5MQuhAJkiWNuC9MmCg9TZHXbJ2/y
+# LVSov9p16UDTLtT0+aa1vN71fHeu1qMLlLNB3WOB/ADCxr3S/1hxI92Z6jKgEED/
+# btwIvbfuXkNNhg8MtDg43c4tMZae9FvqMOt/9PvmAxF9TNIsIFB8G6yb36ZJZGUL
+# 8N/pL971DyLXcK6HM5PYnH5X+eVtczhCgHCVQCF6XDAlPQIDAQABo4IBlTCCAZEw
+# DAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUFMljijAu1Er7bpTz5uNAfvXszeIwHwYD
 # VR0jBBgwFoAU729TSunkBnx6yuKQVvYv1Ensy04wDgYDVR0PAQH/BAQDAgeAMBYG
 # A1UdJQEB/wQMMAoGCCsGAQUFBwMIMIGVBggrBgEFBQcBAQSBiDCBhTAkBggrBgEF
 # BQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29tMF0GCCsGAQUFBzAChlFodHRw
@@ -414,18 +418,18 @@ function Get-IdePackMap {
 # bXBpbmdSU0E0MDk2U0hBMjU2MjAyNUNBMS5jcnQwXwYDVR0fBFgwVjBUoFKgUIZO
 # aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0VHJ1c3RlZEc0VGltZVN0
 # YW1waW5nUlNBNDA5NlNIQTI1NjIwMjVDQTEuY3JsMCAGA1UdIAQZMBcwCAYGZ4EM
-# AQQCMAsGCWCGSAGG/WwHATANBgkqhkiG9w0BAQsFAAOCAgEAZSqt8RwnBLmuYEHs
-# 0QhEnmNAciH45PYiT9s1i6UKtW+FERp8FgXRGQ/YAavXzWjZhY+hIfP2JkQ38U+w
-# tJPBVBajYfrbIYG+Dui4I4PCvHpQuPqFgqp1PzC/ZRX4pvP/ciZmUnthfAEP1HSh
-# TrY+2DE5qjzvZs7JIIgt0GCFD9ktx0LxxtRQ7vllKluHWiKk6FxRPyUPxAAYH2Vy
-# 1lNM4kzekd8oEARzFAWgeW3az2xejEWLNN4eKGxDJ8WDl/FQUSntbjZ80FU3i54t
-# px5F/0Kr15zW/mJAxZMVBrTE2oi0fcI8VMbtoRAmaaslNXdCG1+lqvP4FbrQ6IwS
-# BXkZagHLhFU9HCrG/syTRLLhAezu/3Lr00GrJzPQFnCEH1Y58678IgmfORBPC1JK
-# kYaEt2OdDh4GmO0/5cHelAK2/gTlQJINqDr6JfwyYHXSd+V08X1JUPvB4ILfJdmL
-# +66Gp3CSBXG6IwXMZUXBhtCyIaehr0XkBoDIGMUG1dUtwq1qmcwbdUfcSYCn+Own
-# cVUXf53VJUNOaMWMts0VlRYxe5nK+At+DI96HAlXHAL5SlfYxJ7La54i71McVWRP
-# 66bW+yERNpbJCjyCYG2j+bdpxo/1Cy4uPcU3AWVPGrbn5PhDBf3Froguzzhk++am
-# i+r3Qrx5bIbY3TVzgiFI7Gq3zWcwgga0MIIEnKADAgECAhANx6xXBf8hmS5AQyIM
+# AQQCMAsGCWCGSAGG/WwHATANBgkqhkiG9w0BAQsFAAOCAgEAjcU6YR6dUgrfmawJ
+# gH59KECxa9Ji8sEi2g10CBDaMiqsaxWyW5cwlT/6ZF5sFznazqVsoC85U9dqLOYq
+# Qwst+UQQoNlDHgKRLa3xoc+OReFreFhnTXSG0Vrd2E2CZqUfm+5a+He1MJ/h+tNL
+# uA+0Zzhn/Fo+FDYAHWZHx4R79ZsfRFYe9UiXpXBDf6DkUo183Y38NYmR/XfDYf7Y
+# Z+oR9t3flbDwK+hgGMs0gNNp1w9Z2CyOyI5or/sSwomAuNQ0hWC9xoU4stD8aWsD
+# 7RkcmgVRs6vlIk3zPKQ+ylcheWkMlj+CoVRlFE55pv0ZWCaFt04lwP/rdGHE9qEV
+# QZtyRE42ox7oNgC/r+Y4bSlZ3dw9K2x1xLtu6PkPKeLBFjzKigwfqm3Hm+k/+lnM
+# E8F5kPZTgiy2HLEHklpryqs6QHnPXrRNeIzkAMyylnRN8P0wmirS0WkU+ywpEWFZ
+# 4QNg+9xS43tTuW9x0eXh7NDc1P/sV+zWxHXKH8tFt1ncHdVzqrZaYPyYMLSn2TOX
+# ajveJW1L3joiQSPsWRGxkbDDW15jERFE4LvjnGu2O9zD1nLJSMdlYZEikl4w2w+q
+# 4IN/R+TIe0H4ngCI1moJCTbevGH4punIxM1Uoi0nmX3ZK+XbRT01uowE5ViXWHng
+# 0RgsmrX/EdYUo80r3TfMlkD0/YMwgga0MIIEnKADAgECAhANx6xXBf8hmS5AQyIM
 # OkmGMA0GCSqGSIb3DQEBCwUAMGIxCzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxEaWdp
 # Q2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xITAfBgNVBAMTGERp
 # Z2lDZXJ0IFRydXN0ZWQgUm9vdCBHNDAeFw0yNTA1MDcwMDAwMDBaFw0zODAxMTQy
@@ -493,21 +497,21 @@ function Get-IdePackMap {
 # byMt9H5xaiNrIv8SuFQtJ37YOtnwtoeW/VvRXKwYw02fc7cBqZ9Xql4o4rmUMYID
 # fDCCA3gCAQEwfTBpMQswCQYDVQQGEwJVUzEXMBUGA1UEChMORGlnaUNlcnQsIElu
 # Yy4xQTA/BgNVBAMTOERpZ2lDZXJ0IFRydXN0ZWQgRzQgVGltZVN0YW1waW5nIFJT
-# QTQwOTYgU0hBMjU2IDIwMjUgQ0ExAhAKgO8YS43xBYLRxHanlXRoMA0GCWCGSAFl
+# QTQwOTYgU0hBMjU2IDIwMjUgQ0ExAhAIT9wzT35FTtvDD4/5khg1MA0GCWCGSAFl
 # AwQCAQUAoIHRMBoGCSqGSIb3DQEJAzENBgsqhkiG9w0BCRABBDAcBgkqhkiG9w0B
-# CQUxDxcNMjYwNzMwMjEwMjE2WjArBgsqhkiG9w0BCRACDDEcMBowGDAWBBTdYjCs
-# hgotMGvaOLFoeVIwB/tBfjAvBgkqhkiG9w0BCQQxIgQgp09uTplTmNFu5PksYIti
-# +B7EWmXcA/i/9PJkV2hiniIwNwYLKoZIhvcNAQkQAi8xKDAmMCQwIgQgSqA/oizX
-# XITFXJOPgo5na5yuyrM/420mmqM08UYRCjMwDQYJKoZIhvcNAQEBBQAEggIAlm6s
-# S+4RXnt4tCqbZnfaFmV7HbCFuxG+jvV4BJ11KzvxXxuS1YdBvH/jEqt023ODZtD4
-# n8PvfZ9ljEaH9uSsaZZDbBqdBDxkAciLLSl2a/jKgxmMrHawuUzvfXEszM3bdGnV
-# jPOQPCMOZFZ+jqE2al29Re7bS6dQuChXbKQbt4Qy7j9k9uzIEBvhc0fTGErSkiwE
-# GGMXWXTOrHyaJe6otRi9avPQW/NQQMA9jNNfALzlhH3R0TxhmmYsgPlteKpx+BMH
-# i7jgugCEy7yYBZpr4xsv2GwLghWl2o1LVItEM8Uqu80rv6faxx1+RPDvQ0HN5Bkf
-# dJbdH64hU3mvtL/CStVAf5MeZ8AnjWYJWmLawBmTszFOhOqbC74MpFCe8UEV2WDK
-# wzU4Xw/p8wYEJnmM8dnfgH1u7dI3Fks5iMEqF2XvDas9xCznc3ixpNAKhAUfaRny
-# eEfj9ojRl8hTGz1DyliRMMfL9FuodfzzCVxcPTwj5lYFS4hzO/I/yVWuWaRfm3cv
-# sRvqafYkNinvR37F3Ee2XJ9j1j771yf8jS8pm7TAqUYCSR19I+iPMPmp0JcjMJ4N
-# LVhjcClEFgqVCkPrCkB6UUieoABYffbZr0m1BtnF/JRB6wfLvbNRD0qNJMmsxBmI
-# fn8UPaDJNNRVponG6NBnAGQ27QEjvM+sjhtQlSg=
+# CQUxDxcNMjYxMDE1MjIxODAwWjArBgsqhkiG9w0BCRACDDEcMBowGDAWBBRR2ava
+# A0lz2E9CZqykgkjms2nEOTAvBgkqhkiG9w0BCQQxIgQgAfmXVhaClHI+022A4Zqj
+# Hobd5WaAzRxt4lwIJpRC/ZowNwYLKoZIhvcNAQkQAi8xKDAmMCQwIgQgLaCdp/QT
+# H5/nLbbF5unJZWdVrwQ/HqdCzA0hIOFB6/wwDQYJKoZIhvcNAQEBBQAEggIAWq8m
+# HQe7igI7kfPWRMDuW38nFk3fqWqDhcIgGdVxMHtckho67qnk5FNikqU3ro9tbaFv
+# SeY9qYl7tBdd8+AthbRhDfQkXj/q1oQP7B26XrikDR4pbaUFYvBK0G1yDnf93/Yt
+# t+/GWF8BlkugH1BKTydDHsFzpMVPWz7QtsaU2K8D1WAv2GeY7GjO1xd9rmrmgz6T
+# Ox5+grzosKaAsIOlv5DV6U4CGSGBpamwD0m/v25GlEO7/AwGiQtJJUrZ61rm94es
+# Sq4oXgcAT34oB9JoNrU3AU0eOmNSKuh0SE2dzj00qwhRkstGTBdRwsm28HFCQmnB
+# LGdm+QKqfFEB7AD+uRZ8FopHUF62NMWHX+AS2Kqlpm5Br6gB+x626rXeGfAZd4Mq
+# Y3u9dx8w0kLZiaJHRKkk0pUKXdNhWyj5C8E1Kk0/QPFvtDnn13t7YQOKkOWMKK3J
+# gPEYRUH7WjL+cpXWtE9FKt5NIpuDHisMPCw+9D9rwSNjYGYyG/2IVOqokZBcXmcK
+# MQVNyVeASZgDhPsvJcGrnIbFjv2ROg4VVkMWCSjsFaKcUPkuS9wpfzmqDE0ZJ0oP
+# 6Mp/n1W9VMelpm+kBfH//WrSIm89k6ZPrwvBCILhyj22pbNBLQrFUw1mdFmlYKEL
+# Z9DaU5vlDz5x6rphmCuVFOgL6fyjJKEqvRlL1hU=
 # SIG # End signature block

@@ -1,6 +1,6 @@
 {
   "name": "cli-api-commander",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "organization": "Tricentis",
   "technology": "Tosca Commander CLI (TCShell) / TCAPI / Remote Control",
   "abstract": "Agent skill for Commander CLI and API automation \u2014 TCShell headless scripts, TCAPI (.NET), Remote Control, path detection, and version-matched reference bundles for Commander 24.1 through 26.1.",
